@@ -1,9 +1,14 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   Outlet,
   Link,
   createRootRouteWithContext,
   useRouter,
+  useNavigate,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -11,6 +16,8 @@ import { useEffect, useState, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { useAuth } from "../hooks/useAuth";
+import { supabase } from "../integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -137,6 +144,23 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [signingOut, setSigningOut] = useState(false);
+
+  async function handleSignOut() {
+    setSigningOut(true);
+    try {
+      await queryClient.cancelQueries();
+      queryClient.clear();
+      await supabase.auth.signOut();
+      setIsOpen(false);
+      navigate({ to: "/login", replace: true });
+    } finally {
+      setSigningOut(false);
+    }
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-surface/80 backdrop-blur-md">
@@ -151,10 +175,25 @@ function Header() {
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
-          <NavLink to="/login">登入</NavLink>
-          <NavLink to="/register">註冊</NavLink>
-          <NavLink to="/onboarding">新手上路</NavLink>
-          <NavLink to="/dashboard">儀表板</NavLink>
+          {isAuthenticated ? (
+            <>
+              <NavLink to="/onboarding">新手上路</NavLink>
+              <NavLink to="/dashboard">儀表板</NavLink>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                disabled={signingOut}
+                className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-60"
+              >
+                {signingOut ? "登出中…" : "登出"}
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink to="/login">登入</NavLink>
+              <NavLink to="/register">註冊</NavLink>
+            </>
+          )}
         </nav>
 
         <button
@@ -195,18 +234,33 @@ function Header() {
       {isOpen && (
         <div className="border-t border-border/50 bg-surface md:hidden">
           <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-3 sm:px-6 lg:px-8">
-            <MobileNavLink to="/login" onClick={() => setIsOpen(false)}>
-              登入
-            </MobileNavLink>
-            <MobileNavLink to="/register" onClick={() => setIsOpen(false)}>
-              註冊
-            </MobileNavLink>
-            <MobileNavLink to="/onboarding" onClick={() => setIsOpen(false)}>
-              新手上路
-            </MobileNavLink>
-            <MobileNavLink to="/dashboard" onClick={() => setIsOpen(false)}>
-              儀表板
-            </MobileNavLink>
+            {isAuthenticated ? (
+              <>
+                <MobileNavLink to="/onboarding" onClick={() => setIsOpen(false)}>
+                  新手上路
+                </MobileNavLink>
+                <MobileNavLink to="/dashboard" onClick={() => setIsOpen(false)}>
+                  儀表板
+                </MobileNavLink>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  disabled={signingOut}
+                  className="rounded-md px-3 py-2.5 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-60"
+                >
+                  {signingOut ? "登出中…" : "登出"}
+                </button>
+              </>
+            ) : (
+              <>
+                <MobileNavLink to="/login" onClick={() => setIsOpen(false)}>
+                  登入
+                </MobileNavLink>
+                <MobileNavLink to="/register" onClick={() => setIsOpen(false)}>
+                  註冊
+                </MobileNavLink>
+              </>
+            )}
           </nav>
         </div>
       )}
