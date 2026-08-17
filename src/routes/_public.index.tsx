@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_public/")({
   head: () => ({
     meta: [
       { title: "NexNav — 健康導航平台" },
@@ -29,7 +29,7 @@ function Index() {
         <div className="inline-flex items-center rounded-full border border-border bg-surface-elevated px-3 py-1 text-sm text-muted-foreground">
           健康導航平台
         </div>
-        <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+        <h1 className="text-4xl font-bold leading-snug tracking-tight text-foreground sm:text-5xl lg:text-6xl">
           整理健康困擾，
           <br className="hidden sm:block" />
           準備好就醫資訊

@@ -60,7 +60,11 @@ export function useSignOut() {
   return { signOut, signingOut };
 }
 
-export function GlobalNav({ displayName }: { displayName?: string | null }) {
+export function GlobalNav({
+  displayName,
+}: {
+  displayName?: string | null | undefined;
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { signOut, signingOut } = useSignOut();
 

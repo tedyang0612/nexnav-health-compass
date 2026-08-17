@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute("/_public/login")({
   head: () => ({
     meta: [
       { title: "登入 — NexNav" },
