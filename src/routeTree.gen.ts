@@ -20,11 +20,6 @@ import { Route as PublicRegisterRouteImport } from './routes/_public.register'
 import { Route as AppEventsEventIdRouteImport } from './routes/_app.events.$eventId'
 import { Route as AppEventsNewRouteImport } from './routes/_app.events.new'
 import { Route as AppEventsEventIdIndexRouteImport } from './routes/_app.events.$eventId.index'
-import { Route as AppEventsEventIdCareRouteImport } from './routes/_app.events.$eventId.care'
-import { Route as AppEventsEventIdChangesRouteImport } from './routes/_app.events.$eventId.changes'
-import { Route as AppEventsEventIdDirectionsRouteImport } from './routes/_app.events.$eventId.directions'
-import { Route as AppEventsEventIdSummaryRouteImport } from './routes/_app.events.$eventId.summary'
-import { Route as AppEventsEventIdTodayRouteImport } from './routes/_app.events.$eventId.today'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -79,32 +74,6 @@ const AppEventsEventIdIndexRoute = AppEventsEventIdIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppEventsEventIdRoute,
 } as any)
-const AppEventsEventIdCareRoute = AppEventsEventIdCareRouteImport.update({
-  id: '/care',
-  path: '/care',
-  getParentRoute: () => AppEventsEventIdRoute,
-} as any)
-const AppEventsEventIdChangesRoute = AppEventsEventIdChangesRouteImport.update({
-  id: '/changes',
-  path: '/changes',
-  getParentRoute: () => AppEventsEventIdRoute,
-} as any)
-const AppEventsEventIdDirectionsRoute =
-  AppEventsEventIdDirectionsRouteImport.update({
-    id: '/directions',
-    path: '/directions',
-    getParentRoute: () => AppEventsEventIdRoute,
-  } as any)
-const AppEventsEventIdSummaryRoute = AppEventsEventIdSummaryRouteImport.update({
-  id: '/summary',
-  path: '/summary',
-  getParentRoute: () => AppEventsEventIdRoute,
-} as any)
-const AppEventsEventIdTodayRoute = AppEventsEventIdTodayRouteImport.update({
-  id: '/today',
-  path: '/today',
-  getParentRoute: () => AppEventsEventIdRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
@@ -115,11 +84,6 @@ export interface FileRoutesByFullPath {
   '/register': typeof PublicRegisterRoute
   '/events/$eventId': typeof AppEventsEventIdRouteWithChildren
   '/events/new': typeof AppEventsNewRoute
-  '/events/$eventId/care': typeof AppEventsEventIdCareRoute
-  '/events/$eventId/changes': typeof AppEventsEventIdChangesRoute
-  '/events/$eventId/directions': typeof AppEventsEventIdDirectionsRoute
-  '/events/$eventId/summary': typeof AppEventsEventIdSummaryRoute
-  '/events/$eventId/today': typeof AppEventsEventIdTodayRoute
   '/events/$eventId/': typeof AppEventsEventIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -130,11 +94,6 @@ export interface FileRoutesByTo {
   '/login': typeof PublicLoginRoute
   '/register': typeof PublicRegisterRoute
   '/events/new': typeof AppEventsNewRoute
-  '/events/$eventId/care': typeof AppEventsEventIdCareRoute
-  '/events/$eventId/changes': typeof AppEventsEventIdChangesRoute
-  '/events/$eventId/directions': typeof AppEventsEventIdDirectionsRoute
-  '/events/$eventId/summary': typeof AppEventsEventIdSummaryRoute
-  '/events/$eventId/today': typeof AppEventsEventIdTodayRoute
   '/events/$eventId': typeof AppEventsEventIdIndexRoute
 }
 export interface FileRoutesById {
@@ -149,11 +108,6 @@ export interface FileRoutesById {
   '/_public/': typeof PublicIndexRoute
   '/_app/events/$eventId': typeof AppEventsEventIdRouteWithChildren
   '/_app/events/new': typeof AppEventsNewRoute
-  '/_app/events/$eventId/care': typeof AppEventsEventIdCareRoute
-  '/_app/events/$eventId/changes': typeof AppEventsEventIdChangesRoute
-  '/_app/events/$eventId/directions': typeof AppEventsEventIdDirectionsRoute
-  '/_app/events/$eventId/summary': typeof AppEventsEventIdSummaryRoute
-  '/_app/events/$eventId/today': typeof AppEventsEventIdTodayRoute
   '/_app/events/$eventId/': typeof AppEventsEventIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -167,11 +121,6 @@ export interface FileRouteTypes {
     | '/register'
     | '/events/$eventId'
     | '/events/new'
-    | '/events/$eventId/care'
-    | '/events/$eventId/changes'
-    | '/events/$eventId/directions'
-    | '/events/$eventId/summary'
-    | '/events/$eventId/today'
     | '/events/$eventId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -182,11 +131,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/events/new'
-    | '/events/$eventId/care'
-    | '/events/$eventId/changes'
-    | '/events/$eventId/directions'
-    | '/events/$eventId/summary'
-    | '/events/$eventId/today'
     | '/events/$eventId'
   id:
     | '__root__'
@@ -200,11 +144,6 @@ export interface FileRouteTypes {
     | '/_public/'
     | '/_app/events/$eventId'
     | '/_app/events/new'
-    | '/_app/events/$eventId/care'
-    | '/_app/events/$eventId/changes'
-    | '/_app/events/$eventId/directions'
-    | '/_app/events/$eventId/summary'
-    | '/_app/events/$eventId/today'
     | '/_app/events/$eventId/'
   fileRoutesById: FileRoutesById
 }
@@ -292,59 +231,14 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEventsEventIdIndexRouteImport
       parentRoute: typeof AppEventsEventIdRoute
     }
-    '/_app/events/$eventId/care': {
-      id: '/_app/events/$eventId/care'
-      path: '/care'
-      fullPath: '/events/$eventId/care'
-      preLoaderRoute: typeof AppEventsEventIdCareRouteImport
-      parentRoute: typeof AppEventsEventIdRoute
-    }
-    '/_app/events/$eventId/changes': {
-      id: '/_app/events/$eventId/changes'
-      path: '/changes'
-      fullPath: '/events/$eventId/changes'
-      preLoaderRoute: typeof AppEventsEventIdChangesRouteImport
-      parentRoute: typeof AppEventsEventIdRoute
-    }
-    '/_app/events/$eventId/directions': {
-      id: '/_app/events/$eventId/directions'
-      path: '/directions'
-      fullPath: '/events/$eventId/directions'
-      preLoaderRoute: typeof AppEventsEventIdDirectionsRouteImport
-      parentRoute: typeof AppEventsEventIdRoute
-    }
-    '/_app/events/$eventId/summary': {
-      id: '/_app/events/$eventId/summary'
-      path: '/summary'
-      fullPath: '/events/$eventId/summary'
-      preLoaderRoute: typeof AppEventsEventIdSummaryRouteImport
-      parentRoute: typeof AppEventsEventIdRoute
-    }
-    '/_app/events/$eventId/today': {
-      id: '/_app/events/$eventId/today'
-      path: '/today'
-      fullPath: '/events/$eventId/today'
-      preLoaderRoute: typeof AppEventsEventIdTodayRouteImport
-      parentRoute: typeof AppEventsEventIdRoute
-    }
   }
 }
 
 interface AppEventsEventIdRouteChildren {
-  AppEventsEventIdCareRoute: typeof AppEventsEventIdCareRoute
-  AppEventsEventIdChangesRoute: typeof AppEventsEventIdChangesRoute
-  AppEventsEventIdDirectionsRoute: typeof AppEventsEventIdDirectionsRoute
-  AppEventsEventIdSummaryRoute: typeof AppEventsEventIdSummaryRoute
-  AppEventsEventIdTodayRoute: typeof AppEventsEventIdTodayRoute
   AppEventsEventIdIndexRoute: typeof AppEventsEventIdIndexRoute
 }
 
 const AppEventsEventIdRouteChildren: AppEventsEventIdRouteChildren = {
-  AppEventsEventIdCareRoute: AppEventsEventIdCareRoute,
-  AppEventsEventIdChangesRoute: AppEventsEventIdChangesRoute,
-  AppEventsEventIdDirectionsRoute: AppEventsEventIdDirectionsRoute,
-  AppEventsEventIdSummaryRoute: AppEventsEventIdSummaryRoute,
-  AppEventsEventIdTodayRoute: AppEventsEventIdTodayRoute,
   AppEventsEventIdIndexRoute: AppEventsEventIdIndexRoute,
 }
 
