@@ -10,12 +10,13 @@ import {
 /** 固定順序的狀況歷程導覽（不含 workflow gate）。 */
 export const EVENT_JOURNEY = [
   { to: "/events/$eventId", label: "狀況總覽", exact: true },
-  { to: "/events/$eventId/directions", label: "改善方向", exact: false },
-  { to: "/events/$eventId/today", label: "今日追蹤", exact: false },
-  { to: "/events/$eventId/changes", label: "追蹤變化", exact: false },
-  { to: "/events/$eventId/care", label: "就醫與專業支持方向", exact: false },
-  { to: "/events/$eventId/summary", label: "摘要", exact: false },
+  { to: "/events/$eventId/guide", label: "改善方向", exact: false },
+  { to: "/events/$eventId/track/today", label: "今日追蹤", exact: false },
+  { to: "/events/$eventId/reassess", label: "追蹤變化", exact: false },
+  { to: "/events/$eventId/navigate", label: "就醫與專業支持方向", exact: false },
+  { to: "/events/$eventId/summary/new", label: "摘要", exact: false },
 ] as const;
+
 
 export function EventJourneyNav({ eventId }: { eventId: string }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
