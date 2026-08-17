@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/onboarding")({
+export const Route = createFileRoute("/_app/onboarding")({
   head: () => ({
     meta: [
       { title: "新手上路 — NexNav" },
