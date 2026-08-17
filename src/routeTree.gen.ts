@@ -19,7 +19,15 @@ import { Route as PublicLoginRouteImport } from './routes/_public.login'
 import { Route as PublicRegisterRouteImport } from './routes/_public.register'
 import { Route as AppEventsEventIdRouteImport } from './routes/_app.events.$eventId'
 import { Route as AppEventsNewRouteImport } from './routes/_app.events.new'
+import { Route as AppSummariesSummaryIdRouteImport } from './routes/_app.summaries.$summaryId'
 import { Route as AppEventsEventIdIndexRouteImport } from './routes/_app.events.$eventId.index'
+import { Route as AppEventsEventIdEditRouteImport } from './routes/_app.events.$eventId.edit'
+import { Route as AppEventsEventIdGuideRouteImport } from './routes/_app.events.$eventId.guide'
+import { Route as AppEventsEventIdNavigateRouteImport } from './routes/_app.events.$eventId.navigate'
+import { Route as AppEventsEventIdReassessRouteImport } from './routes/_app.events.$eventId.reassess'
+import { Route as AppEventsEventIdSafetyRouteImport } from './routes/_app.events.$eventId.safety'
+import { Route as AppEventsEventIdSummaryNewRouteImport } from './routes/_app.events.$eventId.summary.new'
+import { Route as AppEventsEventIdTrackTodayRouteImport } from './routes/_app.events.$eventId.track.today'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -69,11 +77,55 @@ const AppEventsNewRoute = AppEventsNewRouteImport.update({
   path: '/events/new',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSummariesSummaryIdRoute = AppSummariesSummaryIdRouteImport.update({
+  id: '/summaries/$summaryId',
+  path: '/summaries/$summaryId',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppEventsEventIdIndexRoute = AppEventsEventIdIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppEventsEventIdRoute,
 } as any)
+const AppEventsEventIdEditRoute = AppEventsEventIdEditRouteImport.update({
+  id: '/edit',
+  path: '/edit',
+  getParentRoute: () => AppEventsEventIdRoute,
+} as any)
+const AppEventsEventIdGuideRoute = AppEventsEventIdGuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
+  getParentRoute: () => AppEventsEventIdRoute,
+} as any)
+const AppEventsEventIdNavigateRoute =
+  AppEventsEventIdNavigateRouteImport.update({
+    id: '/navigate',
+    path: '/navigate',
+    getParentRoute: () => AppEventsEventIdRoute,
+  } as any)
+const AppEventsEventIdReassessRoute =
+  AppEventsEventIdReassessRouteImport.update({
+    id: '/reassess',
+    path: '/reassess',
+    getParentRoute: () => AppEventsEventIdRoute,
+  } as any)
+const AppEventsEventIdSafetyRoute = AppEventsEventIdSafetyRouteImport.update({
+  id: '/safety',
+  path: '/safety',
+  getParentRoute: () => AppEventsEventIdRoute,
+} as any)
+const AppEventsEventIdSummaryNewRoute =
+  AppEventsEventIdSummaryNewRouteImport.update({
+    id: '/summary/new',
+    path: '/summary/new',
+    getParentRoute: () => AppEventsEventIdRoute,
+  } as any)
+const AppEventsEventIdTrackTodayRoute =
+  AppEventsEventIdTrackTodayRouteImport.update({
+    id: '/track/today',
+    path: '/track/today',
+    getParentRoute: () => AppEventsEventIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
@@ -84,7 +136,15 @@ export interface FileRoutesByFullPath {
   '/register': typeof PublicRegisterRoute
   '/events/$eventId': typeof AppEventsEventIdRouteWithChildren
   '/events/new': typeof AppEventsNewRoute
+  '/summaries/$summaryId': typeof AppSummariesSummaryIdRoute
+  '/events/$eventId/edit': typeof AppEventsEventIdEditRoute
+  '/events/$eventId/guide': typeof AppEventsEventIdGuideRoute
+  '/events/$eventId/navigate': typeof AppEventsEventIdNavigateRoute
+  '/events/$eventId/reassess': typeof AppEventsEventIdReassessRoute
+  '/events/$eventId/safety': typeof AppEventsEventIdSafetyRoute
   '/events/$eventId/': typeof AppEventsEventIdIndexRoute
+  '/events/$eventId/summary/new': typeof AppEventsEventIdSummaryNewRoute
+  '/events/$eventId/track/today': typeof AppEventsEventIdTrackTodayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
@@ -94,7 +154,15 @@ export interface FileRoutesByTo {
   '/login': typeof PublicLoginRoute
   '/register': typeof PublicRegisterRoute
   '/events/new': typeof AppEventsNewRoute
+  '/summaries/$summaryId': typeof AppSummariesSummaryIdRoute
+  '/events/$eventId/edit': typeof AppEventsEventIdEditRoute
+  '/events/$eventId/guide': typeof AppEventsEventIdGuideRoute
+  '/events/$eventId/navigate': typeof AppEventsEventIdNavigateRoute
+  '/events/$eventId/reassess': typeof AppEventsEventIdReassessRoute
+  '/events/$eventId/safety': typeof AppEventsEventIdSafetyRoute
   '/events/$eventId': typeof AppEventsEventIdIndexRoute
+  '/events/$eventId/summary/new': typeof AppEventsEventIdSummaryNewRoute
+  '/events/$eventId/track/today': typeof AppEventsEventIdTrackTodayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -108,7 +176,15 @@ export interface FileRoutesById {
   '/_public/': typeof PublicIndexRoute
   '/_app/events/$eventId': typeof AppEventsEventIdRouteWithChildren
   '/_app/events/new': typeof AppEventsNewRoute
+  '/_app/summaries/$summaryId': typeof AppSummariesSummaryIdRoute
+  '/_app/events/$eventId/edit': typeof AppEventsEventIdEditRoute
+  '/_app/events/$eventId/guide': typeof AppEventsEventIdGuideRoute
+  '/_app/events/$eventId/navigate': typeof AppEventsEventIdNavigateRoute
+  '/_app/events/$eventId/reassess': typeof AppEventsEventIdReassessRoute
+  '/_app/events/$eventId/safety': typeof AppEventsEventIdSafetyRoute
   '/_app/events/$eventId/': typeof AppEventsEventIdIndexRoute
+  '/_app/events/$eventId/summary/new': typeof AppEventsEventIdSummaryNewRoute
+  '/_app/events/$eventId/track/today': typeof AppEventsEventIdTrackTodayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,7 +197,15 @@ export interface FileRouteTypes {
     | '/register'
     | '/events/$eventId'
     | '/events/new'
+    | '/summaries/$summaryId'
+    | '/events/$eventId/edit'
+    | '/events/$eventId/guide'
+    | '/events/$eventId/navigate'
+    | '/events/$eventId/reassess'
+    | '/events/$eventId/safety'
     | '/events/$eventId/'
+    | '/events/$eventId/summary/new'
+    | '/events/$eventId/track/today'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -131,7 +215,15 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/events/new'
+    | '/summaries/$summaryId'
+    | '/events/$eventId/edit'
+    | '/events/$eventId/guide'
+    | '/events/$eventId/navigate'
+    | '/events/$eventId/reassess'
+    | '/events/$eventId/safety'
     | '/events/$eventId'
+    | '/events/$eventId/summary/new'
+    | '/events/$eventId/track/today'
   id:
     | '__root__'
     | '/_app'
@@ -144,7 +236,15 @@ export interface FileRouteTypes {
     | '/_public/'
     | '/_app/events/$eventId'
     | '/_app/events/new'
+    | '/_app/summaries/$summaryId'
+    | '/_app/events/$eventId/edit'
+    | '/_app/events/$eventId/guide'
+    | '/_app/events/$eventId/navigate'
+    | '/_app/events/$eventId/reassess'
+    | '/_app/events/$eventId/safety'
     | '/_app/events/$eventId/'
+    | '/_app/events/$eventId/summary/new'
+    | '/_app/events/$eventId/track/today'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -224,6 +324,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEventsNewRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/summaries/$summaryId': {
+      id: '/_app/summaries/$summaryId'
+      path: '/summaries/$summaryId'
+      fullPath: '/summaries/$summaryId'
+      preLoaderRoute: typeof AppSummariesSummaryIdRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/events/$eventId/': {
       id: '/_app/events/$eventId/'
       path: '/'
@@ -231,15 +338,78 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEventsEventIdIndexRouteImport
       parentRoute: typeof AppEventsEventIdRoute
     }
+    '/_app/events/$eventId/edit': {
+      id: '/_app/events/$eventId/edit'
+      path: '/edit'
+      fullPath: '/events/$eventId/edit'
+      preLoaderRoute: typeof AppEventsEventIdEditRouteImport
+      parentRoute: typeof AppEventsEventIdRoute
+    }
+    '/_app/events/$eventId/guide': {
+      id: '/_app/events/$eventId/guide'
+      path: '/guide'
+      fullPath: '/events/$eventId/guide'
+      preLoaderRoute: typeof AppEventsEventIdGuideRouteImport
+      parentRoute: typeof AppEventsEventIdRoute
+    }
+    '/_app/events/$eventId/navigate': {
+      id: '/_app/events/$eventId/navigate'
+      path: '/navigate'
+      fullPath: '/events/$eventId/navigate'
+      preLoaderRoute: typeof AppEventsEventIdNavigateRouteImport
+      parentRoute: typeof AppEventsEventIdRoute
+    }
+    '/_app/events/$eventId/reassess': {
+      id: '/_app/events/$eventId/reassess'
+      path: '/reassess'
+      fullPath: '/events/$eventId/reassess'
+      preLoaderRoute: typeof AppEventsEventIdReassessRouteImport
+      parentRoute: typeof AppEventsEventIdRoute
+    }
+    '/_app/events/$eventId/safety': {
+      id: '/_app/events/$eventId/safety'
+      path: '/safety'
+      fullPath: '/events/$eventId/safety'
+      preLoaderRoute: typeof AppEventsEventIdSafetyRouteImport
+      parentRoute: typeof AppEventsEventIdRoute
+    }
+    '/_app/events/$eventId/summary/new': {
+      id: '/_app/events/$eventId/summary/new'
+      path: '/summary/new'
+      fullPath: '/events/$eventId/summary/new'
+      preLoaderRoute: typeof AppEventsEventIdSummaryNewRouteImport
+      parentRoute: typeof AppEventsEventIdRoute
+    }
+    '/_app/events/$eventId/track/today': {
+      id: '/_app/events/$eventId/track/today'
+      path: '/track/today'
+      fullPath: '/events/$eventId/track/today'
+      preLoaderRoute: typeof AppEventsEventIdTrackTodayRouteImport
+      parentRoute: typeof AppEventsEventIdRoute
+    }
   }
 }
 
 interface AppEventsEventIdRouteChildren {
+  AppEventsEventIdEditRoute: typeof AppEventsEventIdEditRoute
+  AppEventsEventIdGuideRoute: typeof AppEventsEventIdGuideRoute
+  AppEventsEventIdNavigateRoute: typeof AppEventsEventIdNavigateRoute
+  AppEventsEventIdReassessRoute: typeof AppEventsEventIdReassessRoute
+  AppEventsEventIdSafetyRoute: typeof AppEventsEventIdSafetyRoute
   AppEventsEventIdIndexRoute: typeof AppEventsEventIdIndexRoute
+  AppEventsEventIdSummaryNewRoute: typeof AppEventsEventIdSummaryNewRoute
+  AppEventsEventIdTrackTodayRoute: typeof AppEventsEventIdTrackTodayRoute
 }
 
 const AppEventsEventIdRouteChildren: AppEventsEventIdRouteChildren = {
+  AppEventsEventIdEditRoute: AppEventsEventIdEditRoute,
+  AppEventsEventIdGuideRoute: AppEventsEventIdGuideRoute,
+  AppEventsEventIdNavigateRoute: AppEventsEventIdNavigateRoute,
+  AppEventsEventIdReassessRoute: AppEventsEventIdReassessRoute,
+  AppEventsEventIdSafetyRoute: AppEventsEventIdSafetyRoute,
   AppEventsEventIdIndexRoute: AppEventsEventIdIndexRoute,
+  AppEventsEventIdSummaryNewRoute: AppEventsEventIdSummaryNewRoute,
+  AppEventsEventIdTrackTodayRoute: AppEventsEventIdTrackTodayRoute,
 }
 
 const AppEventsEventIdRouteWithChildren =
@@ -251,6 +421,7 @@ interface AppRouteChildren {
   AppProfileRoute: typeof AppProfileRoute
   AppEventsEventIdRoute: typeof AppEventsEventIdRouteWithChildren
   AppEventsNewRoute: typeof AppEventsNewRoute
+  AppSummariesSummaryIdRoute: typeof AppSummariesSummaryIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -259,6 +430,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProfileRoute: AppProfileRoute,
   AppEventsEventIdRoute: AppEventsEventIdRouteWithChildren,
   AppEventsNewRoute: AppEventsNewRoute,
+  AppSummariesSummaryIdRoute: AppSummariesSummaryIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
