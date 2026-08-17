@@ -15,6 +15,7 @@ import {
   ProfileStep2Fields,
 } from "@/components/profile/ProfileFields";
 import { UnsavedChangesGuard } from "@/components/profile/UnsavedChangesGuard";
+import { Spinner } from "@/components/profile/Spinner";
 import {
   EMPTY_FORM,
   SAVE_ERROR_MESSAGE,
@@ -304,7 +305,7 @@ function OnboardingPage() {
                   {saving ? (
                     <span className="inline-flex items-center gap-2">
                       <Spinner />
-                      {"<儲存中>"}
+                      {SAVING_LABEL}
                     </span>
                   ) : (
                     "完成設定"
@@ -318,31 +319,3 @@ function OnboardingPage() {
     </PageContainer>
   );
 }
-
-export function Spinner() {
-  return (
-    <svg
-      className="h-4 w-4 animate-spin"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden="true"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-90"
-        fill="currentColor"
-        d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"
-      />
-    </svg>
-  );
-}
-
-void SAVING_LABEL;
