@@ -113,9 +113,10 @@ function OnboardingPage() {
     return true;
   }
 
-  async function handleComplete() {
+  async function handleComplete(overrides?: Partial<ProfileFormValues>) {
     if (saving) return;
     if (!ensureStep1Valid()) return;
+    const payload: ProfileFormValues = { ...values, ...overrides };
 
     const userId = user?.id;
     if (!userId) {
@@ -131,10 +132,10 @@ function OnboardingPage() {
       const { data, error } = await supabase
         .from("profiles")
         .update({
-          display_name: values.displayName.trim(),
-          birth_year: Number(values.birthYear),
-          gender: values.gender,
-          health_background: buildHealthBackground(values),
+          display_name: payload.displayName.trim(),
+          birth_year: Number(payload.birthYear),
+          gender: payload.gender,
+          health_background: buildHealthBackground(payload),
           onboarding_completed: true,
           onboarding_completed_at: new Date().toISOString(),
         })
@@ -284,14 +285,14 @@ function OnboardingPage() {
                   className="min-h-11 w-full sm:w-auto"
                   disabled={saving}
                   onClick={() => {
-                    setValues((prev) => ({
-                      ...prev,
+                    const skipped = {
                       chronicConditions: "",
                       allergies: "",
                       medications: "",
                       otherNotes: "",
-                    }));
-                    void handleComplete();
+                    };
+                    setValues((prev) => ({ ...prev, ...skipped }));
+                    void handleComplete(skipped);
                   }}
                 >
                   略過
