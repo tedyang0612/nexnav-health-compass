@@ -56,7 +56,7 @@ export function ProfileStep1Fields({
         label="顯示名稱"
         required
         hint={`1～${DISPLAY_NAME_MAX} 個字元，會顯示在 NexNav 介面中。`}
-        error={errors.displayName}
+        error={errors.displayName ?? ""}
       >
         <Input
           id={nameId}
@@ -77,7 +77,7 @@ export function ProfileStep1Fields({
         label="出生年份"
         required
         hint="用於了解一般年齡區間，不需要完整生日。"
-        error={errors.birthYear}
+        error={errors.birthYear ?? ""}
       >
         <select
           id={yearId}
@@ -99,7 +99,7 @@ export function ProfileStep1Fields({
         </select>
       </FormField>
 
-      <FormField id={genderId} label="性別" required error={errors.gender}>
+      <FormField id={genderId} label="性別" required error={errors.gender ?? ""}>
         <select
           id={genderId}
           ref={refs.gender}
