@@ -21,7 +21,7 @@ const INPUT_CLASS =
   "w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-[invalid=true]:border-destructive";
 
 type Field = "email" | "password";
-type Errors = Partial<Record<Field, string>>;
+type Errors = { [K in Field]?: string | undefined };
 
 /** 統一的登入失敗訊息，避免洩漏帳號是否存在。 */
 const CREDENTIALS_ERROR = "Email 或密碼不正確，請重新確認。";

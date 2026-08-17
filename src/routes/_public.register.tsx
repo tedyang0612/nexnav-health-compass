@@ -24,7 +24,7 @@ const GENERIC_ERROR = "目前無法建立帳號，請稍後再試一次。";
 
 type Field = "email" | "password" | "confirmPassword";
 type Values = { email: string; password: string; confirmPassword: string };
-type Errors = Partial<Record<Field, string>>;
+type Errors = { [K in Field]?: string | undefined };
 
 function validateField(field: Field, v: Values) {
   if (field === "email") {
