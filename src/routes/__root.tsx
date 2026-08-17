@@ -1,23 +1,16 @@
-import {
-  QueryClient,
-  QueryClientProvider,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
   Link,
   createRootRouteWithContext,
   useRouter,
-  useNavigate,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { useAuth } from "../hooks/useAuth";
-import { supabase } from "../integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -142,181 +135,12 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
-function Header() {
-  const [isOpen, setIsOpen] = useState(false);
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const [signingOut, setSigningOut] = useState(false);
-
-  async function handleSignOut() {
-    setSigningOut(true);
-    try {
-      await queryClient.cancelQueries();
-      queryClient.clear();
-      await supabase.auth.signOut();
-      setIsOpen(false);
-      navigate({ to: "/login", replace: true });
-    } finally {
-      setSigningOut(false);
-    }
-  }
-
-  return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-surface/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-lg font-bold text-primary-foreground">
-            N
-          </span>
-          <span className="text-lg font-semibold tracking-tight text-foreground">
-            NexNav
-          </span>
-        </Link>
-
-        <nav className="hidden items-center gap-1 md:flex">
-          {isAuthenticated ? (
-            <>
-              <NavLink to="/onboarding">新手上路</NavLink>
-              <NavLink to="/dashboard">儀表板</NavLink>
-              <button
-                type="button"
-                onClick={handleSignOut}
-                disabled={signingOut}
-                className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-60"
-              >
-                {signingOut ? "登出中…" : "登出"}
-              </button>
-            </>
-          ) : (
-            <>
-              <NavLink to="/login">登入</NavLink>
-              <NavLink to="/register">註冊</NavLink>
-            </>
-          )}
-        </nav>
-
-        <button
-          type="button"
-          onClick={() => setIsOpen((prev) => !prev)}
-          className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground md:hidden"
-          aria-label={isOpen ? "關閉選單" : "開啟選單"}
-          aria-expanded={isOpen}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            {isOpen ? (
-              <>
-                <path d="M18 6 6 18" />
-                <path d="m6 6 12 12" />
-              </>
-            ) : (
-              <>
-                <path d="M4 12h16" />
-                <path d="M4 18h16" />
-                <path d="M4 6h16" />
-              </>
-            )}
-          </svg>
-        </button>
-      </div>
-
-      {isOpen && (
-        <div className="border-t border-border/50 bg-surface md:hidden">
-          <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-3 sm:px-6 lg:px-8">
-            {isAuthenticated ? (
-              <>
-                <MobileNavLink to="/onboarding" onClick={() => setIsOpen(false)}>
-                  新手上路
-                </MobileNavLink>
-                <MobileNavLink to="/dashboard" onClick={() => setIsOpen(false)}>
-                  儀表板
-                </MobileNavLink>
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  disabled={signingOut}
-                  className="rounded-md px-3 py-2.5 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-60"
-                >
-                  {signingOut ? "登出中…" : "登出"}
-                </button>
-              </>
-            ) : (
-              <>
-                <MobileNavLink to="/login" onClick={() => setIsOpen(false)}>
-                  登入
-                </MobileNavLink>
-                <MobileNavLink to="/register" onClick={() => setIsOpen(false)}>
-                  註冊
-                </MobileNavLink>
-              </>
-            )}
-          </nav>
-        </div>
-      )}
-    </header>
-  );
-}
-
-function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
-  return (
-    <Link
-      to={to}
-      activeProps={{ className: "bg-accent text-accent-foreground" }}
-      className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-    >
-      {children}
-    </Link>
-  );
-}
-
-function MobileNavLink({
-  to,
-  onClick,
-  children,
-}: {
-  to: string;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      to={to}
-      onClick={onClick}
-      activeProps={{ className: "bg-accent text-accent-foreground" }}
-      className="rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-    >
-      {children}
-    </Link>
-  );
-}
-
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex min-h-screen flex-col bg-background">
-        <Header />
-        <main className="flex flex-1 flex-col">
-          <Outlet />
-        </main>
-        <footer className="border-t border-border/50 bg-surface py-6">
-          <div className="mx-auto max-w-7xl px-4 text-center text-sm text-muted-foreground sm:px-6 lg:px-8">
-            © {new Date().getFullYear()} NexNav. 保留所有權利。
-          </div>
-        </footer>
-      </div>
+      <Outlet />
     </QueryClientProvider>
   );
 }
