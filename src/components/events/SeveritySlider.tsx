@@ -1,7 +1,6 @@
 import { Slider } from "@/components/ui/slider";
-import { SEVERITY_ANCHORS } from "@/lib/event-wizard";
 
-/** 1–10 困擾程度，數值以文字同時呈現，不以顏色承載語意。 */
+/** 1–10 困擾程度，僅以數值呈現，不加入解釋性標籤或顏色語意。 */
 export function SeveritySlider({
   id,
   value,
@@ -20,7 +19,7 @@ export function SeveritySlider({
       <div className="flex items-baseline justify-between">
         <span className="text-sm text-muted-foreground">目前選擇</span>
         <span className="text-lg font-semibold text-foreground" aria-hidden="true">
-          {value}／10
+          {value} / 10
         </span>
       </div>
       <Slider
@@ -36,11 +35,6 @@ export function SeveritySlider({
         aria-describedby={describedBy}
         className="py-2"
       />
-      <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-        {SEVERITY_ANCHORS.map((a) => (
-          <li key={a}>{a}</li>
-        ))}
-      </ul>
     </div>
   );
 }
