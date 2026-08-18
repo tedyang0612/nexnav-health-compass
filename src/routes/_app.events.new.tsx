@@ -177,14 +177,17 @@ function NewEventPage() {
 
       if (error) throw error;
 
-      const row = Array.isArray(data) ? data[0] : null;
-      if (!row?.health_event_id || !row?.initial_record_id) {
+      const rows = Array.isArray(data) ? data : [];
+      const row = rows.length === 1 ? rows[0] : undefined;
+      if (!row || !row.health_event_id || !row.initial_record_id) {
         setSubmitError({
           kind: "generic",
           message: "目前無法建立狀況追蹤，請稍後再試。",
         });
         return;
       }
+
+
 
       await queryClient.invalidateQueries({ queryKey: ["health-events"] });
 
