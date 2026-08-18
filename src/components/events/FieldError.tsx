@@ -1,5 +1,5 @@
 /** 錯誤訊息：icon＋文字，不單靠顏色。 */
-export function FieldError({ id, message }: { id: string; message?: string }) {
+export function FieldError({ id, message }: { id: string; message?: string | undefined }) {
   if (!message) return null;
   return (
     <p id={id} className="flex items-center gap-1.5 text-xs text-destructive">

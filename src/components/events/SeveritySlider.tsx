@@ -12,8 +12,8 @@ export function SeveritySlider({
   id: string;
   value: number;
   onChange: (next: number) => void;
-  describedBy?: string;
-  invalid?: boolean;
+  describedBy?: string | undefined;
+  invalid?: boolean | undefined;
 }) {
   return (
     <div className="space-y-3">
