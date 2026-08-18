@@ -88,7 +88,7 @@ function useSafetyContext(eventId: string) {
           .select("result, assessment_status, record_revision, created_at")
           .eq("health_event_id", eventId)
           .eq("record_revision", currentRevision)
-          .eq("assessment_status", "resolved")
+          .eq("assessment_status", "completed")
           .not("result", "is", null)
           .order("created_at", { ascending: false })
           .limit(1);
@@ -144,7 +144,7 @@ function Page() {
         const rows = data ?? [];
         if (rows.length !== 1) throw new Error("unexpected_response");
         const row = rows[0]!;
-        if (row.assessment_status !== "resolved" || !isKnownResult(row.result)) {
+        if (row.assessment_status !== "completed" || !isKnownResult(row.result)) {
           throw new Error("incomplete_assessment");
         }
         setSubmittedResult(row.result);
