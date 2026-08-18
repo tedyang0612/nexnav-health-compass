@@ -5,6 +5,7 @@ import {
   FREQUENCY_OPTIONS,
   LIFE_CONTEXT_FIELDS,
   NOT_FILLED,
+  formatDisplayDate,
   type EventFormValues,
   type SymptomOption,
 } from "@/lib/event-wizard";
@@ -68,7 +69,7 @@ export function StepReview({
               value={values.customPrimarySymptom.trim() || NOT_FILLED}
             />
           ) : null}
-          <Row label="不適開始日期" value={values.startedOn || NOT_FILLED} />
+          <Row label="不適開始日期" value={values.startedOn ? formatDisplayDate(values.startedOn) : NOT_FILLED} />
           <Row label="目前困擾程度" value={`${values.severity}／10`} />
           <Row label="最近的發生頻率" value={frequency} />
           <Row

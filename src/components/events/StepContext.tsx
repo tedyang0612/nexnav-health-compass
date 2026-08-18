@@ -99,7 +99,7 @@ export function StepContext({
             htmlFor="custom-associated"
             className="text-sm font-medium text-foreground"
           >
-            自訂相關症狀（選填）
+            其他症狀（選填）
           </label>
           <div className="flex flex-col gap-2 sm:flex-row">
             <Input
@@ -132,7 +132,7 @@ export function StepContext({
             </Button>
           </div>
           <p id="custom-associated-hint" className="text-xs text-muted-foreground">
-            每個項目最多 100 個字元。
+            若上方沒有符合的選項，可自行加入其他症狀。每個項目最多 100 個字元。
           </p>
           <FieldError
             id="custom-associated-error"
@@ -167,8 +167,9 @@ export function StepContext({
         description="以下四項皆為必填，僅用於整理紀錄，不代表任何健康判斷。"
       >
         {LIFE_CONTEXT_FIELDS.map((field) => (
-          <fieldset key={field.key} className="space-y-2">
-            <legend className="text-sm font-medium text-foreground">
+          <fieldset key={field.key} className="space-y-3 pt-4 first:pt-0">
+            <legend className="mb-1 flex items-center gap-2 text-base font-semibold text-foreground">
+              <span aria-hidden="true" className="inline-block h-4 w-1 rounded-full bg-primary" />
               {field.label}
             </legend>
             <div className="space-y-2">
