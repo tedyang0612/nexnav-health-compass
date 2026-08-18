@@ -169,6 +169,12 @@ function NewEventPage() {
     setSubmitting(true);
     setSubmitError(null);
 
+    // 讓 loading state 至少完成一次畫面更新後再送出 RPC。
+    await new Promise<void>((resolve) => {
+      if (typeof window === "undefined") return resolve();
+      window.requestAnimationFrame(() => window.requestAnimationFrame(() => resolve()));
+    });
+
     try {
       const { data, error } = await supabase.rpc(
         "create_health_event",
@@ -326,6 +332,10 @@ function NewEventPage() {
               onEditStep={(target) => setStep(target)}
             />
           )}
+
+          <p aria-live="polite" className="sr-only">
+            {submitting ? "建立中，請稍候。" : ""}
+          </p>
 
           <div className="flex flex-col gap-2 sm:flex-row-reverse sm:justify-start">
             {step < 3 ? (
