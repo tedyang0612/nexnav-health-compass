@@ -520,6 +520,20 @@ export type Database = {
           initial_record_id: string
         }[]
       }
+      run_safety_assessment: {
+        Args: {
+          p_answers: Json
+          p_health_event_id: string
+          p_trigger_type?: string
+        }
+        Returns: {
+          assessment_status: string
+          record_revision: number
+          result: string
+          rule_version: string
+          safety_assessment_id: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
