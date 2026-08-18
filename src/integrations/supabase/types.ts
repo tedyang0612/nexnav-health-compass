@@ -501,7 +501,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_health_event: {
+        Args: {
+          p_associated_symptoms?: Json
+          p_custom_primary_symptom?: string
+          p_duration_unit: string
+          p_duration_value: number
+          p_frequency_description?: string
+          p_frequency_level: number
+          p_life_context: Json
+          p_primary_symptom_id: string
+          p_severity: number
+          p_started_on: string
+          p_supplemental_description?: string
+        }
+        Returns: {
+          health_event_id: string
+          initial_record_id: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
