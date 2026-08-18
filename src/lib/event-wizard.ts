@@ -1,4 +1,7 @@
-import type { Json } from "@/integrations/supabase/types";
+import type { Database, Json } from "@/integrations/supabase/types";
+
+export type CreateHealthEventArgs =
+  Database["public"]["Functions"]["create_health_event"]["Args"];
 
 /**
  * P05 New Health Event Wizard — 型別、鎖定文案、驗證與 payload 正規化。
@@ -279,6 +282,13 @@ export type AssociatedSymptomPayload = {
   custom_text: string | null;
 };
 
+export type LifeContextPayload = {
+  sleep: number;
+  diet: number;
+  activity: number;
+  stress: number;
+};
+
 /** 依使用者選擇順序輸出，catalog 去重、自訂文字 trim 後去重。 */
 export function buildAssociatedSymptoms(
   values: EventFormValues,
@@ -303,7 +313,7 @@ export function buildAssociatedSymptoms(
   return out;
 }
 
-export function buildLifeContext(values: EventFormValues) {
+export function buildLifeContext(values: EventFormValues): LifeContextPayload {
   return {
     sleep: values.sleep as number,
     diet: values.diet as number,
@@ -315,12 +325,15 @@ export function buildLifeContext(values: EventFormValues) {
 export function buildRpcPayload(
   values: EventFormValues,
   options: SymptomOption[],
-) {
+): CreateHealthEventArgs {
   const selected = options.find((o) => o.id === values.primarySymptomId);
   const isOther = !!selected?.is_other;
   const customPrimary = isOther ? values.customPrimarySymptom.trim() : "";
   const freqDesc = values.frequencyDescription.trim();
   const supplemental = values.supplementalDescription.trim();
+
+  const lifeContext: Json = buildLifeContext(values);
+  const associatedSymptoms: Json = buildAssociatedSymptoms(values);
 
   return {
     p_primary_symptom_id: values.primarySymptomId,
@@ -329,10 +342,10 @@ export function buildRpcPayload(
     p_frequency_level: values.frequencyLevel as number,
     p_duration_value: Number(values.durationValue),
     p_duration_unit: values.durationUnit as DurationUnit,
-    p_life_context: buildLifeContext(values) as unknown as Json,
+    p_life_context: lifeContext,
     ...(customPrimary ? { p_custom_primary_symptom: customPrimary } : {}),
     ...(freqDesc ? { p_frequency_description: freqDesc } : {}),
-    p_associated_symptoms: buildAssociatedSymptoms(values) as unknown as Json,
+    p_associated_symptoms: associatedSymptoms,
     ...(supplemental ? { p_supplemental_description: supplemental } : {}),
   };
 }
