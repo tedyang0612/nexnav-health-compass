@@ -74,7 +74,7 @@ export function GlobalNav({
         <BrandMark to="/dashboard" />
 
         {/* Desktop */}
-        <nav aria-label="主導覽" className="hidden items-center gap-1 md:flex">
+        <nav aria-label="主導覽" className="hidden items-center gap-1 sm:flex">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.to}
@@ -126,7 +126,7 @@ export function GlobalNav({
             <Button
               variant="ghost"
               size="icon"
-              className="h-11 w-11 md:hidden"
+              className="h-11 w-11 sm:hidden"
               aria-label="開啟選單"
             >
               <MenuIcon />

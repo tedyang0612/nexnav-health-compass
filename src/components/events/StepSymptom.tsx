@@ -49,11 +49,14 @@ export function StepSymptom({
   const heroOptions = options.filter((o) => o.is_hero_group && !o.is_other);
   const otherOptions = options.filter((o) => o.is_other);
   const normalOptions = options.filter((o) => !o.is_other);
-  const listed = showAll
-    ? normalOptions.filter(
-        (o) => !values.categoryCode || o.category_code === values.categoryCode,
-      )
-    : heroOptions;
+  const listed = [
+    ...(showAll
+      ? normalOptions.filter(
+          (o) => !values.categoryCode || o.category_code === values.categoryCode,
+        )
+      : heroOptions),
+    ...otherOptions,
+  ];
 
   function selectPrimary(option: SymptomOption) {
     set("primarySymptomId", option.id);
@@ -129,18 +132,6 @@ export function StepSymptom({
               查看全部主要不適症狀
             </Button>
           ) : null}
-
-          <div className="grid gap-2 sm:grid-cols-2">
-            {otherOptions.map((option) => (
-              <SymptomRadio
-                key={option.id}
-                name="primary-symptom"
-                option={option}
-                checked={values.primarySymptomId === option.id}
-                onSelect={() => selectPrimary(option)}
-              />
-            ))}
-          </div>
 
           <FieldError id="primary-symptom-error" message={errors.primarySymptomId} />
         </fieldset>

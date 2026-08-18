@@ -40,11 +40,12 @@ export const FREQUENCY_OPTIONS: { value: number; label: string }[] = [
   { value: 5, label: "平均每天2次以上，或幾乎持續出現" },
 ];
 
-export const SEVERITY_ANCHORS = [
-  "1｜幾乎不影響日常",
-  "5｜已有明顯影響",
-  "10｜嚴重影響日常",
-];
+/** 使用者可見日期一律 YYYY/MM/DD；RPC payload 仍使用 ISO YYYY-MM-DD。 */
+export function formatDisplayDate(isoDate: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(isoDate.trim());
+  if (!match) return isoDate;
+  return `${match[1]}/${match[2]}/${match[3]}`;
+}
 
 export type LifeContextKey = "sleep" | "diet" | "activity" | "stress";
 
