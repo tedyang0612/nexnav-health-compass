@@ -51,7 +51,7 @@ export function useActiveEvents(userId: string | undefined) {
 
       const { data: safetyRows, error: safetyError } = await supabase
         .from("safety_assessments")
-        .select("health_event_id, assessment_status, result")
+        .select("health_event_id, assessment_status, result, record_revision")
         .in(
           "health_event_id",
           events.map((e) => e.id),
@@ -59,10 +59,31 @@ export function useActiveEvents(userId: string | undefined) {
 
       if (safetyError) throw safetyError;
 
+      const { data: revisionRows, error: revisionError } = await supabase
+        .from("initial_records")
+        .select("health_event_id, revision")
+        .in(
+          "health_event_id",
+          events.map((e) => e.id),
+        )
+        .order("revision", { ascending: false });
+
+      if (revisionError) throw revisionError;
+
+      const currentRevisionByEvent = new Map<string, number>();
+      for (const r of revisionRows ?? []) {
+        if (!currentRevisionByEvent.has(r.health_event_id)) {
+          currentRevisionByEvent.set(r.health_event_id, r.revision);
+        }
+      }
+
       const completed = new Set(
         (safetyRows ?? [])
           .filter(
-            (r) => r.assessment_status === "resolved" && r.result !== null,
+            (r) =>
+              r.assessment_status === "completed" &&
+              r.result !== null &&
+              r.record_revision === currentRevisionByEvent.get(r.health_event_id),
           )
           .map((r) => r.health_event_id),
       );
