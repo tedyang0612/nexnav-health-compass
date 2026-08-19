@@ -1,17 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
 import {
   ErrorState,
-  LoadingState,
   PageContainer,
   PageHeader,
   PrimaryCta,
   SectionCard,
 } from "@/components/shell";
+import { Skeleton } from "@/components/ui/skeleton";
 import { GuideSections } from "@/components/events/GuideSections";
 import { useGuide } from "@/hooks/useGuide";
-import { supabase } from "@/integrations/supabase/client";
-import { isKnownResult, type SafetyResult } from "@/lib/safety";
+import { useGuideSafetyGate } from "@/hooks/useGuideSafetyGate";
 
 export const Route = createFileRoute("/_app/events/$eventId/guide")({
   head: () => ({
@@ -33,79 +31,72 @@ export const Route = createFileRoute("/_app/events/$eventId/guide")({
   component: Page,
 });
 
-/** 依 current revision 的最新 completed safety 結果決定 Guide 是否可用。 */
-function useCurrentSafetyResult(eventId: string) {
-  return useQuery({
-    queryKey: ["guide-safety-gate", eventId],
-    retry: 1,
-    queryFn: async (): Promise<SafetyResult | null> => {
-      const { data: records, error: recordError } = await supabase
-        .from("initial_records")
-        .select("revision")
-        .eq("health_event_id", eventId)
-        .order("revision", { ascending: false })
-        .limit(1);
-      if (recordError) throw recordError;
-
-      const currentRevision = records?.[0]?.revision ?? null;
-      if (currentRevision === null) return null;
-
-      const { data: assessments, error: assessmentError } = await supabase
-        .from("safety_assessments")
-        .select("result, assessment_status, record_revision, created_at")
-        .eq("health_event_id", eventId)
-        .eq("record_revision", currentRevision)
-        .eq("assessment_status", "completed")
-        .not("result", "is", null)
-        .order("created_at", { ascending: false })
-        .limit(1);
-      if (assessmentError) throw assessmentError;
-
-      const found = assessments?.[0]?.result;
-      return isKnownResult(found) ? found : null;
-    },
-  });
-}
-
-function Page() {
-  const { eventId } = Route.useParams();
-  const navigate = useNavigate();
-  const safetyQuery = useCurrentSafetyResult(eventId);
-  const safetyResult = safetyQuery.data ?? null;
-
-  const guideQuery = useGuide({
-    eventId,
-    enabled: safetyQuery.isSuccess && safetyResult === "normal",
-  });
-
-  const header = (
+function GuideHeader() {
+  return (
     <PageHeader
       title="改善方向"
       description="根據目前紀錄，查看可以先嘗試的生活調整與觀察方向。"
     />
   );
+}
+
+/** 真實載入中的頁面骨架：預先呈現標題與 3 個內容區塊輪廓，降低 layout shift。 */
+function GuideSkeleton() {
+  return (
+    <div role="status" aria-live="polite" className="space-y-4 sm:space-y-6">
+      <span className="sr-only">建立改善方向中</span>
+      <div className="rounded-xl border border-heal/30 border-l-4 border-l-heal bg-heal-muted/40 p-4 sm:p-5">
+        <Skeleton className="h-3 w-24" />
+        <Skeleton className="mt-2 h-5 w-2/3" />
+        <Skeleton className="mt-3 h-4 w-full" />
+      </div>
+      {[0, 1, 2].map((i) => (
+        <div
+          key={i}
+          className="space-y-3 rounded-xl border border-border/80 bg-surface-elevated p-4 sm:p-5"
+        >
+          <Skeleton className="h-5 w-40" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-11/12" />
+          <Skeleton className="h-4 w-3/4" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Page() {
+  const { eventId } = Route.useParams();
+  const navigate = useNavigate();
+  const gateQuery = useGuideSafetyGate(eventId);
+  const safetyResult = gateQuery.data?.currentResult ?? null;
+
+  const guideQuery = useGuide({
+    eventId,
+    enabled: gateQuery.isSuccess && safetyResult === "normal",
+  });
 
   const goNavigate = () =>
     void navigate({ to: "/events/$eventId/navigate", params: { eventId } });
 
-  if (safetyQuery.isLoading) {
+  if (gateQuery.isLoading) {
     return (
-      <PageContainer width="narrow" className="space-y-6">
-        {header}
-        <LoadingState label="載入中…" />
+      <PageContainer width="default" className="space-y-5 sm:space-y-6">
+        <GuideHeader />
+        <GuideSkeleton />
       </PageContainer>
     );
   }
 
-  if (safetyQuery.isError) {
+  if (gateQuery.isError) {
     return (
-      <PageContainer width="narrow" className="space-y-6">
-        {header}
+      <PageContainer width="default" className="space-y-5 sm:space-y-6">
+        <GuideHeader />
         <ErrorState
           title="目前無法取得改善方向"
           description="請稍後再試一次。"
           retryLabel="再試一次"
-          onRetry={() => void safetyQuery.refetch()}
+          onRetry={() => void gateQuery.refetch()}
         />
       </PageContainer>
     );
@@ -113,8 +104,8 @@ function Page() {
 
   if (safetyResult === null) {
     return (
-      <PageContainer width="narrow" className="space-y-6">
-        {header}
+      <PageContainer width="default" className="space-y-5 sm:space-y-6">
+        <GuideHeader />
         <SectionCard
           title="完成狀況確認後再查看改善方向"
           description="需要先確認目前是否有應優先處理的安全警訊。"
@@ -133,8 +124,8 @@ function Page() {
 
   if (safetyResult === "priority_care") {
     return (
-      <PageContainer width="narrow" className="space-y-6">
-        {header}
+      <PageContainer width="default" className="space-y-5 sm:space-y-6">
+        <GuideHeader />
         <SectionCard
           className="border-heal/40 bg-heal-muted"
           title="目前建議優先尋求專業協助"
@@ -151,8 +142,8 @@ function Page() {
 
   if (safetyResult !== "normal") {
     return (
-      <PageContainer width="narrow" className="space-y-6">
-        {header}
+      <PageContainer width="default" className="space-y-5 sm:space-y-6">
+        <GuideHeader />
         <SectionCard title="這次確認有需要留意的地方">
           <p className="text-sm text-muted-foreground">
             目前不提供改善方向，建議先查看就醫與專業支持方向。
@@ -163,19 +154,19 @@ function Page() {
     );
   }
 
-  if (guideQuery.isPending || guideQuery.isFetching) {
+  if (guideQuery.isPending) {
     return (
-      <PageContainer width="narrow" className="space-y-6">
-        {header}
-        <LoadingState label="<建立改善方向中>" />
+      <PageContainer width="default" className="space-y-5 sm:space-y-6">
+        <GuideHeader />
+        <GuideSkeleton />
       </PageContainer>
     );
   }
 
   if (guideQuery.isError || !guideQuery.data) {
     return (
-      <PageContainer width="narrow" className="space-y-6">
-        {header}
+      <PageContainer width="default" className="space-y-5 sm:space-y-6">
+        <GuideHeader />
         <ErrorState
           title="目前無法取得改善方向"
           description="請稍後再試一次。"
@@ -187,8 +178,8 @@ function Page() {
   }
 
   return (
-    <PageContainer width="narrow" className="space-y-6">
-      {header}
+    <PageContainer width="default" className="space-y-5 sm:space-y-6">
+      <GuideHeader />
       <GuideSections guide={guideQuery.data} />
     </PageContainer>
   );
