@@ -206,10 +206,12 @@ export function ErrorState({
   title = "目前無法載入這個頁面",
   description = "請稍後再試一次，或返回上一頁。",
   onRetry,
+  retryLabel = "重試",
 }: {
   title?: string;
   description?: string;
   onRetry?: () => void;
+  retryLabel?: string;
 }) {
   return (
     <div
@@ -223,12 +225,13 @@ export function ErrorState({
       <p className="max-w-sm text-sm text-muted-foreground">{description}</p>
       {onRetry ? (
         <Button variant="outline" className="min-h-11" onClick={onRetry}>
-          重試
+          {retryLabel}
         </Button>
       ) : null}
     </div>
   );
 }
+
 
 /** 表單欄位外框：label、說明、錯誤訊息與 a11y 綁定。 */
 export function FormField({
