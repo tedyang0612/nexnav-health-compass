@@ -105,7 +105,7 @@ function Page() {
   const goNavigate = () =>
     void navigate({ to: "/events/$eventId/navigate", params: { eventId } });
 
-  if (gateQuery.isLoading) {
+  if (gateQuery.isLoading || existingQuery.isLoading) {
     return (
       <PageContainer width="default" className="space-y-5 sm:space-y-6">
         <GuideHeader />
@@ -113,6 +113,8 @@ function Page() {
       </PageContainer>
     );
   }
+
+
 
 
   if (gateQuery.isError) {
@@ -181,6 +183,15 @@ function Page() {
     );
   }
 
+  if (reusableGuide) {
+    return (
+      <PageContainer width="default" className="space-y-5 sm:space-y-6">
+        <GuideHeader />
+        <GuideSections guide={reusableGuide} />
+      </PageContainer>
+    );
+  }
+
   if (guideQuery.isPending) {
     return (
       <PageContainer width="default" className="space-y-5 sm:space-y-6">
@@ -189,6 +200,7 @@ function Page() {
       </PageContainer>
     );
   }
+
 
   if (guideQuery.isError || !guideQuery.data) {
     return (
