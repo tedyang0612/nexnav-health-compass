@@ -42,12 +42,12 @@ export const Route = createFileRoute("/_app/events/$eventId/track/today")({
       { title: "今日追蹤 — NexNav" },
       {
         name: "description",
-        content: "NexNav 狀況歷程：記錄今天的不適與生活狀況，觀察後續變化。",
+        content: "NexNav 狀況歷程：記錄目前的不適與生活狀況，方便持續觀察變化。",
       },
       { property: "og:title", content: "今日追蹤 — NexNav" },
       {
         property: "og:description",
-        content: "NexNav 狀況歷程：記錄今天的不適與生活狀況，觀察後續變化。",
+        content: "NexNav 狀況歷程：記錄目前的不適與生活狀況，方便持續觀察變化。",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -57,17 +57,7 @@ export const Route = createFileRoute("/_app/events/$eventId/track/today")({
 });
 
 function TrackHeader() {
-  return (
-    <div className="space-y-1">
-      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-        狀況追蹤
-      </p>
-      <PageHeader
-        title="今日追蹤"
-        description="記錄今天的不適與生活狀況，觀察後續變化。"
-      />
-    </div>
-  );
+  return <PageHeader title="今日追蹤" description="記錄目前的不適與生活狀況，方便持續觀察變化。" />;
 }
 
 function Page() {
@@ -96,7 +86,7 @@ function Page() {
   const initialized = useRef(false);
 
   const refs = {
-    severity: useRef<HTMLSpanElement | null>(null),
+    severity: useRef<HTMLDivElement | null>(null),
     frequencyLevel: useRef<HTMLInputElement | null>(null),
     frequencyDescription: useRef<HTMLInputElement | null>(null),
     subjectiveChange: useRef<HTMLInputElement | null>(null),
@@ -112,9 +102,7 @@ function Page() {
   useEffect(() => {
     if (initialized.current) return;
     if (!todayReady) return;
-    const initial = todayTrack
-      ? { ...todayTrack.values }
-      : createEmptyDailyTrackForm();
+    const initial = todayTrack ? { ...todayTrack.values } : createEmptyDailyTrackForm();
     initialized.current = true;
     setValues(initial);
     setBaseline(initial);
@@ -129,13 +117,9 @@ function Page() {
 
   const saveMutation = useSaveDailyTrack(eventId);
 
-  const dirty =
-    values !== null && baseline !== null && isDailyTrackDirty(values, baseline);
+  const dirty = values !== null && baseline !== null && isDailyTrackDirty(values, baseline);
 
-  function set<K extends keyof DailyTrackFormValues>(
-    key: K,
-    value: DailyTrackFormValues[K],
-  ) {
+  function set<K extends keyof DailyTrackFormValues>(key: K, value: DailyTrackFormValues[K]) {
     setSuccessMessage(null);
     setValues((prev) => (prev ? { ...prev, [key]: value } : prev));
   }
@@ -166,14 +150,12 @@ function Page() {
       {
         values,
         existing: todayTrack,
-        guideId: todayTrack ? todayTrack.guideId : guideQuery.data?.guideId ?? null,
+        guideId: todayTrack ? todayTrack.guideId : (guideQuery.data?.guideId ?? null),
       },
       {
         onSuccess: (result) => {
           setBaseline({ ...values });
-          setSuccessMessage(
-            result.mode === "insert" ? "今日追蹤已儲存" : "今日追蹤已更新",
-          );
+          setSuccessMessage(result.mode === "insert" ? "今日追蹤已儲存" : "今日追蹤已更新");
         },
         onError: () => {
           setSaveError("目前無法儲存今日追蹤，請稍後再試一次。");
@@ -270,11 +252,7 @@ function Page() {
     : "與建立狀況追蹤時的初始感受相比";
 
   const isUpdate = todayTrack !== null;
-  const ctaLabel = saveMutation.isPending
-    ? "<儲存中>"
-    : isUpdate
-      ? "更新今日追蹤"
-      : "儲存今日追蹤";
+  const ctaLabel = saveMutation.isPending ? "<儲存中>" : isUpdate ? "更新今日追蹤" : "儲存今日追蹤";
 
   function toggleSuggestion(code: string) {
     if (!values) return;
@@ -293,16 +271,10 @@ function Page() {
       <UnsavedChangesGuard enabled={dirty && !saveMutation.isPending} />
       <TrackHeader />
 
-      {/* Section 1 */}
-      <SectionCard title="今天的不適狀況">
+      {/* Section 1：不適與比較 */}
+      <SectionCard title="今天不適症狀的困擾程度">
         <div className="grid gap-6 lg:grid-cols-2">
-          <div className="space-y-2">
-            <span
-              ref={refs.severity}
-              className="text-base font-semibold text-foreground"
-            >
-              今天的困擾程度
-            </span>
+          <div ref={refs.severity} className="space-y-2">
             <SeveritySlider
               id="daily-severity"
               value={values.severity}
@@ -314,9 +286,7 @@ function Page() {
           </div>
 
           <fieldset className="space-y-2">
-            <legend className="mb-1 text-base font-semibold text-foreground">
-              今天的發生頻率
-            </legend>
+            <legend className="mb-1 text-base font-semibold text-foreground">發生頻率</legend>
             <div className="space-y-2">
               {DAILY_FREQUENCY_OPTIONS.map((option, index) => (
                 <label
@@ -330,9 +300,7 @@ function Page() {
                     className="h-4 w-4 accent-primary"
                     checked={values.frequencyLevel === option.value}
                     onChange={() => set("frequencyLevel", option.value)}
-                    aria-describedby={
-                      errors.frequencyLevel ? "daily-frequency-error" : undefined
-                    }
+                    aria-describedby={errors.frequencyLevel ? "daily-frequency-error" : undefined}
                   />
                   <span>{option.label}</span>
                 </label>
@@ -343,10 +311,7 @@ function Page() {
         </div>
 
         <div className="space-y-1.5 pt-2">
-          <label
-            htmlFor="daily-frequency-desc"
-            className="text-sm font-medium text-foreground"
-          >
+          <label htmlFor="daily-frequency-desc" className="text-sm font-medium text-foreground">
             頻率補充（選填）
           </label>
           <Input
@@ -362,10 +327,7 @@ function Page() {
           <p id="daily-frequency-desc-hint" className="text-xs text-muted-foreground">
             {values.frequencyDescription.length} / {FREQ_DESC_MAX} 個字元
           </p>
-          <FieldError
-            id="daily-frequency-desc-error"
-            message={errors.frequencyDescription}
-          />
+          <FieldError id="daily-frequency-desc-error" message={errors.frequencyDescription} />
         </div>
 
         <div className="pt-2">
@@ -379,18 +341,15 @@ function Page() {
         </div>
       </SectionCard>
 
-      {/* Section 2 */}
+      {/* Section 2：生活狀況 */}
       <SectionCard
-        title="今天的生活狀況"
+        title="生活狀況"
         description="以下四項皆為必填，僅用於整理紀錄，不代表任何健康判斷。"
       >
         {LIFE_CONTEXT_FIELDS.map((field) => (
-          <fieldset key={field.key} className="space-y-3 pt-4 first:pt-0">
+          <fieldset key={field.key} className="mt-6 space-y-3 first:mt-0">
             <legend className="mb-1 flex items-center gap-2 text-base font-semibold text-foreground">
-              <span
-                aria-hidden="true"
-                className="inline-block h-4 w-1 rounded-full bg-primary"
-              />
+              <span aria-hidden="true" className="inline-block h-4 w-1 rounded-full bg-primary" />
               {field.label}
             </legend>
             <div className="space-y-2">
@@ -414,20 +373,14 @@ function Page() {
                 </label>
               ))}
             </div>
-            <FieldError
-              id={`daily-life-${field.key}-error`}
-              message={errors[field.key]}
-            />
+            <FieldError id={`daily-life-${field.key}-error`} message={errors[field.key]} />
           </fieldset>
         ))}
       </SectionCard>
 
-      {/* Section 3 */}
+      {/* Section 3：改善建議 */}
       {showSuggestions ? (
-        <SectionCard
-          title="今天嘗試的調整"
-          description="可勾選今天有實際嘗試的項目。"
-        >
+        <SectionCard title="已嘗試的調整" description="可勾選本次有實際嘗試的項目。">
           <div className="grid gap-2 sm:grid-cols-3">
             {suggestions.slice(0, SUGGESTION_MAX).map((suggestion, index) => (
               <label
@@ -445,15 +398,22 @@ function Page() {
               </label>
             ))}
           </div>
-          <FieldError
-            id="daily-suggestion-error"
-            message={errors.suggestionExecution}
-          />
+          <FieldError id="daily-suggestion-error" message={errors.suggestionExecution} />
         </SectionCard>
       ) : null}
 
-      {/* Section 4 */}
-      <SectionCard title="補充紀錄（選填）">
+      {/* Section 4：補充紀錄 */}
+      <SectionCard
+        title={
+          <span className="inline-flex items-center gap-2">
+            補充紀錄
+            <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+              選填
+            </span>
+          </span>
+        }
+        description="記下其他想補充的狀況。"
+      >
         <div className="space-y-1.5">
           <label htmlFor="daily-notes" className="text-sm font-medium text-foreground">
             其他想記錄的內容
