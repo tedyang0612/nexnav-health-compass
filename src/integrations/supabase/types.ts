@@ -80,6 +80,50 @@ export type Database = {
           },
         ]
       }
+      guide_templates: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          is_active: boolean
+          sources: Json
+          suggestions: Json
+          symptom_code: string
+          template_code: string
+          template_version: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          sources?: Json
+          suggestions: Json
+          symptom_code: string
+          template_code: string
+          template_version: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          sources?: Json
+          suggestions?: Json
+          symptom_code?: string
+          template_code?: string
+          template_version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_templates_symptom_code_fkey"
+            columns: ["symptom_code"]
+            isOneToOne: false
+            referencedRelation: "symptom_catalog"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
       guides: {
         Row: {
           content_snapshot: Json
@@ -501,6 +545,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_guide_for_event: {
+        Args: { p_health_event_id: string }
+        Returns: {
+          content_snapshot: Json
+          created_new: boolean
+          guide_id: string
+          record_revision: number
+          safety_assessment_id: string
+          suggestions_snapshot: Json
+          template_code: string
+          template_version: string
+          version_number: number
+        }[]
+      }
       create_health_event: {
         Args: {
           p_associated_symptoms?: Json
