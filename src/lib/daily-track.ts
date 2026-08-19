@@ -40,8 +40,7 @@ export const SUBJECTIVE_CHANGE_OPTIONS: {
 
 export function isSubjectiveChange(value: unknown): value is SubjectiveChange {
   return (
-    typeof value === "string" &&
-    (SUBJECTIVE_CHANGE_VALUES as readonly string[]).includes(value)
+    typeof value === "string" && (SUBJECTIVE_CHANGE_VALUES as readonly string[]).includes(value)
   );
 }
 
@@ -201,11 +200,7 @@ export function validateDailyTrack(
 ): DailyTrackErrors {
   const errors: DailyTrackErrors = {};
 
-  if (
-    !Number.isInteger(values.severity) ||
-    values.severity < 1 ||
-    values.severity > 10
-  ) {
+  if (!Number.isInteger(values.severity) || values.severity < 1 || values.severity > 10) {
     errors.severity = "請選擇困擾程度";
   }
 
@@ -248,9 +243,7 @@ export function validateDailyTrack(
   return errors;
 }
 
-export function buildDailyLifeContext(
-  values: DailyTrackFormValues,
-): DailyLifeContext {
+export function buildDailyLifeContext(values: DailyTrackFormValues): DailyLifeContext {
   return {
     sleep: values.sleep as number,
     diet: values.diet as number,

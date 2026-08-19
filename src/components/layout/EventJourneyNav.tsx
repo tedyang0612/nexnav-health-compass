@@ -28,18 +28,14 @@ export function EventJourneyNav({ eventId }: { eventId: string }) {
       : pathname.startsWith(item.to.replace("$eventId", eventId));
   }
 
-  const current =
-    EVENT_JOURNEY.find((item) => isCurrent(item)) ?? EVENT_JOURNEY[0];
+  const current = EVENT_JOURNEY.find((item) => isCurrent(item)) ?? EVENT_JOURNEY[0];
 
   return (
     <div className="border-b border-border/60 bg-surface">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         {/* Desktop：輕量區塊感水平選單 */}
         <div className="hidden py-3 md:block">
-          <nav
-            aria-label="狀況歷程導覽"
-            className="flex flex-wrap gap-1 rounded-xl bg-muted p-1.5"
-          >
+          <nav aria-label="狀況歷程導覽" className="flex flex-wrap gap-1 rounded-xl bg-muted p-1.5">
             {EVENT_JOURNEY.map((item) => {
               const active = isCurrent(item);
               return (
@@ -75,10 +71,7 @@ export function EventJourneyNav({ eventId }: { eventId: string }) {
                 <ChevronIcon />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="start"
-              className="w-[calc(100vw-2rem)] max-w-sm"
-            >
+            <DropdownMenuContent align="start" className="w-[calc(100vw-2rem)] max-w-sm">
               {EVENT_JOURNEY.map((item) => (
                 <DropdownMenuItem key={item.label} asChild className="min-h-11">
                   <Link to={item.to} params={{ eventId }}>

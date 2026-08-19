@@ -48,9 +48,7 @@ export function PageHeader({
         <h1 className="truncate text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
           {title}
         </h1>
-        {description ? (
-          <p className="text-sm text-muted-foreground">{description}</p>
-        ) : null}
+        {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
       </div>
       {actions ? <div className="shrink-0">{actions}</div> : null}
     </header>
@@ -74,12 +72,8 @@ export function SectionCard({
     <Card className={cn("gap-4 border-border bg-surface-elevated p-5 sm:p-6", className)}>
       {title || description ? (
         <div className="space-y-1">
-          {title ? (
-            <h2 className="text-base font-semibold text-foreground">{title}</h2>
-          ) : null}
-          {description ? (
-            <p className="text-sm text-muted-foreground">{description}</p>
-          ) : null}
+          {title ? <h2 className="text-base font-semibold text-foreground">{title}</h2> : null}
+          {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
         </div>
       ) : null}
       {children}
@@ -89,17 +83,9 @@ export function SectionCard({
 }
 
 /** Mobile 預設滿寬的主要行動按鈕外框。 */
-export function PrimaryCta({
-  children,
-  className,
-  ...props
-}: React.ComponentProps<typeof Button>) {
+export function PrimaryCta({ children, className, ...props }: React.ComponentProps<typeof Button>) {
   return (
-    <Button
-      size="lg"
-      className={cn("min-h-11 w-full sm:w-auto", className)}
-      {...props}
-    >
+    <Button size="lg" className={cn("min-h-11 w-full sm:w-auto", className)} {...props}>
       {children}
     </Button>
   );
@@ -131,10 +117,7 @@ export function StatusBanner({
         : "border-border bg-surface-elevated";
 
   return (
-    <section
-      role="status"
-      className={cn("rounded-xl border p-4 sm:p-5", toneClass)}
-    >
+    <section role="status" className={cn("rounded-xl border p-4 sm:p-5", toneClass)}>
       <div className="flex items-start gap-3">
         <span aria-hidden="true" className="mt-0.5 shrink-0 text-muted-foreground">
           {icon ?? <InfoIcon />}
@@ -146,9 +129,7 @@ export function StatusBanner({
             </p>
           ) : null}
           <p className="text-sm font-medium text-foreground">{title}</p>
-          {description ? (
-            <p className="text-sm text-muted-foreground">{description}</p>
-          ) : null}
+          {description ? <p className="text-sm text-muted-foreground">{description}</p> : null}
           {actions ? <div className="pt-2">{actions}</div> : null}
         </div>
       </div>
@@ -194,9 +175,7 @@ export function EmptyState({
         <InfoIcon />
       </span>
       <p className="text-base font-medium text-foreground">{title}</p>
-      {description ? (
-        <p className="max-w-sm text-sm text-muted-foreground">{description}</p>
-      ) : null}
+      {description ? <p className="max-w-sm text-sm text-muted-foreground">{description}</p> : null}
       {action}
     </div>
   );
@@ -231,7 +210,6 @@ export function ErrorState({
     </div>
   );
 }
-
 
 /** 表單欄位外框：label、說明、錯誤訊息與 a11y 綁定。 */
 export function FormField({

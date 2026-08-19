@@ -57,12 +57,7 @@ export const Route = createFileRoute("/_app/events/$eventId/track/today")({
 });
 
 function TrackHeader() {
-  return (
-    <PageHeader
-      title="今日追蹤"
-      description="記錄目前的不適與生活狀況，方便持續觀察變化。"
-    />
-  );
+  return <PageHeader title="今日追蹤" description="記錄目前的不適與生活狀況，方便持續觀察變化。" />;
 }
 
 function Page() {
@@ -107,9 +102,7 @@ function Page() {
   useEffect(() => {
     if (initialized.current) return;
     if (!todayReady) return;
-    const initial = todayTrack
-      ? { ...todayTrack.values }
-      : createEmptyDailyTrackForm();
+    const initial = todayTrack ? { ...todayTrack.values } : createEmptyDailyTrackForm();
     initialized.current = true;
     setValues(initial);
     setBaseline(initial);
@@ -124,13 +117,9 @@ function Page() {
 
   const saveMutation = useSaveDailyTrack(eventId);
 
-  const dirty =
-    values !== null && baseline !== null && isDailyTrackDirty(values, baseline);
+  const dirty = values !== null && baseline !== null && isDailyTrackDirty(values, baseline);
 
-  function set<K extends keyof DailyTrackFormValues>(
-    key: K,
-    value: DailyTrackFormValues[K],
-  ) {
+  function set<K extends keyof DailyTrackFormValues>(key: K, value: DailyTrackFormValues[K]) {
     setSuccessMessage(null);
     setValues((prev) => (prev ? { ...prev, [key]: value } : prev));
   }
@@ -161,14 +150,12 @@ function Page() {
       {
         values,
         existing: todayTrack,
-        guideId: todayTrack ? todayTrack.guideId : guideQuery.data?.guideId ?? null,
+        guideId: todayTrack ? todayTrack.guideId : (guideQuery.data?.guideId ?? null),
       },
       {
         onSuccess: (result) => {
           setBaseline({ ...values });
-          setSuccessMessage(
-            result.mode === "insert" ? "今日追蹤已儲存" : "今日追蹤已更新",
-          );
+          setSuccessMessage(result.mode === "insert" ? "今日追蹤已儲存" : "今日追蹤已更新");
         },
         onError: () => {
           setSaveError("目前無法儲存今日追蹤，請稍後再試一次。");
@@ -265,11 +252,7 @@ function Page() {
     : "與建立狀況追蹤時的初始感受相比";
 
   const isUpdate = todayTrack !== null;
-  const ctaLabel = saveMutation.isPending
-    ? "<儲存中>"
-    : isUpdate
-      ? "更新今日追蹤"
-      : "儲存今日追蹤";
+  const ctaLabel = saveMutation.isPending ? "<儲存中>" : isUpdate ? "更新今日追蹤" : "儲存今日追蹤";
 
   function toggleSuggestion(code: string) {
     if (!values) return;
@@ -303,9 +286,7 @@ function Page() {
           </div>
 
           <fieldset className="space-y-2">
-            <legend className="mb-1 text-base font-semibold text-foreground">
-              發生頻率
-            </legend>
+            <legend className="mb-1 text-base font-semibold text-foreground">發生頻率</legend>
             <div className="space-y-2">
               {DAILY_FREQUENCY_OPTIONS.map((option, index) => (
                 <label
@@ -319,9 +300,7 @@ function Page() {
                     className="h-4 w-4 accent-primary"
                     checked={values.frequencyLevel === option.value}
                     onChange={() => set("frequencyLevel", option.value)}
-                    aria-describedby={
-                      errors.frequencyLevel ? "daily-frequency-error" : undefined
-                    }
+                    aria-describedby={errors.frequencyLevel ? "daily-frequency-error" : undefined}
                   />
                   <span>{option.label}</span>
                 </label>
@@ -332,10 +311,7 @@ function Page() {
         </div>
 
         <div className="space-y-1.5 pt-2">
-          <label
-            htmlFor="daily-frequency-desc"
-            className="text-sm font-medium text-foreground"
-          >
+          <label htmlFor="daily-frequency-desc" className="text-sm font-medium text-foreground">
             頻率補充（選填）
           </label>
           <Input
@@ -351,10 +327,7 @@ function Page() {
           <p id="daily-frequency-desc-hint" className="text-xs text-muted-foreground">
             {values.frequencyDescription.length} / {FREQ_DESC_MAX} 個字元
           </p>
-          <FieldError
-            id="daily-frequency-desc-error"
-            message={errors.frequencyDescription}
-          />
+          <FieldError id="daily-frequency-desc-error" message={errors.frequencyDescription} />
         </div>
 
         <div className="pt-2">
@@ -376,10 +349,7 @@ function Page() {
         {LIFE_CONTEXT_FIELDS.map((field) => (
           <fieldset key={field.key} className="mt-6 space-y-3 first:mt-0">
             <legend className="mb-1 flex items-center gap-2 text-base font-semibold text-foreground">
-              <span
-                aria-hidden="true"
-                className="inline-block h-4 w-1 rounded-full bg-primary"
-              />
+              <span aria-hidden="true" className="inline-block h-4 w-1 rounded-full bg-primary" />
               {field.label}
             </legend>
             <div className="space-y-2">
@@ -403,20 +373,14 @@ function Page() {
                 </label>
               ))}
             </div>
-            <FieldError
-              id={`daily-life-${field.key}-error`}
-              message={errors[field.key]}
-            />
+            <FieldError id={`daily-life-${field.key}-error`} message={errors[field.key]} />
           </fieldset>
         ))}
       </SectionCard>
 
       {/* Section 3：改善建議 */}
       {showSuggestions ? (
-        <SectionCard
-          title="已嘗試的調整"
-          description="可勾選本次有實際嘗試的項目。"
-        >
+        <SectionCard title="已嘗試的調整" description="可勾選本次有實際嘗試的項目。">
           <div className="grid gap-2 sm:grid-cols-3">
             {suggestions.slice(0, SUGGESTION_MAX).map((suggestion, index) => (
               <label
@@ -434,10 +398,7 @@ function Page() {
               </label>
             ))}
           </div>
-          <FieldError
-            id="daily-suggestion-error"
-            message={errors.suggestionExecution}
-          />
+          <FieldError id="daily-suggestion-error" message={errors.suggestionExecution} />
         </SectionCard>
       ) : null}
 
