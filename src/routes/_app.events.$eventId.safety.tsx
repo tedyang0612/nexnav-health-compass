@@ -331,18 +331,10 @@ function ResultView({
     return (
       <SectionCard title="這次確認有需要留意的地方">
         <p className="text-sm text-muted-foreground">
-          你可以先查看改善方向；若情況持續或加重，也可以查看就醫方向。
+          目前不提供改善方向，建議先查看就醫與專業支持方向。
         </p>
-        <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-          <PrimaryCta onClick={onGuide}>查看改善方向</PrimaryCta>
-          <Button
-            variant="outline"
-            size="lg"
-            className="min-h-11 w-full sm:w-auto"
-            onClick={onNavigate}
-          >
-            查看就醫方向
-          </Button>
+        <div className="pt-2">
+          <PrimaryCta onClick={onNavigate}>查看就醫與專業支持</PrimaryCta>
         </div>
       </SectionCard>
     );

@@ -104,6 +104,7 @@ function Page() {
         <ErrorState
           title="目前無法取得改善方向"
           description="請稍後再試一次。"
+          retryLabel="再試一次"
           onRetry={() => void safetyQuery.refetch()}
         />
       </PageContainer>
@@ -178,6 +179,7 @@ function Page() {
         <ErrorState
           title="目前無法取得改善方向"
           description="請稍後再試一次。"
+          retryLabel="再試一次"
           onRetry={() => void guideQuery.refetch()}
         />
       </PageContainer>
