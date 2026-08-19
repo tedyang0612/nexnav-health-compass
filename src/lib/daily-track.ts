@@ -10,7 +10,7 @@ export type { LifeContextKey };
 
 /** Daily Track 專用：只描述「今天」，不得沿用初次紀錄的「最近 7 天」文案。 */
 export const DAILY_FREQUENCY_OPTIONS: { value: number; label: string }[] = [
-  { value: 1, label: "今天沒有發生" },
+  { value: 1, label: "目前沒有發生" },
   { value: 2, label: "偶爾出現" },
   { value: 3, label: "反覆出現" },
   { value: 4, label: "多數時間出現" },
@@ -206,7 +206,7 @@ export function validateDailyTrack(
     values.severity < 1 ||
     values.severity > 10
   ) {
-    errors.severity = "請選擇今天的困擾程度";
+    errors.severity = "請選擇困擾程度";
   }
 
   if (
@@ -214,7 +214,7 @@ export function validateDailyTrack(
     values.frequencyLevel < 1 ||
     values.frequencyLevel > 5
   ) {
-    errors.frequencyLevel = "請選擇今天的發生頻率";
+    errors.frequencyLevel = "請選擇發生頻率";
   }
 
   if (values.frequencyDescription.trim().length > FREQ_DESC_MAX) {

@@ -6,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 /** 固定順序的狀況歷程導覽（不含 workflow gate）。 */
 export const EVENT_JOURNEY = [
@@ -17,41 +18,49 @@ export const EVENT_JOURNEY = [
   { to: "/events/$eventId/summary/new", label: "摘要", exact: false },
 ] as const;
 
-
 export function EventJourneyNav({ eventId }: { eventId: string }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const base = `/events/${eventId}`;
+
+  function isCurrent(item: (typeof EVENT_JOURNEY)[number]) {
+    return item.exact
+      ? pathname === base || pathname === `${base}/`
+      : pathname.startsWith(item.to.replace("$eventId", eventId));
+  }
+
   const current =
-    EVENT_JOURNEY.find((item) =>
-      item.exact
-        ? pathname === base || pathname === `${base}/`
-        : pathname.startsWith(item.to.replace("$eventId", eventId)),
-    ) ?? EVENT_JOURNEY[0];
+    EVENT_JOURNEY.find((item) => isCurrent(item)) ?? EVENT_JOURNEY[0];
 
   return (
     <div className="border-b border-border/60 bg-surface">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        {/* Desktop：水平選單 */}
-        <nav
-          aria-label="狀況歷程導覽"
-          className="hidden items-center gap-1 overflow-x-auto md:flex"
-        >
-          {EVENT_JOURNEY.map((item) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              params={{ eventId }}
-              activeOptions={{ exact: item.exact }}
-              activeProps={{
-                className:
-                  "border-primary text-foreground",
-              }}
-              className="inline-flex min-h-11 shrink-0 items-center border-b-2 border-transparent px-3 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        {/* Desktop：輕量區塊感水平選單 */}
+        <div className="hidden py-3 md:block">
+          <nav
+            aria-label="狀況歷程導覽"
+            className="flex flex-wrap gap-1 rounded-xl bg-muted p-1.5"
+          >
+            {EVENT_JOURNEY.map((item) => {
+              const active = isCurrent(item);
+              return (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  params={{ eventId }}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "inline-flex min-h-11 shrink-0 items-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                    active
+                      ? "bg-primary/10 font-semibold text-primary"
+                      : "text-muted-foreground hover:bg-primary/5 hover:text-foreground",
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
 
         {/* Mobile：Dropdown */}
         <div className="py-2 md:hidden">
