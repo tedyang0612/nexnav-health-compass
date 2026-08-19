@@ -8,8 +8,9 @@ import {
 } from "@/components/shell";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GuideSections } from "@/components/events/GuideSections";
-import { useGuide } from "@/hooks/useGuide";
+import { useGuide, useExistingGuide, parseGuideTableRow } from "@/hooks/useGuide";
 import { useGuideSafetyGate } from "@/hooks/useGuideSafetyGate";
+
 
 export const Route = createFileRoute("/_app/events/$eventId/guide")({
   head: () => ({
