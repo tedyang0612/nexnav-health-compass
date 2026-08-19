@@ -46,6 +46,31 @@ export type GuideViewModel = {
   suggestions: GuideSuggestion[];
 };
 
+/** P08-C3：來自 public.guides 的既有列（尚未驗證 snapshot 內容）。 */
+export type ExistingGuide = {
+  guideId: string;
+  versionNumber: number;
+  recordRevision: number;
+  safetyAssessmentId: string;
+  raw: {
+    id: string;
+    version_number: number;
+    content_snapshot: unknown;
+    suggestions_snapshot: unknown;
+  };
+};
+
+/** 將 guides 資料列轉為已驗證的 View Model（欄位為 id，非 guide_id）。 */
+export function parseGuideTableRow(row: ExistingGuide): GuideViewModel {
+  return {
+    guideId: row.raw.id,
+    versionNumber: row.raw.version_number,
+    content: parseGuideContentSnapshot(row.raw.content_snapshot),
+    suggestions: parseGuideSuggestions(row.raw.suggestions_snapshot),
+  };
+}
+
+
 export class GuideSnapshotError extends Error {
   constructor(message = "invalid_guide_snapshot") {
     super(message);

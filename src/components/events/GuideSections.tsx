@@ -43,7 +43,7 @@ export function GuideSections({ guide }: { guide: GuideViewModel }) {
       <section className="space-y-3">
         <GuideCard>
           <SectionTitle>可以先嘗試的調整</SectionTitle>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
             {suggestions.map((suggestion, index) => (
               <div
                 key={suggestion.code}

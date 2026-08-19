@@ -8,8 +8,9 @@ import {
 } from "@/components/shell";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GuideSections } from "@/components/events/GuideSections";
-import { useGuide } from "@/hooks/useGuide";
+import { useGuide, useExistingGuide, parseGuideTableRow } from "@/hooks/useGuide";
 import { useGuideSafetyGate } from "@/hooks/useGuideSafetyGate";
+
 
 export const Route = createFileRoute("/_app/events/$eventId/guide")({
   head: () => ({
@@ -69,17 +70,42 @@ function Page() {
   const { eventId } = Route.useParams();
   const navigate = useNavigate();
   const gateQuery = useGuideSafetyGate(eventId);
+  const existingQuery = useExistingGuide(eventId);
   const safetyResult = gateQuery.data?.currentResult ?? null;
+
+  // 既有 Guide 只有在 Safety 為 normal，且 revision 與 safety assessment 皆相符時可重用。
+  const existing = existingQuery.data ?? null;
+  const reusable =
+    safetyResult === "normal" &&
+    existing !== null &&
+    gateQuery.data != null &&
+    existing.recordRevision === gateQuery.data.currentRevision &&
+    existing.safetyAssessmentId === gateQuery.data.currentAssessmentId
+      ? existing
+      : null;
+
+  const reusableGuide = (() => {
+    if (!reusable) return null;
+    try {
+      return parseGuideTableRow(reusable);
+    } catch {
+      return null; // 驗證失敗時退回 RPC 流程
+    }
+  })();
 
   const guideQuery = useGuide({
     eventId,
-    enabled: gateQuery.isSuccess && safetyResult === "normal",
+    enabled:
+      gateQuery.isSuccess &&
+      safetyResult === "normal" &&
+      existingQuery.isSuccess &&
+      reusableGuide === null,
   });
 
   const goNavigate = () =>
     void navigate({ to: "/events/$eventId/navigate", params: { eventId } });
 
-  if (gateQuery.isLoading) {
+  if (gateQuery.isLoading || existingQuery.isLoading) {
     return (
       <PageContainer width="default" className="space-y-5 sm:space-y-6">
         <GuideHeader />
@@ -87,6 +113,9 @@ function Page() {
       </PageContainer>
     );
   }
+
+
+
 
   if (gateQuery.isError) {
     return (
@@ -154,6 +183,15 @@ function Page() {
     );
   }
 
+  if (reusableGuide) {
+    return (
+      <PageContainer width="default" className="space-y-5 sm:space-y-6">
+        <GuideHeader />
+        <GuideSections guide={reusableGuide} />
+      </PageContainer>
+    );
+  }
+
   if (guideQuery.isPending) {
     return (
       <PageContainer width="default" className="space-y-5 sm:space-y-6">
@@ -162,6 +200,7 @@ function Page() {
       </PageContainer>
     );
   }
+
 
   if (guideQuery.isError || !guideQuery.data) {
     return (

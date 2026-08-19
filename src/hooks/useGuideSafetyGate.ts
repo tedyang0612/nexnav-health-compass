@@ -5,12 +5,14 @@ import { isKnownResult, type SafetyResult } from "@/lib/safety";
 export type GuideSafetyGate = {
   currentRevision: number | null;
   currentResult: SafetyResult | null;
+  currentAssessmentId: string | null;
 };
 
 /**
- * P08-C2：Guide 進入條件查詢。
+ * P08-C2/C3：Guide 進入條件查詢。
  * Current revision 與 completed safety 以單一 query（平行請求）取得，
- * 避免同一次頁面載入產生串行的兩次往返；判斷邏輯與先前一致。
+ * 並回傳目前 revision 對應的最新 completed safety assessment id，
+ * 供既有 Guide 是否可重用之比對使用。
  */
 export function useGuideSafetyGate(eventId: string) {
   return useQuery<GuideSafetyGate>({
@@ -28,7 +30,7 @@ export function useGuideSafetyGate(eventId: string) {
           .limit(1),
         supabase
           .from("safety_assessments")
-          .select("result, assessment_status, record_revision, created_at")
+          .select("id, result, assessment_status, record_revision, created_at")
           .eq("health_event_id", eventId)
           .eq("assessment_status", "completed")
           .not("result", "is", null)
@@ -41,7 +43,11 @@ export function useGuideSafetyGate(eventId: string) {
 
       const currentRevision = recordRes.data?.[0]?.revision ?? null;
       if (currentRevision === null) {
-        return { currentRevision: null, currentResult: null };
+        return {
+          currentRevision: null,
+          currentResult: null,
+          currentAssessmentId: null,
+        };
       }
 
       const match = (assessmentRes.data ?? []).find(
@@ -52,6 +58,7 @@ export function useGuideSafetyGate(eventId: string) {
       return {
         currentRevision,
         currentResult: isKnownResult(result) ? result : null,
+        currentAssessmentId: match?.id ?? null,
       };
     },
   });
