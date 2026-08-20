@@ -136,9 +136,7 @@ export function hasDirectionMismatch(
   subjective: SeverityDirection | null,
 ): boolean {
   if (!subjective) return false;
-  return (
-    (numeric === "down" && subjective === "up") || (numeric === "up" && subjective === "down")
-  );
+  return (numeric === "down" && subjective === "up") || (numeric === "up" && subjective === "down");
 }
 
 export const MISMATCH_TEXT = "數字紀錄與主觀感受可能呈現不同方向，建議一併參考。";

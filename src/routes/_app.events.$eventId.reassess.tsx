@@ -284,8 +284,10 @@ function ReassessView({
             }／10，${
               conclusion
                 ? conclusion.text
-                : buildSeverityConclusion(initial.severity, latestTrack?.severity ?? initial.severity)
-                    .text
+                : buildSeverityConclusion(
+                    initial.severity,
+                    latestTrack?.severity ?? initial.severity,
+                  ).text
             }。`}
           />
         </SectionCard>

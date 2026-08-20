@@ -67,9 +67,7 @@ export function useReassessData(eventId: string) {
           .limit(1),
         supabase
           .from("daily_tracks")
-          .select(
-            "id, track_date, severity, frequency_level, subjective_change, notes, created_at",
-          )
+          .select("id, track_date, severity, frequency_level, subjective_change, notes, created_at")
           .eq("health_event_id", eventId)
           .order("track_date", { ascending: true }),
         supabase

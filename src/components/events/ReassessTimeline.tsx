@@ -42,9 +42,7 @@ export function ReassessTimeline({
                   <CalendarDays aria-hidden="true" className="size-4 text-muted-foreground" />
                   今日追蹤
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  困擾程度 {entry.track.severity}／10
-                </p>
+                <p className="text-sm text-muted-foreground">困擾程度 {entry.track.severity}／10</p>
                 <p className="text-sm text-muted-foreground">
                   發生頻率：{frequencyLabel(entry.track.frequencyLevel)}（
                   {entry.track.frequencyLevel}／5）
