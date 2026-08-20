@@ -46,6 +46,12 @@
   --color-heal: var(--heal);
   --color-heal-foreground: var(--heal-foreground);
   --color-heal-muted: var(--heal-muted);
+  --color-urgent: var(--urgent);
+  --color-urgent-strong: var(--urgent-strong);
+  --color-urgent-muted: var(--urgent-muted);
+  --color-caution: var(--caution);
+  --color-caution-strong: var(--caution-strong);
+  --color-caution-muted: var(--caution-muted);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -98,6 +104,12 @@
   --heal: oklch(0.58 0.11 195);
   --heal-foreground: oklch(1 0 0);
   --heal-muted: oklch(0.92 0.03 195);
+  --urgent: oklch(0.55 0.21 27);
+  --urgent-strong: oklch(0.44 0.18 27);
+  --urgent-muted: oklch(0.96 0.03 27);
+  --caution: oklch(0.72 0.15 75);
+  --caution-strong: oklch(0.48 0.12 75);
+  --caution-muted: oklch(0.96 0.05 85);
 
   --chart-1: oklch(0.58 0.11 195);
   --chart-2: oklch(0.65 0.13 160);
@@ -149,6 +161,12 @@
   --heal: oklch(0.68 0.11 195);
   --heal-foreground: oklch(0.15 0.03 255);
   --heal-muted: oklch(0.28 0.04 195);
+  --urgent: oklch(0.65 0.19 27);
+  --urgent-strong: oklch(0.78 0.14 27);
+  --urgent-muted: oklch(0.28 0.08 27);
+  --caution: oklch(0.78 0.13 75);
+  --caution-strong: oklch(0.86 0.11 80);
+  --caution-muted: oklch(0.3 0.06 80);
 
   --chart-1: oklch(0.68 0.11 195);
   --chart-2: oklch(0.72 0.13 160);
@@ -178,9 +196,16 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans TC",
-      "Hiragino Sans GB", system-ui, -apple-system, BlinkMacSystemFont,
-      "Segoe UI", sans-serif;
+    font-family:
+      "PingFang TC",
+      "Microsoft JhengHei",
+      "Noto Sans TC",
+      "Hiragino Sans GB",
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

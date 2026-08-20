@@ -22,15 +22,15 @@ import { NAVIGATE_DISCLAIMER, START_POINTS, SUPPORT_OPTIONS } from "@/lib/naviga
 export const Route = createFileRoute("/_app/events/$eventId/navigate")({
   head: () => ({
     meta: [
-      { title: "就醫與專業支持 — NexNav" },
+      { title: "就醫與專業協助 — NexNav" },
       {
         name: "description",
-        content: "NexNav 狀況歷程：依目前紀錄提供一般性的下一步方向與專業支持參考。",
+        content: "NexNav 狀況歷程：依目前紀錄提供一般性的就醫與專業協助方向。",
       },
-      { property: "og:title", content: "就醫與專業支持 — NexNav" },
+      { property: "og:title", content: "就醫與專業協助 — NexNav" },
       {
         property: "og:description",
-        content: "NexNav 狀況歷程：依目前紀錄提供一般性的下一步方向與專業支持參考。",
+        content: "NexNav 狀況歷程：依目前紀錄提供一般性的就醫與專業協助方向。",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -39,8 +39,8 @@ export const Route = createFileRoute("/_app/events/$eventId/navigate")({
   component: Page,
 });
 
-const PAGE_TITLE = "就醫與專業支持";
-const PAGE_DESCRIPTION = "依目前紀錄，提供一般性的下一步方向與專業支持參考。";
+const PAGE_TITLE = "就醫與專業協助";
+const PAGE_DESCRIPTION = "依目前紀錄，提供一般性的就醫與專業協助方向。";
 
 function BackToEvents() {
   return (
@@ -74,7 +74,7 @@ function Page() {
         <PageHeader title={PAGE_TITLE} />
         <SectionCard>
           <div role="alert" className="space-y-3">
-            <p className="text-base font-medium text-foreground">目前無法取得就醫與專業支持內容</p>
+            <p className="text-base font-medium text-foreground">目前無法取得就醫與專業協助內容</p>
             <p className="text-sm text-muted-foreground">請稍後再試一次。</p>
             <div className="flex flex-wrap gap-3 pt-1">
               <Button
@@ -153,33 +153,49 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
 
       <SafetySection eventId={eventId} result={result} />
 
-      <SectionCard title="可以從哪裡開始" description="以下為一般性方向，不是個人化醫療建議。">
-        <ul className="space-y-2">
-          {START_POINTS.map((item) => (
-            <li key={item} className="flex gap-2 text-sm text-foreground">
-              <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      </SectionCard>
+      {result !== "priority_care" ? (
+        <>
+          <SectionCard title="可以從哪裡開始" description="以下為一般性方向，不是個人化醫療建議。">
+            <ul>
+              {START_POINTS.map((item) => (
+                <li
+                  key={item}
+                  className="flex gap-2 py-1.5 text-sm font-medium text-foreground first:pt-0 last:pb-0"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="mt-2 size-1.5 shrink-0 rounded-full bg-primary"
+                  />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </SectionCard>
 
-      <SectionCard
-        title="哪些情況可考慮尋求支持"
-        description="以下僅供你選擇諮詢方向參考，系統並未判定你需要其中任何一項服務。"
-      >
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {SUPPORT_OPTIONS.map((option) => (
-            <li key={option.topic} className="rounded-xl border border-border bg-surface p-4">
-              <h3 className="text-sm font-semibold text-foreground">{option.topic}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{option.people}</p>
-              {option.note ? (
-                <p className="mt-2 text-sm text-muted-foreground">{option.note}</p>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-      </SectionCard>
+          <SectionCard
+            title="哪些情況可考慮尋求專業協助"
+            description="以下提供常見的諮詢方向參考，系統並未判定你需要其中任何一項服務。"
+          >
+            <ul className="divide-y divide-border">
+              {SUPPORT_OPTIONS.map((option) => (
+                <li key={option.topic} className="py-3 first:pt-0 last:pb-0">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+                    <h3 className="min-w-0 text-sm font-semibold text-foreground">
+                      {option.topic}
+                    </h3>
+                    <p className="min-w-0 text-sm font-medium text-primary sm:text-right">
+                      {option.people}
+                    </p>
+                  </div>
+                  {option.note ? (
+                    <p className="mt-1.5 text-sm text-muted-foreground">補充：{option.note}</p>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </SectionCard>
+        </>
+      ) : null}
 
       <SectionCard title="目前紀錄摘要">
         <dl className="grid gap-4 sm:grid-cols-2">
@@ -272,24 +288,29 @@ function SafetySection({ eventId, result }: { eventId: string; result: SafetyRes
     return (
       <section
         role="alert"
-        className="rounded-xl border-2 border-heal bg-heal-muted p-5 sm:p-6"
+        className="rounded-xl border-2 border-urgent bg-urgent-muted p-5 sm:p-6"
         aria-labelledby="safety-priority-title"
       >
         <div className="flex items-start gap-3">
-          <AlertTriangle aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-foreground" />
+          <AlertTriangle aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-urgent-strong" />
           <div className="min-w-0 space-y-2">
-            <h2 id="safety-priority-title" className="text-lg font-semibold text-foreground">
+            <h2 id="safety-priority-title" className="text-lg font-bold text-urgent-strong">
               目前有需要優先尋求醫療協助的訊號
             </h2>
-            <p className="text-sm text-foreground">
-              建議儘快尋求醫療專業協助。若情況緊急或快速惡化，請立即撥打 119 或前往就近的急診就醫。
+            <p className="text-sm text-foreground">建議儘快尋求醫療專業協助。</p>
+            <p className="text-base font-bold text-urgent-strong">
+              若情況緊急或快速惡化，請立即撥打 119 或前往就近急診就醫。
             </p>
             <ul className="space-y-1 text-sm text-foreground">
               <li>優先處理目前的不適，其他整理與紀錄可稍後再做。</li>
               <li>就醫時可簡要說明症狀開始時間、變化與目前困擾程度。</li>
             </ul>
             <div className="pt-1">
-              <Button asChild className="min-h-11">
+              <Button
+                asChild
+                variant="outline"
+                className="min-h-11 border-urgent text-urgent-strong hover:bg-urgent-muted"
+              >
                 <Link to="/events/$eventId/safety" params={{ eventId }}>
                   重新確認目前狀況
                 </Link>
@@ -303,19 +324,40 @@ function SafetySection({ eventId, result }: { eventId: string; result: SafetyRes
 
   if (result === "attention") {
     return (
-      <StatusBanner
-        tone="attention"
-        icon={<AlertTriangle aria-hidden="true" className="size-4" />}
-        title="目前有需要持續留意的狀況"
-        description="建議安排合適的醫療專業評估；若症狀持續、加重或影響日常活動，請提早就醫。"
-        actions={
-          <Button asChild className="min-h-11">
-            <Link to="/events/$eventId/safety" params={{ eventId }}>
-              重新確認目前狀況
-            </Link>
-          </Button>
-        }
-      />
+      <section
+        role="alert"
+        className="rounded-xl border border-caution bg-caution-muted p-5 sm:p-6"
+        aria-labelledby="safety-attention-title"
+      >
+        <div className="flex items-start gap-3">
+          <AlertTriangle
+            aria-hidden="true"
+            className="mt-0.5 size-5 shrink-0 text-caution-strong"
+          />
+          <div className="min-w-0 space-y-2">
+            <h2 id="safety-attention-title" className="text-base font-semibold text-caution-strong">
+              目前有需要持續留意的狀況
+            </h2>
+            <p className="text-sm text-foreground">
+              建議持續觀察症狀變化；若症狀持續、加重或影響日常活動，可考慮尋求專業評估。
+            </p>
+            <p className="text-sm font-medium text-foreground">
+              若出現明顯警訊或快速惡化，請立即尋求醫療協助。
+            </p>
+            <div className="pt-1">
+              <Button
+                asChild
+                variant="outline"
+                className="min-h-11 border-caution text-caution-strong hover:bg-caution-muted"
+              >
+                <Link to="/events/$eventId/safety" params={{ eventId }}>
+                  重新確認目前狀況
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
     );
   }
 
