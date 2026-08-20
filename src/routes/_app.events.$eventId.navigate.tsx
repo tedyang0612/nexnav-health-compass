@@ -74,9 +74,7 @@ function Page() {
         <PageHeader title={PAGE_TITLE} />
         <SectionCard>
           <div role="alert" className="space-y-3">
-            <p className="text-base font-medium text-foreground">
-              目前無法取得就醫與專業支持內容
-            </p>
+            <p className="text-base font-medium text-foreground">目前無法取得就醫與專業支持內容</p>
             <p className="text-sm text-muted-foreground">請稍後再試一次。</p>
             <div className="flex flex-wrap gap-3 pt-1">
               <Button
@@ -223,10 +221,7 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
         </div>
       </SectionCard>
 
-      <SectionCard
-        title="建立摘要"
-        description="摘要可協助你整理目前紀錄，方便與專業人員溝通。"
-      >
+      <SectionCard title="建立摘要" description="摘要可協助你整理目前紀錄，方便與專業人員溝通。">
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild className="min-h-11 w-full sm:w-auto">
             <Link
@@ -254,13 +249,7 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
   );
 }
 
-function SafetySection({
-  eventId,
-  result,
-}: {
-  eventId: string;
-  result: SafetyResultValue | null;
-}) {
+function SafetySection({ eventId, result }: { eventId: string; result: SafetyResultValue | null }) {
   if (result === null) {
     return (
       <StatusBanner
@@ -293,8 +282,7 @@ function SafetySection({
               目前有需要優先尋求醫療協助的訊號
             </h2>
             <p className="text-sm text-foreground">
-              建議儘快尋求醫療專業協助。若情況緊急或快速惡化，請立即撥打 119
-              或前往就近的急診就醫。
+              建議儘快尋求醫療專業協助。若情況緊急或快速惡化，請立即撥打 119 或前往就近的急診就醫。
             </p>
             <ul className="space-y-1 text-sm text-foreground">
               <li>優先處理目前的不適，其他整理與紀錄可稍後再做。</li>
