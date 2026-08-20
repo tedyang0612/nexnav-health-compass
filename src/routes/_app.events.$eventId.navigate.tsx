@@ -22,15 +22,15 @@ import { NAVIGATE_DISCLAIMER, START_POINTS, SUPPORT_OPTIONS } from "@/lib/naviga
 export const Route = createFileRoute("/_app/events/$eventId/navigate")({
   head: () => ({
     meta: [
-      { title: "就醫與專業支持 — NexNav" },
+      { title: "就醫與專業協助 — NexNav" },
       {
         name: "description",
-        content: "NexNav 狀況歷程：依目前紀錄提供一般性的下一步方向與專業支持參考。",
+        content: "NexNav 狀況歷程：依目前紀錄提供一般性的就醫與專業協助方向。",
       },
-      { property: "og:title", content: "就醫與專業支持 — NexNav" },
+      { property: "og:title", content: "就醫與專業協助 — NexNav" },
       {
         property: "og:description",
-        content: "NexNav 狀況歷程：依目前紀錄提供一般性的下一步方向與專業支持參考。",
+        content: "NexNav 狀況歷程：依目前紀錄提供一般性的就醫與專業協助方向。",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -39,8 +39,8 @@ export const Route = createFileRoute("/_app/events/$eventId/navigate")({
   component: Page,
 });
 
-const PAGE_TITLE = "就醫與專業支持";
-const PAGE_DESCRIPTION = "依目前紀錄，提供一般性的下一步方向與專業支持參考。";
+const PAGE_TITLE = "就醫與專業協助";
+const PAGE_DESCRIPTION = "依目前紀錄，提供一般性的就醫與專業協助方向。";
 
 function BackToEvents() {
   return (
@@ -74,7 +74,7 @@ function Page() {
         <PageHeader title={PAGE_TITLE} />
         <SectionCard>
           <div role="alert" className="space-y-3">
-            <p className="text-base font-medium text-foreground">目前無法取得就醫與專業支持內容</p>
+            <p className="text-base font-medium text-foreground">目前無法取得就醫與專業協助內容</p>
             <p className="text-sm text-muted-foreground">請稍後再試一次。</p>
             <div className="flex flex-wrap gap-3 pt-1">
               <Button
