@@ -292,10 +292,7 @@ function SafetySection({ eventId, result }: { eventId: string; result: SafetyRes
         aria-labelledby="safety-priority-title"
       >
         <div className="flex items-start gap-3">
-          <AlertTriangle
-            aria-hidden="true"
-            className="mt-0.5 size-5 shrink-0 text-urgent-strong"
-          />
+          <AlertTriangle aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-urgent-strong" />
           <div className="min-w-0 space-y-2">
             <h2 id="safety-priority-title" className="text-lg font-bold text-urgent-strong">
               目前有需要優先尋求醫療協助的訊號
