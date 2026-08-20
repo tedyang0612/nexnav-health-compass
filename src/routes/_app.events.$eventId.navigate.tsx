@@ -153,33 +153,49 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
 
       <SafetySection eventId={eventId} result={result} />
 
-      <SectionCard title="可以從哪裡開始" description="以下為一般性方向，不是個人化醫療建議。">
-        <ul className="space-y-2">
-          {START_POINTS.map((item) => (
-            <li key={item} className="flex gap-2 text-sm text-foreground">
-              <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      </SectionCard>
+      {result !== "priority_care" ? (
+        <>
+          <SectionCard title="可以從哪裡開始" description="以下為一般性方向，不是個人化醫療建議。">
+            <ul>
+              {START_POINTS.map((item) => (
+                <li
+                  key={item}
+                  className="flex gap-2 py-1.5 text-sm font-medium text-foreground first:pt-0 last:pb-0"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="mt-2 size-1.5 shrink-0 rounded-full bg-primary"
+                  />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </SectionCard>
 
-      <SectionCard
-        title="哪些情況可考慮尋求支持"
-        description="以下僅供你選擇諮詢方向參考，系統並未判定你需要其中任何一項服務。"
-      >
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {SUPPORT_OPTIONS.map((option) => (
-            <li key={option.topic} className="rounded-xl border border-border bg-surface p-4">
-              <h3 className="text-sm font-semibold text-foreground">{option.topic}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{option.people}</p>
-              {option.note ? (
-                <p className="mt-2 text-sm text-muted-foreground">{option.note}</p>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-      </SectionCard>
+          <SectionCard
+            title="哪些情況可考慮尋求專業協助"
+            description="以下提供常見的諮詢方向參考，系統並未判定你需要其中任何一項服務。"
+          >
+            <ul className="divide-y divide-border">
+              {SUPPORT_OPTIONS.map((option) => (
+                <li key={option.topic} className="py-3 first:pt-0 last:pb-0">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+                    <h3 className="min-w-0 text-sm font-semibold text-foreground">
+                      {option.topic}
+                    </h3>
+                    <p className="min-w-0 text-sm font-medium text-primary sm:text-right">
+                      {option.people}
+                    </p>
+                  </div>
+                  {option.note ? (
+                    <p className="mt-1.5 text-sm text-muted-foreground">補充：{option.note}</p>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </SectionCard>
+        </>
+      ) : null}
 
       <SectionCard title="目前紀錄摘要">
         <dl className="grid gap-4 sm:grid-cols-2">
