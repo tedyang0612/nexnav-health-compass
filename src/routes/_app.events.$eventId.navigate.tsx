@@ -288,24 +288,32 @@ function SafetySection({ eventId, result }: { eventId: string; result: SafetyRes
     return (
       <section
         role="alert"
-        className="rounded-xl border-2 border-heal bg-heal-muted p-5 sm:p-6"
+        className="rounded-xl border-2 border-urgent bg-urgent-muted p-5 sm:p-6"
         aria-labelledby="safety-priority-title"
       >
         <div className="flex items-start gap-3">
-          <AlertTriangle aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-foreground" />
+          <AlertTriangle
+            aria-hidden="true"
+            className="mt-0.5 size-5 shrink-0 text-urgent-strong"
+          />
           <div className="min-w-0 space-y-2">
-            <h2 id="safety-priority-title" className="text-lg font-semibold text-foreground">
+            <h2 id="safety-priority-title" className="text-lg font-bold text-urgent-strong">
               目前有需要優先尋求醫療協助的訊號
             </h2>
-            <p className="text-sm text-foreground">
-              建議儘快尋求醫療專業協助。若情況緊急或快速惡化，請立即撥打 119 或前往就近的急診就醫。
+            <p className="text-sm text-foreground">建議儘快尋求醫療專業協助。</p>
+            <p className="text-base font-bold text-urgent-strong">
+              若情況緊急或快速惡化，請立即撥打 119 或前往就近急診就醫。
             </p>
             <ul className="space-y-1 text-sm text-foreground">
               <li>優先處理目前的不適，其他整理與紀錄可稍後再做。</li>
               <li>就醫時可簡要說明症狀開始時間、變化與目前困擾程度。</li>
             </ul>
             <div className="pt-1">
-              <Button asChild className="min-h-11">
+              <Button
+                asChild
+                variant="outline"
+                className="min-h-11 border-urgent text-urgent-strong hover:bg-urgent-muted"
+              >
                 <Link to="/events/$eventId/safety" params={{ eventId }}>
                   重新確認目前狀況
                 </Link>
@@ -319,19 +327,40 @@ function SafetySection({ eventId, result }: { eventId: string; result: SafetyRes
 
   if (result === "attention") {
     return (
-      <StatusBanner
-        tone="attention"
-        icon={<AlertTriangle aria-hidden="true" className="size-4" />}
-        title="目前有需要持續留意的狀況"
-        description="建議安排合適的醫療專業評估；若症狀持續、加重或影響日常活動，請提早就醫。"
-        actions={
-          <Button asChild className="min-h-11">
-            <Link to="/events/$eventId/safety" params={{ eventId }}>
-              重新確認目前狀況
-            </Link>
-          </Button>
-        }
-      />
+      <section
+        role="alert"
+        className="rounded-xl border border-caution bg-caution-muted p-5 sm:p-6"
+        aria-labelledby="safety-attention-title"
+      >
+        <div className="flex items-start gap-3">
+          <AlertTriangle
+            aria-hidden="true"
+            className="mt-0.5 size-5 shrink-0 text-caution-strong"
+          />
+          <div className="min-w-0 space-y-2">
+            <h2 id="safety-attention-title" className="text-base font-semibold text-caution-strong">
+              目前有需要持續留意的狀況
+            </h2>
+            <p className="text-sm text-foreground">
+              建議持續觀察症狀變化；若症狀持續、加重或影響日常活動，可考慮尋求專業評估。
+            </p>
+            <p className="text-sm font-medium text-foreground">
+              若出現明顯警訊或快速惡化，請立即尋求醫療協助。
+            </p>
+            <div className="pt-1">
+              <Button
+                asChild
+                variant="outline"
+                className="min-h-11 border-caution text-caution-strong hover:bg-caution-muted"
+              >
+                <Link to="/events/$eventId/safety" params={{ eventId }}>
+                  重新確認目前狀況
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
     );
   }
 
