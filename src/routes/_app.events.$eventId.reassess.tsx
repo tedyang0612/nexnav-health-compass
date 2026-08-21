@@ -46,6 +46,9 @@ export const Route = createFileRoute("/_app/events/$eventId/reassess")({
   component: Page,
 });
 
+/** 四張主要卡片一致的標題貼齊上緣間距。 */
+const CARD_TIGHT = "gap-3 pt-4 sm:pt-5";
+
 function BackToEvents() {
   return (
     <Button asChild variant="outline" className="min-h-11">
@@ -300,13 +303,13 @@ function ReassessView({
       ) : null}
 
       {showFrequency && frequency ? (
-        <SectionCard title="發生頻率">
+        <SectionCard title="發生頻率" className={CARD_TIGHT}>
           <div className="space-y-3">
             <p className="flex items-center gap-2 text-base font-semibold text-foreground">
               <DirectionIcon direction={frequency.direction} />
               {frequency.text}
             </p>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-4">
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-stretch sm:gap-4">
               <FrequencyEnd
                 label="最早追蹤"
                 date={frequency.earliest.date}
@@ -315,9 +318,10 @@ function ReassessView({
               />
               <div
                 aria-hidden="true"
-                className="self-center text-sm text-muted-foreground sm:self-center"
+                className="self-center text-sm leading-none text-muted-foreground"
               >
-                →
+                <span className="sm:hidden">↓</span>
+                <span className="hidden sm:inline">→</span>
               </div>
               <FrequencyEnd
                 label="最新追蹤"
@@ -330,7 +334,7 @@ function ReassessView({
         </SectionCard>
       ) : null}
 
-      <SectionCard title="追蹤時間軸">
+      <SectionCard title="追蹤時間軸" className={CARD_TIGHT}>
         <ReassessTimeline
           entries={timeline}
           symptomName={event.symptomName}
