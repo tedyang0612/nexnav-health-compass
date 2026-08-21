@@ -236,9 +236,11 @@ export type Database = {
           source_data_updated_at: string
           source_record_revision: number
           status: string
+          submission_id: string | null
           summary_type: string
           updated_at: string
           user_id: string
+          version_number: number | null
         }
         Insert: {
           confirmed_at?: string | null
@@ -250,9 +252,11 @@ export type Database = {
           source_data_updated_at: string
           source_record_revision: number
           status?: string
+          submission_id?: string | null
           summary_type: string
           updated_at?: string
           user_id: string
+          version_number?: number | null
         }
         Update: {
           confirmed_at?: string | null
@@ -264,9 +268,11 @@ export type Database = {
           source_data_updated_at?: string
           source_record_revision?: number
           status?: string
+          submission_id?: string | null
           summary_type?: string
           updated_at?: string
           user_id?: string
+          version_number?: number | null
         }
         Relationships: [
           {
@@ -545,6 +551,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      confirm_health_summary: {
+        Args: {
+          p_expected_latest_track_date?: string
+          p_expected_record_revision: number
+          p_expected_source_updated_at: string
+          p_health_event_id: string
+          p_questions?: Json
+          p_selected_background_keys?: string[]
+          p_selected_track_ids?: string[]
+          p_submission_id: string
+          p_summary_type: string
+          p_target_professional?: string
+        }
+        Returns: {
+          confirmed_at: string
+          created_new: boolean
+          latest_track_date: string
+          snapshot_content: Json
+          source_data_updated_at: string
+          source_record_revision: number
+          status: string
+          summary_id: string
+          summary_type: string
+          version_number: number
+        }[]
+      }
       create_guide_for_event: {
         Args: { p_health_event_id: string }
         Returns: {
