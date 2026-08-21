@@ -18,9 +18,20 @@ export function summaryTypeFromSearch(value: unknown): SummaryType {
 }
 
 export const SUMMARY_TYPE_LABEL: Record<SummaryType, string> = {
-  medical: "就醫溝通摘要",
+  medical: "醫療溝通摘要",
   professional_support: "其他健康專業諮詢摘要",
 };
+
+export const SUMMARY_TYPE_DESCRIPTION: Record<SummaryType, string> = {
+  medical: "整理症狀、安全確認與追蹤變化，方便就醫時溝通。",
+  professional_support: "整理生活狀況、已嘗試的調整與追蹤紀錄，方便與其他健康專業人員討論。",
+};
+
+/** 可選填私人資訊區塊上方的固定說明文字。 */
+export const PRIVACY_COPY_LINES = [
+  "以下資訊預設不會帶入。",
+  "只有你勾選的內容會出現在這份摘要中，不會修改個人資料或其他版本。",
+] as const;
 
 export const SUMMARY_DISCLAIMER: Record<SummaryType, string> = {
   medical:
