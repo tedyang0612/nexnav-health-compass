@@ -83,7 +83,7 @@ export function summaryErrorMessage(raw: unknown): string {
   if (message.includes("PROFESSIONAL_SUPPORT_BLOCKED_BY_SAFETY"))
     return "目前的安全確認結果建議優先尋求醫療協助，暫時無法建立其他健康專業諮詢摘要。";
   if (message.includes("SOURCE_CHANGED"))
-    return "你的紀錄在預覽後有更新，請重新整理預覽內容再確認一次。";
+    return "來源紀錄已更新，請重新產生預覽並再次確認。";
   if (message.includes("INVALID_TRACK_SELECTION"))
     return "選取的每日追蹤備註已不存在，請重新選擇。";
   if (message.includes("TOO_MANY_QUESTIONS") || message.includes("INVALID_QUESTIONS"))

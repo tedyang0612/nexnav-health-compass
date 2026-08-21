@@ -245,18 +245,20 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
               params={{ eventId }}
               search={{ type: "medical" }}
             >
-              產生就醫摘要
+              建立醫療溝通摘要
             </Link>
           </Button>
-          <Button asChild variant="outline" className="min-h-11 w-full sm:w-auto">
-            <Link
-              to="/events/$eventId/summary/new"
-              params={{ eventId }}
-              search={{ type: "professional" }}
-            >
-              產生諮詢摘要
-            </Link>
-          </Button>
+          {result !== "priority_care" ? (
+            <Button asChild variant="outline" className="min-h-11 w-full sm:w-auto">
+              <Link
+                to="/events/$eventId/summary/new"
+                params={{ eventId }}
+                search={{ type: "professional" }}
+              >
+                建立其他健康專業諮詢摘要
+              </Link>
+            </Button>
+          ) : null}
         </div>
       </SectionCard>
 
