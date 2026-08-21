@@ -147,7 +147,7 @@ export function useSummarySource(eventId: string) {
         profileUpdatedAt: profileRes.data?.updated_at ?? null,
         healthBackground:
           (profileRes.data?.health_background as Record<string, unknown> | null) ?? {},
-        latestTrackDate: tracks.length > 0 ? tracks[tracks.length - 1].track_date : null,
+        latestTrackDate: tracks[tracks.length - 1]?.track_date ?? null,
       };
     },
   });
