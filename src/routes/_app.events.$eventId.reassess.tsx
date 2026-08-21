@@ -250,7 +250,7 @@ function ReassessView({
       ) : null}
 
       {showConclusion && conclusion ? (
-        <SectionCard title="困擾程度變化">
+        <SectionCard title="困擾程度變化" className={CARD_TIGHT}>
           <div className="space-y-2">
             <p className="flex items-center gap-2 text-base font-semibold text-foreground">
               <DirectionIcon direction={conclusion.direction} />
@@ -269,14 +269,20 @@ function ReassessView({
               conclusion.direction,
               subjectiveDirection(latestTrack.subjectiveChange),
             ) ? (
-              <p className="text-sm text-muted-foreground">{MISMATCH_TEXT}</p>
+              <div className="mt-1 flex items-start gap-2 rounded-lg border border-caution/50 bg-caution-muted px-3 py-2">
+                <AlertTriangle
+                  aria-hidden="true"
+                  className="mt-0.5 size-4 shrink-0 text-caution-strong"
+                />
+                <p className="text-sm leading-6 text-foreground">{MISMATCH_TEXT}</p>
+              </div>
             ) : null}
           </div>
         </SectionCard>
       ) : null}
 
       {showChart ? (
-        <SectionCard title="困擾程度">
+        <SectionCard title="困擾程度" className={CARD_TIGHT}>
           <SeverityTrendChart
             points={chartPoints}
             accessibleText={`困擾程度折線圖：初始 ${initial.severity}／10，最新 ${
