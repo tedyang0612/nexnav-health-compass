@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 export const EVENT_JOURNEY = [
   { to: "/events/$eventId", label: "狀況總覽", exact: true },
   { to: "/events/$eventId/guide", label: "改善方向", exact: false },
-  { to: "/events/$eventId/track/today", label: "今日追蹤", exact: false },
+  { to: "/events/$eventId/track/today", label: "每日追蹤", exact: false },
   { to: "/events/$eventId/reassess", label: "追蹤變化", exact: false },
   { to: "/events/$eventId/navigate", label: "就醫與專業協助", exact: false },
   { to: "/events/$eventId/summary/new", label: "摘要", exact: false },
