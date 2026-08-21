@@ -26,7 +26,6 @@ import {
   formatTaipeiDate,
   frequencyLabel,
   HEALTH_BACKGROUND_KEYS,
-  isSummaryType,
   normalizeQuestions,
   PRIVACY_COPY_LINES,
   QUESTION_MAX_COUNT,
@@ -383,7 +382,7 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
               <SectionCard
                 title="想諮詢的對象"
                 description="選擇後會一併記錄在摘要中。"
-                className={targetError ? "border-caution ring-1 ring-caution" : undefined}
+                {...(targetError ? { className: "border-caution ring-1 ring-caution" } : {})}
               >
                 <RadioGroup
                   value={target}
@@ -657,5 +656,3 @@ function buildPreviewSnapshot(
     })),
   };
 }
-
-export { isSummaryType };
