@@ -154,7 +154,7 @@ function LifeContext({
   labels,
   compact,
 }: {
-  values?: Record<string, number> | null;
+  values?: Record<string, number> | null | undefined;
   labels: Record<string, string>;
   compact?: boolean;
 }) {
