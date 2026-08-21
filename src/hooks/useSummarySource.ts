@@ -6,6 +6,11 @@ export type SummarySourceTrack = {
   id: string;
   track_date: string;
   severity: number;
+  frequency_level: number | null;
+  frequency_description: string | null;
+  subjective_change: string | null;
+  life_context: Record<string, number> | null;
+  suggestion_execution: string[];
   notes: string | null;
   updated_at: string;
 };
@@ -19,17 +24,38 @@ export type SummarySource = {
     primary_symptom_label: string | null;
     custom_primary_symptom: string | null;
   };
-  initialRecord: { revision: number; severity: number; updated_at: string };
+  initialRecord: {
+    revision: number;
+    severity: number;
+    frequency_level: number | null;
+    frequency_description: string | null;
+    duration_value: number | null;
+    duration_unit: string | null;
+    associated_symptoms: { label: string | null }[];
+    life_context: Record<string, number> | null;
+    supplemental_description: string | null;
+    updated_at: string;
+  };
   safety: {
     id: string;
     result: string;
     record_revision: number;
     assessed_at: string;
+    warnings: { code: string; label: string }[];
   } | null;
   tracks: SummarySourceTrack[];
+  suggestionMap: Record<string, { title: string; description?: string | null }>;
   profileUpdatedAt: string | null;
   healthBackground: Record<string, unknown>;
   latestTrackDate: string | null;
+};
+
+const SAFETY_WARNING_LABELS: Record<string, string> = {
+  severe_breathing_difficulty: "明顯呼吸困難",
+  significant_chest_discomfort: "明顯胸悶或胸痛",
+  stroke_warning_signs: "疑似中風徵兆（臉部歪斜、單側無力、說話困難）",
+  consciousness_change: "意識改變或昏厥",
+  other_emergency_signs: "其他需要立即處理的緊急徵兆",
 };
 
 function maxIso(values: (string | null | undefined)[]): string | null {
@@ -74,7 +100,7 @@ export function useSummarySource(eventId: string) {
     retry: 1,
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      const [eventRes, recordRes, trackRes, profileRes] = await Promise.all([
+      const [eventRes, recordRes, trackRes, profileRes, guideRes] = await Promise.all([
         supabase
           .from("health_events")
           .select(
@@ -84,16 +110,21 @@ export function useSummarySource(eventId: string) {
           .maybeSingle(),
         supabase
           .from("initial_records")
-          .select("revision, severity, updated_at")
+          .select(
+            "revision, severity, frequency_level, frequency_description, duration_value, duration_unit, associated_symptoms, life_context, supplemental_description, updated_at",
+          )
           .eq("health_event_id", eventId)
           .order("revision", { ascending: false })
           .limit(1),
         supabase
           .from("daily_tracks")
-          .select("id, track_date, severity, notes, updated_at")
+          .select(
+            "id, track_date, severity, frequency_level, frequency_description, subjective_change, life_context, suggestion_execution, notes, updated_at",
+          )
           .eq("health_event_id", eventId)
           .order("track_date", { ascending: true }),
         supabase.from("profiles").select("updated_at, health_background").maybeSingle(),
+        supabase.from("guides").select("suggestions_snapshot").eq("health_event_id", eventId),
       ]);
 
       if (eventRes.error) throw eventRes.error;
@@ -107,7 +138,7 @@ export function useSummarySource(eventId: string) {
 
       const safetyRes = await supabase
         .from("safety_assessments")
-        .select("id, result, record_revision, resolved_at, created_at")
+        .select("id, result, record_revision, resolved_at, created_at, answers_snapshot")
         .eq("health_event_id", eventId)
         .eq("assessment_status", "completed")
         .eq("record_revision", recordRow.revision)
@@ -118,8 +149,52 @@ export function useSummarySource(eventId: string) {
       if (safetyRes.error) throw safetyRes.error;
 
       const safetyRow = safetyRes.data?.[0] ?? null;
-      const tracks = (trackRes.data ?? []) as SummarySourceTrack[];
+
+      const tracks: SummarySourceTrack[] = (trackRes.data ?? []).map((row) => ({
+        id: row.id,
+        track_date: row.track_date,
+        severity: row.severity,
+        frequency_level: row.frequency_level ?? null,
+        frequency_description: row.frequency_description ?? null,
+        subjective_change: row.subjective_change ?? null,
+        life_context: (row.life_context as Record<string, number> | null) ?? null,
+        suggestion_execution: Array.isArray(row.suggestion_execution)
+          ? (row.suggestion_execution as unknown[]).filter(
+              (v): v is string => typeof v === "string",
+            )
+          : [],
+        notes: row.notes ?? null,
+        updated_at: row.updated_at,
+      }));
+
+      const suggestionMap: Record<string, { title: string; description?: string | null }> = {};
+      for (const guide of guideRes.data ?? []) {
+        const list = guide.suggestions_snapshot;
+        if (!Array.isArray(list)) continue;
+        for (const raw of list as Record<string, unknown>[]) {
+          const code = typeof raw?.["code"] === "string" ? (raw["code"] as string) : null;
+          if (!code) continue;
+          suggestionMap[code] = {
+            title: typeof raw["title"] === "string" ? (raw["title"] as string) : code,
+            description:
+              typeof raw["description"] === "string" ? (raw["description"] as string) : null,
+          };
+        }
+      }
+
+      const answers = (safetyRow?.answers_snapshot as Record<string, unknown> | null) ?? {};
+      const warnings = Object.entries(answers)
+        .filter(([, value]) => value === true)
+        .map(([code]) => ({ code, label: SAFETY_WARNING_LABELS[code] ?? code }))
+        .sort((a, b) => a.code.localeCompare(b.code));
+
       const symptom = eventRow.symptom_catalog as { display_name: string } | null;
+
+      const associated = Array.isArray(recordRow.associated_symptoms)
+        ? (recordRow.associated_symptoms as Record<string, unknown>[]).map((item) => ({
+            label: typeof item?.["custom_text"] === "string" ? (item["custom_text"] as string) : null,
+          }))
+        : [];
 
       return {
         event: {
@@ -133,6 +208,13 @@ export function useSummarySource(eventId: string) {
         initialRecord: {
           revision: recordRow.revision,
           severity: recordRow.severity,
+          frequency_level: recordRow.frequency_level ?? null,
+          frequency_description: recordRow.frequency_description ?? null,
+          duration_value: recordRow.duration_value ?? null,
+          duration_unit: recordRow.duration_unit ?? null,
+          associated_symptoms: associated,
+          life_context: (recordRow.life_context as Record<string, number> | null) ?? null,
+          supplemental_description: recordRow.supplemental_description ?? null,
           updated_at: recordRow.updated_at,
         },
         safety: safetyRow
@@ -141,9 +223,11 @@ export function useSummarySource(eventId: string) {
               result: safetyRow.result as string,
               record_revision: safetyRow.record_revision,
               assessed_at: safetyRow.resolved_at ?? safetyRow.created_at,
+              warnings,
             }
           : null,
         tracks,
+        suggestionMap,
         profileUpdatedAt: profileRes.data?.updated_at ?? null,
         healthBackground:
           (profileRes.data?.health_background as Record<string, unknown> | null) ?? {},
