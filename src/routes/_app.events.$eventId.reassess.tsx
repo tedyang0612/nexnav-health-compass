@@ -363,12 +363,12 @@ function FrequencyEnd({
   level: number;
 }) {
   return (
-    <div className="min-w-0 flex-1 rounded-xl border border-border bg-surface p-4">
-      <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      <p className="mt-1 break-words text-base font-semibold text-foreground">
+    <div className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-3.5 py-2.5 sm:p-4">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="mt-0.5 break-words text-base font-semibold text-foreground">
         {text}（{level}／5）
       </p>
-      <p className="mt-1 text-xs text-muted-foreground">{formatDisplayDate(date)}</p>
+      <p className="mt-0.5 text-xs text-muted-foreground">{formatDisplayDate(date)}</p>
     </div>
   );
 }
