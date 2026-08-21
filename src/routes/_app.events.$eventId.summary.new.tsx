@@ -1,5 +1,6 @@
-import { useMemo, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMemo, useRef, useState } from "react";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   ErrorState,
@@ -15,18 +16,25 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { FieldError } from "@/components/events/FieldError";
+import { UnsavedChangesGuard } from "@/components/profile/UnsavedChangesGuard";
 import { SummarySnapshotView } from "@/components/summary/SummarySnapshotView";
-import { sourceFingerprint, useSummarySource } from "@/hooks/useSummarySource";
+import { sourceFingerprint, useSummarySource, type SummarySource } from "@/hooks/useSummarySource";
 import {
   backgroundContentToText,
+  DURATION_UNIT_LABELS,
   formatTaipeiDate,
+  frequencyLabel,
   HEALTH_BACKGROUND_KEYS,
+  isSummaryType,
   normalizeQuestions,
+  PRIVACY_COPY_LINES,
   QUESTION_MAX_COUNT,
   QUESTION_MAX_LENGTH,
+  subjectiveLabel,
   summaryErrorMessage,
-  summaryTypeFromSearch,
   SUMMARY_DISCLAIMER,
+  SUMMARY_TYPE_DESCRIPTION,
   SUMMARY_TYPE_LABEL,
   TARGET_PROFESSIONALS,
   validateQuestions,
@@ -36,12 +44,16 @@ import {
   type TargetProfessional,
 } from "@/lib/summary";
 
-type SummarySearch = { type: "medical" | "professional" };
+type SummarySearch = { type?: "medical" | "professional" };
+
+const TARGET_ERROR = "請選擇想諮詢的對象，或選擇「尚未確定」。";
+const SOURCE_CHANGED_MESSAGE = "來源紀錄已更新，請重新產生預覽並再次確認。";
 
 export const Route = createFileRoute("/_app/events/$eventId/summary/new")({
-  validateSearch: (search: Record<string, unknown>): SummarySearch => ({
-    type: search["type"] === "professional" ? "professional" : "medical",
-  }),
+  validateSearch: (search: Record<string, unknown>): SummarySearch =>
+    search["type"] === "professional" || search["type"] === "medical"
+      ? { type: search["type"] }
+      : {},
   head: () => ({
     meta: [
       { title: "建立摘要 — NexNav" },
@@ -55,26 +67,133 @@ export const Route = createFileRoute("/_app/events/$eventId/summary/new")({
   component: Page,
 });
 
+function useExistingSummaries(eventId: string) {
+  return useQuery({
+    queryKey: ["health-summaries", eventId],
+    refetchOnWindowFocus: false,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("health_summaries")
+        .select("id, summary_type, version_number, confirmed_at, created_at")
+        .eq("health_event_id", eventId)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
+
 function Page() {
   const { eventId } = Route.useParams();
   const search = Route.useSearch();
-  const summaryType: SummaryType = summaryTypeFromSearch(search.type);
+  const summaryType: SummaryType | null =
+    search.type === "professional"
+      ? "professional_support"
+      : search.type === "medical"
+        ? "medical"
+        : null;
+
+  if (!summaryType) return <SelectionPage eventId={eventId} />;
+  return <BuilderPage key={summaryType} eventId={eventId} summaryType={summaryType} />;
+}
+
+/* ---------- 未指定類型：兩張卡片的選擇頁 ---------- */
+
+function SelectionPage({ eventId }: { eventId: string }) {
+  const summaries = useExistingSummaries(eventId);
+
+  return (
+    <PageContainer className="space-y-6">
+      <PageHeader title="建立摘要" description="選擇你這次想準備的摘要類型。" />
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {(["medical", "professional_support"] as const).map((type) => (
+          <SectionCard
+            key={type}
+            title={SUMMARY_TYPE_LABEL[type]}
+            description={SUMMARY_TYPE_DESCRIPTION[type]}
+            footer={
+              <Button asChild className="min-h-11 w-full sm:w-auto">
+                <Link
+                  to="/events/$eventId/summary/new"
+                  params={{ eventId }}
+                  search={{ type: type === "medical" ? "medical" : "professional" }}
+                >
+                  建立{SUMMARY_TYPE_LABEL[type]}
+                </Link>
+              </Button>
+            }
+          />
+        ))}
+      </div>
+
+      <ExistingSummaries query={summaries} />
+    </PageContainer>
+  );
+}
+
+function ExistingSummaries({ query }: { query: ReturnType<typeof useExistingSummaries> }) {
+  const rows = query.data ?? [];
+  if (rows.length === 0) return null;
+  return (
+    <SectionCard title="已建立的摘要">
+      <ul className="divide-y divide-border">
+        {rows.map((row) => (
+          <li
+            key={row.id}
+            className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-foreground">
+                {SUMMARY_TYPE_LABEL[row.summary_type as SummaryType] ?? row.summary_type}
+                {row.version_number ? ` v${row.version_number}` : ""}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                確認日期：{formatTaipeiDate(row.confirmed_at ?? row.created_at)}
+              </p>
+            </div>
+            <Button asChild variant="outline" className="min-h-11 sm:w-auto">
+              <Link to="/summaries/$summaryId" params={{ summaryId: row.id }}>
+                檢視
+              </Link>
+            </Button>
+          </li>
+        ))}
+      </ul>
+    </SectionCard>
+  );
+}
+
+/* ---------- 指定類型：Builder ＋ Preview ---------- */
+
+function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: SummaryType }) {
   const navigate = useNavigate();
   const query = useSummarySource(eventId);
+  const summaries = useExistingSummaries(eventId);
 
   const [backgroundKeys, setBackgroundKeys] = useState<HealthBackgroundKey[]>([]);
   const [trackIds, setTrackIds] = useState<string[]>([]);
   const [target, setTarget] = useState<TargetProfessional | "">("");
   const [questions, setQuestions] = useState<string[]>(["", "", ""]);
+  const [dirty, setDirty] = useState(false);
   const [stage, setStage] = useState<"build" | "preview">("build");
   const [submissionId, setSubmissionId] = useState<string | null>(null);
-  const [formError, setFormError] = useState<string | undefined>(undefined);
+  const [previewFingerprint, setPreviewFingerprint] = useState<string | null>(null);
+  const [targetError, setTargetError] = useState<string | undefined>(undefined);
+  const [questionError, setQuestionError] = useState<string | undefined>(undefined);
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
+  const [sourceChanged, setSourceChanged] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
+  const targetSectionRef = useRef<HTMLDivElement | null>(null);
 
   const source = query.data;
   const notesTracks = useMemo(
-    () => (source?.tracks ?? []).filter((t) => (t.notes ?? "").trim().length > 0),
+    () =>
+      (source?.tracks ?? [])
+        .filter((t) => (t.notes ?? "").trim().length > 0)
+        .slice()
+        .sort((a, b) => b.track_date.localeCompare(a.track_date)),
     [source],
   );
   const fingerprint = useMemo(
@@ -131,7 +250,7 @@ function Page() {
         <StatusBanner
           tone="attention"
           title="目前建議優先尋求醫療協助"
-          description="依最新的安全確認結果，這個時候先準備就醫溝通摘要會比較合適。"
+          description="依最新的安全確認結果，這個時候先準備醫療溝通摘要會比較合適。"
           actions={
             <Button
               className="min-h-11"
@@ -143,7 +262,7 @@ function Page() {
                 })
               }
             >
-              改為建立就醫溝通摘要
+              改為建立醫療溝通摘要
             </Button>
           }
         />
@@ -151,86 +270,67 @@ function Page() {
     );
   }
 
-  const previewSnapshot: SummarySnapshot = buildPreviewSnapshot();
+  const previewSnapshot = buildPreviewSnapshot(source, {
+    summaryType,
+    backgroundKeys,
+    trackIds,
+    target,
+    questions,
+  });
 
-  function buildPreviewSnapshot(): SummarySnapshot {
-    const selectedNotes = notesTracks
-      .filter((t) => trackIds.includes(t.id))
-      .map((t) => ({ track_id: t.id, track_date: t.track_date, notes: (t.notes ?? "").trim() }));
-    const targetOption = TARGET_PROFESSIONALS.find((o) => o.value === target);
-    return {
-      summary_type: summaryType,
-      summary_type_label: SUMMARY_TYPE_LABEL[summaryType],
-      disclaimer: SUMMARY_DISCLAIMER[summaryType],
-      questions: normalizeQuestions(questions),
-      target_professional: targetOption
-        ? { value: targetOption.value, label: targetOption.label }
-        : null,
-      event: {
-        health_event_id: source!.event.id,
-        started_on: source!.event.started_on,
-        status: source!.event.status,
-        primary_symptom_label:
-          source!.event.custom_primary_symptom ?? source!.event.primary_symptom_label,
-        custom_primary_symptom: source!.event.custom_primary_symptom,
-      },
-      initial_record: {
-        revision: source!.initialRecord.revision,
-        severity: source!.initialRecord.severity,
-        frequency_level: 0,
-        duration_value: 0,
-        duration_unit: "",
-      },
-      daily_tracks: (source!.tracks ?? []).map((t) => ({
-        track_id: t.id,
-        track_date: t.track_date,
-        severity: t.severity,
-        frequency_level: 0,
-        subjective_change: "",
-      })),
-      selected_track_notes: selectedNotes,
-      latest_track_date: source!.latestTrackDate ?? null,
-      safety: {
-        safety_assessment_id: safety!.id,
-        result: safety!.result,
-        assessed_at: safety!.assessed_at,
-      },
-      health_background: backgroundKeys.map((key) => ({
-        code: key,
-        label: HEALTH_BACKGROUND_KEYS.find((o) => o.value === key)?.label ?? key,
-        content: source!.healthBackground[key] ?? "",
-      })),
-    };
+  function markDirty() {
+    setDirty(true);
   }
 
   function toggleBackground(key: HealthBackgroundKey, checked: boolean) {
+    markDirty();
     setBackgroundKeys((prev) =>
       checked ? [...new Set([...prev, key])] : prev.filter((k) => k !== key),
     );
   }
 
   function toggleTrack(id: string, checked: boolean) {
+    markDirty();
     setTrackIds((prev) => (checked ? [...new Set([...prev, id])] : prev.filter((t) => t !== id)));
   }
 
   function goPreview() {
     if (summaryType === "professional_support" && !target) {
-      setFormError("請先選擇想諮詢的對象");
+      setTargetError(TARGET_ERROR);
+      targetSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      const first = targetSectionRef.current?.querySelector<HTMLElement>("button[role='radio']");
+      first?.focus();
       return;
     }
-    const questionError = validateQuestions(questions);
-    if (questionError) {
-      setFormError(questionError);
+    const error = validateQuestions(questions);
+    if (error) {
+      setQuestionError(error);
       return;
     }
-    setFormError(undefined);
+    setQuestionError(undefined);
     setSubmitError(undefined);
+    setSourceChanged(false);
     setSubmissionId(crypto.randomUUID());
+    setPreviewFingerprint(fingerprint);
     setStage("preview");
   }
 
+  async function regeneratePreview() {
+    const next = await query.refetch();
+    setSubmitError(undefined);
+    setSourceChanged(false);
+    setSubmissionId(crypto.randomUUID());
+    setPreviewFingerprint(
+      next.data ? sourceFingerprint(next.data, backgroundKeys) : (fingerprint ?? null),
+    );
+  }
+
   async function confirm() {
-    if (!source || !fingerprint || !submissionId) return;
+    if (!source || !fingerprint || !submissionId || submitting) return;
+    if (previewFingerprint && previewFingerprint !== fingerprint) {
+      setSourceChanged(true);
+      return;
+    }
     setSubmitting(true);
     setSubmitError(undefined);
     const { data, error } = await supabase.rpc("confirm_health_summary", {
@@ -250,15 +350,23 @@ function Page() {
     setSubmitting(false);
 
     if (error || !data || data.length === 0) {
+      const message = typeof error?.message === "string" ? error.message : "";
+      if (message.includes("SOURCE_CHANGED")) {
+        setSourceChanged(true);
+        return;
+      }
       setSubmitError(summaryErrorMessage(error));
       return;
     }
     const row = data[0]!;
+    setConfirmed(true);
+    setDirty(false);
     void navigate({ to: "/summaries/$summaryId", params: { summaryId: row.summary_id } });
   }
 
   return (
     <PageContainer className="space-y-6">
+      <UnsavedChangesGuard enabled={dirty && !confirmed} />
       <PageHeader
         title={SUMMARY_TYPE_LABEL[summaryType]}
         description={
@@ -271,29 +379,47 @@ function Page() {
       {stage === "build" ? (
         <>
           {summaryType === "professional_support" ? (
-            <SectionCard title="想諮詢的對象" description="選擇後會一併記錄在摘要中。">
-              <RadioGroup
-                value={target}
-                onValueChange={(v) => setTarget(v as TargetProfessional)}
-                className="grid gap-2 sm:grid-cols-2"
+            <div ref={targetSectionRef}>
+              <SectionCard
+                title="想諮詢的對象"
+                description="選擇後會一併記錄在摘要中。"
+                className={targetError ? "border-caution ring-1 ring-caution" : undefined}
               >
-                {TARGET_PROFESSIONALS.map((option) => (
-                  <label
-                    key={option.value}
-                    className="flex min-h-11 items-center gap-3 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground"
-                  >
-                    <RadioGroupItem value={option.value} id={`target-${option.value}`} />
-                    {option.label}
-                  </label>
-                ))}
-              </RadioGroup>
-            </SectionCard>
+                <RadioGroup
+                  value={target}
+                  aria-describedby={targetError ? "target-error" : undefined}
+                  aria-invalid={targetError ? true : undefined}
+                  onValueChange={(v) => {
+                    markDirty();
+                    setTarget(v as TargetProfessional);
+                    setTargetError(undefined);
+                  }}
+                  className="grid gap-2 sm:grid-cols-2"
+                >
+                  {TARGET_PROFESSIONALS.map((option) => (
+                    <label
+                      key={option.value}
+                      className="flex min-h-11 items-center gap-3 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground"
+                    >
+                      <RadioGroupItem value={option.value} id={`target-${option.value}`} />
+                      {option.label}
+                    </label>
+                  ))}
+                </RadioGroup>
+                <FieldError id="target-error" message={targetError} />
+              </SectionCard>
+            </div>
           ) : null}
 
-          <SectionCard
-            title="健康背景"
-            description="只有你勾選的項目會出現在摘要中。"
-          >
+          <SectionCard title="可選填的私人資訊">
+            {PRIVACY_COPY_LINES.map((line) => (
+              <p key={line} className="text-sm text-muted-foreground">
+                {line}
+              </p>
+            ))}
+          </SectionCard>
+
+          <SectionCard title="健康背景" description="只有你勾選的項目會出現在摘要中。">
             <div className="space-y-2">
               {HEALTH_BACKGROUND_KEYS.map((option) => {
                 const content = backgroundContentToText(source.healthBackground[option.value]);
@@ -325,7 +451,7 @@ function Page() {
 
           <SectionCard
             title="每日追蹤的個人備註"
-            description="嚴重度與變化趨勢一律完整呈現；備註屬於私人內容，只有勾選的才會加入。"
+            description="困擾程度與變化趨勢一律完整呈現；備註屬於私人內容，只有勾選的才會加入。"
           >
             {notesTracks.length === 0 ? (
               <p className="text-sm text-muted-foreground">目前沒有含備註的追蹤紀錄。</p>
@@ -367,22 +493,19 @@ function Page() {
                     value={value}
                     maxLength={QUESTION_MAX_LENGTH}
                     className="min-h-11"
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      markDirty();
+                      setQuestionError(undefined);
                       setQuestions((prev) =>
                         prev.map((q, i) => (i === index ? e.target.value : q)),
-                      )
-                    }
+                      );
+                    }}
                   />
                 </FormField>
               ))}
+              <FieldError id="question-error" message={questionError} />
             </div>
           </SectionCard>
-
-          {formError ? (
-            <p role="alert" className="text-sm text-destructive">
-              {formError}
-            </p>
-          ) : null}
 
           <div className="flex flex-col gap-3 sm:flex-row">
             <PrimaryCta onClick={goPreview}>預覽摘要</PrimaryCta>
@@ -396,6 +519,8 @@ function Page() {
               返回
             </Button>
           </div>
+
+          <ExistingSummaries query={summaries} />
         </>
       ) : (
         <>
@@ -406,6 +531,23 @@ function Page() {
           />
           <SummarySnapshotView snapshot={previewSnapshot} />
 
+          {sourceChanged ? (
+            <StatusBanner
+              tone="attention"
+              title={SOURCE_CHANGED_MESSAGE}
+              actions={
+                <Button
+                  variant="outline"
+                  className="min-h-11"
+                  disabled={query.isFetching}
+                  onClick={() => void regeneratePreview()}
+                >
+                  {query.isFetching ? "產生摘要中…" : "重新產生預覽"}
+                </Button>
+              }
+            />
+          ) : null}
+
           {submitError ? (
             <p role="alert" className="text-sm text-destructive">
               {submitError}
@@ -413,8 +555,8 @@ function Page() {
           ) : null}
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <PrimaryCta disabled={submitting} onClick={() => void confirm()}>
-              {submitting ? "確認中…" : "確認並保存摘要"}
+            <PrimaryCta disabled={submitting || sourceChanged} onClick={() => void confirm()}>
+              {submitting ? "確認中…" : "確認正確"}
             </PrimaryCta>
             <Button
               variant="outline"
@@ -430,3 +572,90 @@ function Page() {
     </PageContainer>
   );
 }
+
+/* ---------- 預覽用 Snapshot 組裝（與 RPC 欄位一致） ---------- */
+
+function buildPreviewSnapshot(
+  source: SummarySource,
+  input: {
+    summaryType: SummaryType;
+    backgroundKeys: HealthBackgroundKey[];
+    trackIds: string[];
+    target: TargetProfessional | "";
+    questions: string[];
+  },
+): SummarySnapshot {
+  const { summaryType, backgroundKeys, trackIds, target, questions } = input;
+  const safety = source.safety!;
+  const selectedNotes = source.tracks
+    .filter((t) => trackIds.includes(t.id) && (t.notes ?? "").trim().length > 0)
+    .map((t) => ({ track_id: t.id, track_date: t.track_date, notes: (t.notes ?? "").trim() }));
+  const targetOption = TARGET_PROFESSIONALS.find((o) => o.value === target);
+
+  return {
+    summary_type: summaryType,
+    summary_type_label: SUMMARY_TYPE_LABEL[summaryType],
+    disclaimer: SUMMARY_DISCLAIMER[summaryType],
+    questions: normalizeQuestions(questions),
+    target_professional:
+      summaryType === "professional_support" && targetOption
+        ? { value: targetOption.value, label: targetOption.label }
+        : null,
+    event: {
+      health_event_id: source.event.id,
+      started_on: source.event.started_on,
+      status: source.event.status,
+      primary_symptom_label:
+        source.event.custom_primary_symptom ?? source.event.primary_symptom_label,
+      custom_primary_symptom: source.event.custom_primary_symptom,
+    },
+    initial_record: {
+      revision: source.initialRecord.revision,
+      severity: source.initialRecord.severity,
+      frequency_level: source.initialRecord.frequency_level ?? 0,
+      frequency_label: frequencyLabel(source.initialRecord.frequency_level),
+      frequency_description: source.initialRecord.frequency_description,
+      duration_value: source.initialRecord.duration_value ?? 0,
+      duration_unit: source.initialRecord.duration_unit ?? "",
+      duration_unit_label: source.initialRecord.duration_unit
+        ? (DURATION_UNIT_LABELS[source.initialRecord.duration_unit] ??
+          source.initialRecord.duration_unit)
+        : null,
+      associated_symptoms: source.initialRecord.associated_symptoms,
+      life_context: source.initialRecord.life_context,
+      supplemental_description: source.initialRecord.supplemental_description,
+    },
+    daily_tracks: source.tracks.map((t) => ({
+      track_id: t.id,
+      track_date: t.track_date,
+      severity: t.severity,
+      frequency_level: t.frequency_level ?? 0,
+      frequency_label: frequencyLabel(t.frequency_level),
+      frequency_description: t.frequency_description,
+      subjective_change: t.subjective_change ?? "",
+      subjective_change_label: subjectiveLabel(t.subjective_change),
+      life_context: t.life_context,
+      actions_tried: t.suggestion_execution.map((code) => ({
+        code,
+        title: source.suggestionMap[code]?.title ?? code,
+        description: source.suggestionMap[code]?.description ?? null,
+      })),
+    })),
+    selected_track_notes: selectedNotes,
+    latest_track_date: source.latestTrackDate ?? null,
+    safety: {
+      safety_assessment_id: safety.id,
+      result: safety.result,
+      assessed_at: safety.assessed_at,
+      record_revision: safety.record_revision,
+      warnings: safety.warnings,
+    },
+    health_background: backgroundKeys.map((key) => ({
+      code: key,
+      label: HEALTH_BACKGROUND_KEYS.find((o) => o.value === key)?.label ?? key,
+      content: source.healthBackground[key] ?? "",
+    })),
+  };
+}
+
+export { isSummaryType };
