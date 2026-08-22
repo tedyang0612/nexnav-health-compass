@@ -9,8 +9,11 @@ import {
   safetyLines,
   subjectiveLabel,
   SUMMARY_TYPE_LABEL,
+  type SnapshotTrack,
   type SummarySnapshot,
 } from "@/lib/summary";
+
+const LIFE_FACTOR_ORDER = ["diet", "sleep", "stress", "activity"] as const;
 
 /** 已確認 Snapshot 的唯讀呈現；不做任何即時運算或重新對照。 */
 export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot }) {
@@ -30,83 +33,106 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   );
   const questions = snapshot.questions ?? [];
   const background = snapshot.health_background ?? [];
+  const associatedSymptoms = (snapshot.initial_record.associated_symptoms ?? [])
+    .map((item) => item.label?.trim())
+    .filter((label): label is string => Boolean(label));
 
   const overview = (
     <SectionCard title="狀況重點">
-      <dl className="grid gap-3 sm:grid-cols-2">
-        <Item label="主要不適">{snapshot.event.primary_symptom_label ?? "—"}</Item>
-        <Item label="開始日期">{formatTaipeiDate(snapshot.event.started_on)}</Item>
-        <Item label="追蹤期間">
+      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <MetricCell label="主要不適">
+          {snapshot.event.primary_symptom_label ?? "未記錄"}
+        </MetricCell>
+        <MetricCell label="追蹤期間">
           {stats.hasTracks
-            ? `${formatTaipeiDate(stats.firstTrackDate)}－${formatTaipeiDate(stats.latestTrackDate)}（共 ${stats.trackCount} 筆紀錄）`
+            ? `${formatTaipeiDate(stats.firstTrackDate)}－${formatTaipeiDate(stats.latestTrackDate)}`
             : "尚無每日追蹤紀錄"}
-        </Item>
-        <Item label="困擾程度">
-          {stats.hasTracks
-            ? `初始 ${stats.initialSeverity} / 10 → 最新 ${stats.latestSeverity} / 10`
-            : `初始 ${stats.initialSeverity} / 10（尚無每日追蹤紀錄）`}
-        </Item>
-        <Item label="每日追蹤出現頻率">
-          {stats.hasTracks && (stats.earliestFrequency || stats.latestFrequency)
-            ? `最早 ${stats.earliestFrequency ?? "—"} / 5 → 最新 ${stats.latestFrequency ?? "—"} / 5`
-            : "尚無每日追蹤紀錄"}
-        </Item>
-        <Item label="最新自覺變化">
-          {stats.latestSubjectiveLabel ?? (stats.hasTracks ? "未填寫" : "尚無每日追蹤紀錄")}
-        </Item>
-        {snapshot.initial_record.frequency_level ? (
-          <Item label="初始紀錄頻率">
-            {frequencyLabel(snapshot.initial_record.frequency_level) ??
-              `${snapshot.initial_record.frequency_level} / 5`}
-          </Item>
-        ) : null}
-        {snapshot.target_professional ? (
-          <Item label="想諮詢的對象">{snapshot.target_professional.label}</Item>
-        ) : null}
+          {stats.hasTracks ? (
+            <span className="mt-1 block text-xs font-normal text-muted-foreground">
+              共 {stats.trackCount} 筆紀錄
+            </span>
+          ) : null}
+        </MetricCell>
+        <MetricCell label="困擾程度">
+          <span className="whitespace-nowrap">
+            初始 {stats.initialSeverity}/10
+            {stats.hasTracks ? ` → 最新 ${stats.latestSeverity}/10` : ""}
+          </span>
+        </MetricCell>
+        <MetricCell label="每日追蹤出現頻率">
+          {stats.hasTracks && (stats.earliestFrequency || stats.latestFrequency) ? (
+            <span className="whitespace-nowrap">
+              最早 {stats.earliestFrequency ?? "未記錄"}/5
+              {" → "}
+              最新 {stats.latestFrequency ?? "未記錄"}/5
+            </span>
+          ) : (
+            "尚無每日追蹤紀錄"
+          )}
+        </MetricCell>
       </dl>
+
+      <div className="rounded-lg bg-muted px-3 py-2">
+        <p className="text-xs text-muted-foreground">最新自覺變化</p>
+        <p className="text-sm font-medium text-foreground">
+          {stats.latestSubjectiveLabel ?? (stats.hasTracks ? "未填寫" : "尚無每日追蹤紀錄")}
+        </p>
+      </div>
+
+      {snapshot.initial_record.frequency_level ? (
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">初始紀錄頻率</p>
+          <FrequencyValue
+            level={snapshot.initial_record.frequency_level}
+            wording={
+              snapshot.initial_record.frequency_label ??
+              frequencyLabel(snapshot.initial_record.frequency_level)
+            }
+          />
+        </div>
+      ) : null}
+
       {stats.mismatch ? <MismatchCallout /> : null}
-      {(snapshot.initial_record.associated_symptoms?.length ?? 0) > 0 ? (
+
+      {associatedSymptoms.length > 0 ? (
         <p className="text-sm text-foreground">
-          一併出現的狀況：
-          {snapshot.initial_record.associated_symptoms
-            ?.map((s) => s.label)
-            .filter(Boolean)
-            .join("、")}
+          <span className="font-medium">一併出現的狀況：</span>
+          {associatedSymptoms.join("、")}
         </p>
       ) : null}
-      {snapshot.initial_record.supplemental_description ? (
+
+      {snapshot.initial_record.supplemental_description?.trim() ? (
         <p className="text-sm text-foreground">
-          補充說明：{snapshot.initial_record.supplemental_description}
+          <span className="font-medium">補充說明：</span>
+          {snapshot.initial_record.supplemental_description.trim()}
         </p>
       ) : null}
     </SectionCard>
   );
 
-  const lifeContextCard =
-    snapshot.initial_record.life_context || tracks.some((t) => t.life_context) ? (
-      <SectionCard title="生活狀況" description="依你在紀錄中填寫的生活因素整理。">
-        <LifeContext values={snapshot.initial_record.life_context} labels={lifeLabels} />
-        {tracks
-          .filter((t) => t.life_context)
-          .slice(-3)
-          .map((t) => (
-            <div key={`lc-${t.track_id}`}>
-              <p className="text-sm font-medium text-foreground">{formatTaipeiDate(t.track_date)}</p>
-              <LifeContext values={t.life_context} labels={lifeLabels} compact />
-            </div>
-          ))}
-      </SectionCard>
-    ) : null;
+  const targetCard = snapshot.target_professional ? (
+    <SectionCard title="想諮詢的對象">
+      <p className="text-sm font-medium text-foreground">{snapshot.target_professional.label}</p>
+    </SectionCard>
+  ) : null;
 
-  const actions = tracks.filter((t) => (t.actions_tried?.length ?? 0) > 0);
+  const lifeContextCard = hasAnyLifeContext(snapshot.initial_record.life_context, tracks) ? (
+    <LifeContextComparison
+      initialValues={snapshot.initial_record.life_context}
+      tracks={tracks}
+      labels={lifeLabels}
+    />
+  ) : null;
+
+  const actions = tracks.filter((track) => (track.actions_tried?.length ?? 0) > 0);
   const actionsCard =
     actions.length > 0 ? (
       <SectionCard title="已嘗試的調整">
         <ul className="space-y-2">
-          {actions.map((t) => (
-            <li key={`act-${t.track_id}`} className="text-sm text-foreground">
-              <span className="font-medium">{formatTaipeiDate(t.track_date)}：</span>
-              {t.actions_tried?.map((a) => a.title).join("、")}
+          {actions.map((track) => (
+            <li key={`act-${track.track_id}`} className="text-sm text-foreground">
+              <span className="font-medium">{formatTaipeiDate(track.track_date)}：</span>
+              {track.actions_tried?.map((action) => action.title).join("、")}
             </li>
           ))}
         </ul>
@@ -127,31 +153,48 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
       {stats.hasTracks ? (
         <ul className="space-y-3">
           {tracks.map((track) => (
-            <li key={track.track_id} className="rounded-lg border border-border bg-surface p-3">
-              <p className="text-sm font-medium text-foreground">
-                {formatTaipeiDate(track.track_date)}｜困擾程度 {track.severity} / 10
+            <li
+              key={track.track_id}
+              className="space-y-2 rounded-lg border border-border bg-surface p-3"
+            >
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+                <p className="text-sm font-semibold text-foreground">
+                  {formatTaipeiDate(track.track_date)}
+                </p>
+                <p className="text-sm text-foreground">
+                  <span className="text-muted-foreground">困擾程度</span>{" "}
+                  <span className="font-medium">{track.severity}/10</span>
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">出現頻率</p>
+                <FrequencyValue
+                  level={track.frequency_level}
+                  wording={
+                    track.frequency_label ??
+                    frequencyLabel(track.frequency_level) ??
+                    "未填寫"
+                  }
+                />
+              </div>
+              <p className="text-sm text-foreground">
+                <span className="text-muted-foreground">自覺變化：</span>
+                {track.subjective_change_label ??
+                  subjectiveLabel(track.subjective_change) ??
+                  "未填寫"}
               </p>
-              <p className="text-sm text-muted-foreground">
-                {track.frequency_level
-                  ? `出現頻率 ${track.frequency_level} / 5（${
-                      track.frequency_label ?? frequencyLabel(track.frequency_level) ?? "—"
-                    }）`
-                  : "出現頻率未填寫"}
-                ．自覺變化：
-                {track.subjective_change_label ?? subjectiveLabel(track.subjective_change) ?? "未填寫"}
-              </p>
-              {track.frequency_description ? (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  頻率補充：{track.frequency_description}
+              {track.frequency_description?.trim() ? (
+                <p className="text-sm text-foreground">
+                  <span className="text-muted-foreground">頻率補充：</span>
+                  {track.frequency_description.trim()}
                 </p>
               ) : null}
               {(track.actions_tried?.length ?? 0) > 0 ? (
-                <p className="mt-1 text-sm text-foreground">
-                  已嘗試的調整：
-                  {track.actions_tried?.map((a) => a.title).join("、")}
+                <p className="text-sm text-foreground">
+                  <span className="font-medium">已嘗試的調整：</span>
+                  {track.actions_tried?.map((action) => action.title).join("、")}
                 </p>
               ) : null}
-              <LifeContext values={track.life_context} labels={lifeLabels} compact />
             </li>
           ))}
         </ul>
@@ -159,47 +202,46 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
     </SectionCard>
   );
 
-  const optionalCards = (
-    <>
-      {background.length > 0 ? (
-        <SectionCard title="健康背景">
-          <dl className="space-y-2">
-            {background.map((item) => (
-              <div key={item.code}>
-                <dt className="text-sm font-medium text-foreground">{item.label}</dt>
-                <dd className="text-sm text-muted-foreground">
-                  {backgroundContentToText(item.content) || "—"}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </SectionCard>
-      ) : null}
+  const backgroundCard =
+    background.length > 0 ? (
+      <SectionCard title="健康背景">
+        <dl className="space-y-2">
+          {background.map((item) => (
+            <div key={item.code}>
+              <dt className="text-sm font-medium text-foreground">{item.label}</dt>
+              <dd className="text-sm text-muted-foreground">
+                {backgroundContentToText(item.content) || "未記錄"}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </SectionCard>
+    ) : null;
 
-      {notes.length > 0 ? (
-        <SectionCard title="我選擇一併提供的紀錄備註">
-          <ul className="space-y-2">
-            {notes.map((note) => (
-              <li key={note.track_id} className="text-sm text-foreground">
-                <span className="font-medium">{formatTaipeiDate(note.track_date)}：</span>
-                {note.notes}
-              </li>
-            ))}
-          </ul>
-        </SectionCard>
-      ) : null}
+  const notesCard =
+    notes.length > 0 ? (
+      <SectionCard title="我選擇一併提供的紀錄備註">
+        <ul className="space-y-2">
+          {notes.map((note) => (
+            <li key={note.track_id} className="text-sm text-foreground">
+              <span className="font-medium">{formatTaipeiDate(note.track_date)}：</span>
+              {note.notes}
+            </li>
+          ))}
+        </ul>
+      </SectionCard>
+    ) : null;
 
-      {questions.length > 0 ? (
-        <SectionCard title="我想問的問題">
-          <ol className="list-decimal space-y-1 pl-5 text-sm text-foreground">
-            {questions.map((q, i) => (
-              <li key={i}>{q}</li>
-            ))}
-          </ol>
-        </SectionCard>
-      ) : null}
-    </>
-  );
+  const questionsCard =
+    questions.length > 0 ? (
+      <SectionCard title="我想問的問題">
+        <ol className="list-decimal space-y-1 pl-5 text-sm text-foreground">
+          {questions.map((question, index) => (
+            <li key={index}>{question}</li>
+          ))}
+        </ol>
+      </SectionCard>
+    ) : null;
 
   return (
     <div className="space-y-4">
@@ -208,12 +250,14 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
       </p>
       {isProfessional ? (
         <>
-          {overview}
+          {targetCard}
+          {backgroundCard}
+          {notesCard}
           {lifeContextCard}
           {actionsCard}
           {safetyCard}
           {tracksCard}
-          {optionalCards}
+          {questionsCard}
         </>
       ) : (
         <>
@@ -221,11 +265,182 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
           {safetyCard}
           {tracksCard}
           {lifeContextCard}
-          {optionalCards}
+          {backgroundCard}
+          {notesCard}
+          {questionsCard}
         </>
       )}
+      {isProfessional ? overview : null}
       <p className="text-sm text-muted-foreground">{snapshot.disclaimer}</p>
     </div>
+  );
+}
+
+function MetricCell({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="min-w-0 rounded-lg border border-border bg-surface p-3">
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className="mt-1 break-words text-sm font-semibold text-foreground">{children}</dd>
+    </div>
+  );
+}
+
+function FiveLevelValue({
+  level,
+  label,
+  compact = false,
+}: {
+  level?: number | null;
+  label: string;
+  compact?: boolean;
+}) {
+  if (typeof level !== "number" || level < 1 || level > 5) {
+    return <span className="text-sm text-muted-foreground">未記錄</span>;
+  }
+  return (
+    <span
+      role="img"
+      aria-label={`${label} ${level}/5`}
+      className={`inline-flex items-center gap-2 ${compact ? "text-xs" : "text-sm"}`}
+    >
+      <span aria-hidden="true" className="inline-flex gap-1">
+        {Array.from({ length: 5 }, (_, index) => (
+          <span
+            key={index}
+            className={
+              index < level
+                ? "size-2 rounded-full bg-primary"
+                : "size-2 rounded-full border border-border bg-surface"
+            }
+          />
+        ))}
+      </span>
+      <span className="whitespace-nowrap font-medium text-foreground">{level}/5</span>
+    </span>
+  );
+}
+
+function FrequencyValue({
+  level,
+  wording,
+}: {
+  level?: number | null;
+  wording?: string | null;
+}) {
+  if (typeof level !== "number" || level < 1 || level > 5) {
+    return <p className="text-sm text-muted-foreground">{wording || "未填寫"}</p>;
+  }
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      <span className="text-sm font-medium text-foreground">
+        {wording || frequencyLabel(level) || "未填寫"}
+      </span>
+      <FiveLevelValue level={level} label="出現頻率" compact />
+    </div>
+  );
+}
+
+function hasNumericLifeContext(values?: Record<string, number> | null): boolean {
+  return Boolean(
+    values &&
+      LIFE_FACTOR_ORDER.some((key) => {
+        const value = values[key];
+        return typeof value === "number" && value >= 1 && value <= 5;
+      }),
+  );
+}
+
+function hasAnyLifeContext(
+  initialValues: Record<string, number> | null | undefined,
+  tracks: SnapshotTrack[],
+): boolean {
+  return hasNumericLifeContext(initialValues) || tracks.some((track) => hasNumericLifeContext(track.life_context));
+}
+
+function LifeContextComparison({
+  initialValues,
+  tracks,
+  labels,
+}: {
+  initialValues?: Record<string, number> | null;
+  tracks: SnapshotTrack[];
+  labels: Record<string, string>;
+}) {
+  const sources = [
+    ...(hasNumericLifeContext(initialValues)
+      ? [{ key: "initial", label: "初始紀錄", values: initialValues }]
+      : []),
+    ...tracks
+      .filter((track) => hasNumericLifeContext(track.life_context))
+      .map((track) => ({
+        key: track.track_id,
+        label: formatTaipeiDate(track.track_date),
+        values: track.life_context,
+      })),
+  ];
+
+  if (sources.length === 0) return null;
+
+  return (
+    <SectionCard title="生活狀況" description="依你在紀錄中填寫的生活因素整理。">
+      <div className="hidden overflow-x-auto md:block">
+        <table className="min-w-max border-separate border-spacing-0 text-left">
+          <thead>
+            <tr>
+              <th className="sticky left-0 z-10 min-w-24 border-b border-border bg-surface-elevated px-3 py-2 text-xs font-medium text-muted-foreground">
+                生活因素
+              </th>
+              {sources.map((source) => (
+                <th
+                  key={source.key}
+                  className="min-w-36 border-b border-border px-3 py-2 text-xs font-medium text-muted-foreground"
+                >
+                  {source.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {LIFE_FACTOR_ORDER.map((factor) => (
+              <tr key={factor}>
+                <th className="sticky left-0 z-10 border-b border-border bg-surface-elevated px-3 py-3 text-sm font-medium text-foreground">
+                  {labels[factor] ?? factor}
+                </th>
+                {sources.map((source) => (
+                  <td key={source.key} className="border-b border-border px-3 py-3">
+                    <FiveLevelValue
+                      level={source.values?.[factor]}
+                      label={`${source.label} ${labels[factor] ?? factor}`}
+                      compact
+                    />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="space-y-3 md:hidden">
+        {sources.map((source) => (
+          <section key={source.key} className="rounded-lg border border-border bg-surface p-3">
+            <h3 className="text-sm font-semibold text-foreground">{source.label}</h3>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              {LIFE_FACTOR_ORDER.map((factor) => (
+                <div key={factor} className="min-w-0">
+                  <p className="text-xs text-muted-foreground">{labels[factor] ?? factor}</p>
+                  <FiveLevelValue
+                    level={source.values?.[factor]}
+                    label={`${source.label} ${labels[factor] ?? factor}`}
+                    compact
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </SectionCard>
   );
 }
 
@@ -245,7 +460,7 @@ function SafetyCard({ safety }: { safety: SummarySnapshot["safety"] }) {
           <AlertTriangle aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-urgent-strong" />
           <div className="min-w-0 space-y-2">
             <h2 id="summary-safety-title" className="text-base font-bold text-urgent-strong">
-              平台安全確認
+              安全確認
             </h2>
             {lines.map((line) => (
               <p key={line} className="text-sm font-medium text-foreground">
@@ -254,8 +469,8 @@ function SafetyCard({ safety }: { safety: SummarySnapshot["safety"] }) {
             ))}
             {warnings.length > 0 ? (
               <ul className="list-disc space-y-1 pl-5 text-sm text-foreground">
-                {warnings.map((w) => (
-                  <li key={w.code}>{w.label}</li>
+                {warnings.map((warning) => (
+                  <li key={warning.code}>{warning.label}</li>
                 ))}
               </ul>
             ) : null}
@@ -266,7 +481,7 @@ function SafetyCard({ safety }: { safety: SummarySnapshot["safety"] }) {
   }
 
   return (
-    <SectionCard title="平台安全確認">
+    <SectionCard title="安全確認">
       {lines.map((line) => (
         <p key={line} className="text-sm text-foreground">
           {line}
@@ -274,8 +489,8 @@ function SafetyCard({ safety }: { safety: SummarySnapshot["safety"] }) {
       ))}
       {warnings.length > 0 ? (
         <ul className="list-disc space-y-1 pl-5 text-sm text-foreground">
-          {warnings.map((w) => (
-            <li key={w.code}>{w.label}</li>
+          {warnings.map((warning) => (
+            <li key={warning.code}>{warning.label}</li>
           ))}
         </ul>
       ) : null}
@@ -288,35 +503,6 @@ function MismatchCallout() {
     <p className="flex items-start gap-2 rounded-lg border border-caution bg-caution-muted p-3 text-sm text-foreground">
       <Info aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-caution-strong" />
       <span>{MISMATCH_NOTICE}</span>
-    </p>
-  );
-}
-
-function Item({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="min-w-0">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="break-words text-sm font-medium text-foreground">{children}</dd>
-    </div>
-  );
-}
-
-function LifeContext({
-  values,
-  labels,
-  compact,
-}: {
-  values?: Record<string, number> | null | undefined;
-  labels: Record<string, string>;
-  compact?: boolean;
-}) {
-  if (!values) return null;
-  const entries = Object.entries(values).filter(([, v]) => typeof v === "number");
-  if (entries.length === 0) return null;
-  return (
-    <p className={compact ? "mt-1 text-sm text-muted-foreground" : "text-sm text-muted-foreground"}>
-      生活因素：
-      {entries.map(([key, value]) => `${labels[key] ?? key} ${value}/5`).join("．")}
     </p>
   );
 }
