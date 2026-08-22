@@ -100,13 +100,37 @@ function Page() {
 
 function SelectionPage({ eventId }: { eventId: string }) {
   const summaries = useExistingSummaries(eventId);
+  const sourceQuery = useSummarySource(eventId);
+
+  if (sourceQuery.isLoading) {
+    return (
+      <PageContainer className="space-y-6">
+        <PageHeader title="建立摘要" />
+        <LoadingState label="正在確認可建立的摘要類型…" />
+      </PageContainer>
+    );
+  }
+
+  if (sourceQuery.isError || !sourceQuery.data) {
+    return (
+      <PageContainer className="space-y-6">
+        <PageHeader title="建立摘要" />
+        <ErrorState onRetry={() => void sourceQuery.refetch()} />
+      </PageContainer>
+    );
+  }
+
+  const types: SummaryType[] =
+    sourceQuery.data.safety?.result === "priority_care"
+      ? ["medical"]
+      : ["medical", "professional_support"];
 
   return (
     <PageContainer className="space-y-6">
       <PageHeader title="建立摘要" description="選擇你這次想準備的摘要類型。" />
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {(["medical", "professional_support"] as const).map((type) => (
+      <div className={types.length === 1 ? "grid max-w-xl gap-4" : "grid gap-4 md:grid-cols-2"}>
+        {types.map((type) => (
           <SectionCard
             key={type}
             title={SUMMARY_TYPE_LABEL[type]}
@@ -185,6 +209,8 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
   const [submitting, setSubmitting] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const targetSectionRef = useRef<HTMLDivElement | null>(null);
+  const submitLockRef = useRef(false);
+  const successNavigationRef = useRef(false);
 
   const source = query.data;
   const notesTracks = useMemo(
@@ -325,13 +351,16 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
   }
 
   async function confirm() {
-    if (!source || !fingerprint || !submissionId || submitting) return;
+    if (!source || !fingerprint || !submissionId || submitLockRef.current) return;
     if (previewFingerprint && previewFingerprint !== fingerprint) {
       setSourceChanged(true);
       return;
     }
+
+    submitLockRef.current = true;
     setSubmitting(true);
     setSubmitError(undefined);
+
     const { data, error } = await supabase.rpc("confirm_health_summary", {
       p_health_event_id: eventId,
       p_summary_type: summaryType,
@@ -346,9 +375,10 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
         : {}),
       p_questions: normalizeQuestions(questions),
     });
-    setSubmitting(false);
 
     if (error || !data || data.length === 0) {
+      submitLockRef.current = false;
+      setSubmitting(false);
       const message = typeof error?.message === "string" ? error.message : "";
       if (message.includes("SOURCE_CHANGED")) {
         setSourceChanged(true);
@@ -357,7 +387,9 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
       setSubmitError(summaryErrorMessage(error));
       return;
     }
+
     const row = data[0]!;
+    successNavigationRef.current = true;
     setConfirmed(true);
     setDirty(false);
     void navigate({ to: "/summaries/$summaryId", params: { summaryId: row.summary_id } });
@@ -365,7 +397,7 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
 
   return (
     <PageContainer className="space-y-6">
-      <UnsavedChangesGuard enabled={dirty && !confirmed} />
+      <UnsavedChangesGuard enabled={dirty && !confirmed} bypassRef={successNavigationRef} />
       <PageHeader
         title={SUMMARY_TYPE_LABEL[summaryType]}
         description={
@@ -531,20 +563,20 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
           <SummarySnapshotView snapshot={previewSnapshot} />
 
           {sourceChanged ? (
-            <StatusBanner
-              tone="attention"
-              title={SOURCE_CHANGED_MESSAGE}
-              actions={
-                <Button
-                  variant="outline"
-                  className="min-h-11"
-                  disabled={query.isFetching}
-                  onClick={() => void regeneratePreview()}
-                >
-                  {query.isFetching ? "產生摘要中…" : "重新產生預覽"}
-                </Button>
-              }
-            />
+            <section
+              role="alert"
+              className="rounded-xl border border-caution bg-caution-muted p-4 sm:p-5"
+            >
+              <p className="text-sm font-medium text-foreground">{SOURCE_CHANGED_MESSAGE}</p>
+              <Button
+                variant="outline"
+                className="mt-3 min-h-11"
+                disabled={query.isFetching}
+                onClick={() => void regeneratePreview()}
+              >
+                {query.isFetching ? "產生摘要中…" : "重新產生預覽"}
+              </Button>
+            </section>
           ) : null}
 
           {submitError ? (
