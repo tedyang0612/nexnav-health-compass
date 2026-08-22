@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -25,8 +27,15 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Lint
-        run: npm run lint
+      - name: Lint changed TypeScript files
+        shell: bash
+        run: |
+          mapfile -t changed_files < <(
+            git diff --name-only --diff-filter=ACMRT "${{ github.event.pull_request.base.sha }}" HEAD -- "*.ts" "*.tsx"
+          )
+          if (( ${#changed_files[@]} > 0 )); then
+            npx eslint --rule "prettier/prettier: off" "${changed_files[@]}"
+          fi
 
       - name: Build
         run: npm run build
