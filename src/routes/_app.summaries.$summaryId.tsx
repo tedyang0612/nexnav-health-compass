@@ -81,21 +81,31 @@ function Page() {
 
   const snapshot = row.snapshot_content as unknown as SummarySnapshot;
 
+  const title = SUMMARY_TYPE_LABEL[snapshot.summary_type as SummaryType] ?? "摘要檢視";
+  const confirmedDate = formatTaipeiDate(row.confirmed_at ?? row.created_at);
+
   return (
     <PageContainer className="space-y-6">
-      <PageHeader
-        title={SUMMARY_TYPE_LABEL[snapshot.summary_type as SummaryType] ?? "摘要檢視"}
-        description={`已於 ${formatTaipeiDate(row.confirmed_at ?? row.created_at)} 確認保存${
-          row.version_number ? `．版本 v${row.version_number}` : ""
-        }`}
-        actions={
-          <Button asChild variant="outline" className="min-h-11">
+      <header className="space-y-4 sm:flex sm:items-start sm:justify-between sm:gap-4 sm:space-y-0">
+        <div className="min-w-0 space-y-1">
+          <h1 className="break-words text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+            {title}
+          </h1>
+          <p className="flex flex-wrap gap-x-2 gap-y-1 text-sm text-muted-foreground">
+            <span className="whitespace-nowrap">已於 {confirmedDate} 確認保存</span>
+            {row.version_number ? (
+              <span className="whitespace-nowrap">版本 v{row.version_number}</span>
+            ) : null}
+          </p>
+        </div>
+        <div className="w-full sm:w-auto sm:shrink-0">
+          <Button asChild variant="outline" className="min-h-11 w-full sm:w-auto">
             <Link to="/events/$eventId/navigate" params={{ eventId: row.health_event_id }}>
               回到就醫與專業協助
             </Link>
           </Button>
-        }
-      />
+        </div>
+      </header>
       <SummarySnapshotView snapshot={snapshot} />
     </PageContainer>
   );
