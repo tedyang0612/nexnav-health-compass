@@ -15,6 +15,7 @@ import { FieldError } from "@/components/events/FieldError";
 import { SeveritySlider } from "@/components/events/SeveritySlider";
 import { SubjectiveChangeField } from "@/components/events/SubjectiveChangeField";
 import { UnsavedChangesGuard } from "@/components/profile/UnsavedChangesGuard";
+import { useGuideSafetyGate } from "@/hooks/useGuideSafetyGate";
 import {
   useSaveDailyTrack,
   useTodayTrack,
@@ -66,6 +67,7 @@ function Page() {
   const eventQuery = useTrackEvent(eventId);
   const event = eventQuery.data ?? null;
   const isActive = event?.status === "active";
+  const workflowGateQuery = useGuideSafetyGate(eventId);
 
   const todayQuery = useTodayTrack(eventId, !!event && isActive);
   const previousQuery = usePreviousTrack(eventId, !!event && isActive);
@@ -219,6 +221,69 @@ function Page() {
     );
   }
 
+  if (workflowGateQuery.isLoading) {
+    return (
+      <PageContainer width="default" className="space-y-6">
+        <TrackHeader />
+        <LoadingState label="確認追蹤流程中…" />
+      </PageContainer>
+    );
+  }
+
+  if (workflowGateQuery.isError) {
+    return (
+      <PageContainer width="default" className="space-y-6">
+        <TrackHeader />
+        <ErrorState
+          title="目前無法確認追蹤流程"
+          description="請稍後再試一次。"
+          retryLabel="再試一次"
+          onRetry={() => void workflowGateQuery.refetch()}
+        />
+      </PageContainer>
+    );
+  }
+
+  const safetyResult = workflowGateQuery.data?.currentResult ?? null;
+
+  if (safetyResult === null) {
+    return (
+      <PageContainer width="default" className="space-y-6">
+        <TrackHeader />
+        <SectionCard
+          title="請先完成目前的狀況確認"
+          description="需要先確認目前是否有應優先處理的安全警訊，才能開始每日追蹤。"
+          footer={
+            <Button asChild className="min-h-11">
+              <Link to="/events/$eventId/safety" params={{ eventId }}>
+                先完成狀況確認
+              </Link>
+            </Button>
+          }
+        />
+      </PageContainer>
+    );
+  }
+
+  if (safetyResult !== "normal") {
+    return (
+      <PageContainer width="default" className="space-y-6">
+        <TrackHeader />
+        <SectionCard
+          title="目前請優先查看專業協助方向"
+          description="依目前的狀況確認結果，請先參考就醫與專業協助，再決定後續行動。"
+          footer={
+            <Button asChild className="min-h-11">
+              <Link to="/events/$eventId/navigate" params={{ eventId }}>
+                查看就醫與專業協助
+              </Link>
+            </Button>
+          }
+        />
+      </PageContainer>
+    );
+  }
+
   const guideBlocking = todayTrack?.guideId ? guideQuery.isError : false;
 
   if (todayQuery.isError || guideBlocking) {
@@ -243,6 +308,25 @@ function Page() {
       <PageContainer width="default" className="space-y-6">
         <TrackHeader />
         <LoadingState label="載入今日追蹤中…" />
+      </PageContainer>
+    );
+  }
+
+  if (!guideQuery.data?.guideId) {
+    return (
+      <PageContainer width="default" className="space-y-6">
+        <TrackHeader />
+        <SectionCard
+          title="請先查看目前的改善方向"
+          description="每日追蹤會依目前版本的改善方向記錄已嘗試的調整。"
+          footer={
+            <Button asChild className="min-h-11">
+              <Link to="/events/$eventId/guide" params={{ eventId }}>
+                先查看改善方向
+              </Link>
+            </Button>
+          }
+        />
       </PageContainer>
     );
   }
