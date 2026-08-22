@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, type RefObject } from "react";
 import { useBlocker } from "@tanstack/react-router";
 import { ResponsiveModal } from "@/components/shell/responsive-modal";
 import { Button } from "@/components/ui/button";
@@ -7,22 +7,30 @@ import { Button } from "@/components/ui/button";
  * 只在表單相對初始值有實際變更時啟用。
  * Primary「繼續編輯」留在原表單；Secondary「放棄變更並離開」才執行原本導覽。
  */
-export function UnsavedChangesGuard({ enabled }: { enabled: boolean }) {
+export function UnsavedChangesGuard({
+  enabled,
+  bypassRef,
+}: {
+  enabled: boolean;
+  bypassRef?: RefObject<boolean>;
+}) {
+  const shouldBlock = () => enabled && !bypassRef?.current;
   const blocker = useBlocker({
-    shouldBlockFn: () => enabled,
-    enableBeforeUnload: () => enabled,
+    shouldBlockFn: shouldBlock,
+    enableBeforeUnload: shouldBlock,
     withResolver: true,
   });
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || bypassRef?.current) return;
     const handler = (event: BeforeUnloadEvent) => {
+      if (bypassRef?.current) return;
       event.preventDefault();
       event.returnValue = "";
     };
     window.addEventListener("beforeunload", handler);
     return () => window.removeEventListener("beforeunload", handler);
-  }, [enabled]);
+  }, [enabled, bypassRef]);
 
   const open = blocker.status === "blocked";
 
