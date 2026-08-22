@@ -290,7 +290,7 @@ function FiveLevelValue({
   label,
   compact = false,
 }: {
-  level?: number | null;
+  level: number | null | undefined;
   label: string;
   compact?: boolean;
 }) {
@@ -366,7 +366,7 @@ function LifeContextComparison({
   tracks,
   labels,
 }: {
-  initialValues?: Record<string, number> | null;
+  initialValues: Record<string, number> | null | undefined;
   tracks: SnapshotTrack[];
   labels: Record<string, string>;
 }) {
