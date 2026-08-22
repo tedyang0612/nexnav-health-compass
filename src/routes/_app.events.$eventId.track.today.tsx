@@ -440,9 +440,22 @@ function Page() {
             {ctaLabel}
           </PrimaryCta>
           {successMessage ? (
-            <p role="status" className="text-sm font-medium text-foreground">
-              {successMessage}
-            </p>
+            <section
+              role="status"
+              className="rounded-xl border border-heal/40 bg-heal-muted/60 p-4"
+            >
+              <p className="text-sm font-semibold text-foreground">{successMessage}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {previousQuery.data
+                  ? "你可以前往追蹤變化，查看目前的紀錄趨勢。"
+                  : "紀錄已保留；持續追蹤後即可查看變化趨勢。"}
+              </p>
+              <Button asChild variant="outline" className="mt-3 min-h-11 w-full sm:w-auto">
+                <Link to="/events/$eventId/reassess" params={{ eventId }}>
+                  查看追蹤變化
+                </Link>
+              </Button>
+            </section>
           ) : null}
           {saveError ? (
             <p role="alert" className="text-sm text-destructive">
