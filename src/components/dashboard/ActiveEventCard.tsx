@@ -16,8 +16,8 @@ export function ActiveEventCard({ event }: { event: ActiveEventItem }) {
           to: "/events/$eventId/safety" as const,
         }
       : {
-          label: "查看狀況內容",
-          to: "/events/$eventId" as const,
+          label: "查看改善方向",
+          to: "/events/$eventId/guide" as const,
         };
 
   const safetyLabel =
@@ -30,7 +30,7 @@ export function ActiveEventCard({ event }: { event: ActiveEventItem }) {
           {event.primarySymptomLabel}
         </h3>
         <p className="text-sm text-muted-foreground">
-          開始日期 {formatDisplayDate(event.startedOn)}．已追蹤 {event.trackedDays} 天
+          開始日期 {formatDisplayDate(event.startedOn)}．累計追蹤 {event.trackCount} 筆
         </p>
       </div>
 

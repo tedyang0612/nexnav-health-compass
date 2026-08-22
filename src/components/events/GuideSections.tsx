@@ -1,8 +1,10 @@
+import { Link } from "@tanstack/react-router";
 import { SectionCard } from "@/components/shell";
+import { Button } from "@/components/ui/button";
 import type { GuideViewModel } from "@/lib/guide";
 
 /** P08 改善方向內容呈現：只顯示已核准 snapshot，不新增任何醫療文案。 */
-export function GuideSections({ guide }: { guide: GuideViewModel }) {
+export function GuideSections({ guide, eventId }: { guide: GuideViewModel; eventId: string }) {
   const { content, suggestions } = guide;
   const [labelPart, ...restParts] = content.title.split("｜");
   const hasSplit = restParts.length > 0;
@@ -86,6 +88,18 @@ export function GuideSections({ guide }: { guide: GuideViewModel }) {
           </p>
         </div>
       </GuideCard>
+
+      <SectionCard
+        title="接下來，持續記錄變化"
+        description="每天花一點時間記錄目前感受與生活狀況，之後可以查看變化趨勢。"
+        footer={
+          <Button asChild className="min-h-11 w-full sm:w-auto">
+            <Link to="/events/$eventId/track/today" params={{ eventId }}>
+              開始今日追蹤
+            </Link>
+          </Button>
+        }
+      />
 
       {content.sources.length > 0 ? (
         <section className="rounded-xl border border-border bg-surface-elevated px-4 py-3 sm:px-5">

@@ -1,0 +1,41 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: pr-checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Lint changed TypeScript files
+        shell: bash
+        run: |
+          mapfile -t changed_files < <(
+            git diff --name-only --diff-filter=ACMRT "${{ github.event.pull_request.base.sha }}" HEAD -- "*.ts" "*.tsx"
+          )
+          if (( ${#changed_files[@]} > 0 )); then
+            npx eslint --rule "prettier/prettier: off" "${changed_files[@]}"
+          fi
+
+      - name: Build
+        run: npm run build

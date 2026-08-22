@@ -342,6 +342,20 @@ function ReassessView({
         />
       </SectionCard>
 
+      {!isClosed && currentSafety?.result === "normal" ? (
+        <SectionCard
+          title="需要進一步確認嗎？"
+          description="你可以依目前的追蹤變化，查看適合的就醫方向或其他專業協助。"
+          footer={
+            <PrimaryCta asChild>
+              <Link to="/events/$eventId/navigate" params={{ eventId }}>
+                查看就醫與專業協助
+              </Link>
+            </PrimaryCta>
+          }
+        />
+      ) : null}
+
       {isClosed ? (
         <div>
           <BackToEvents />

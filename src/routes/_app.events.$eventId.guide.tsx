@@ -187,7 +187,7 @@ function Page() {
     return (
       <PageContainer width="default" className="space-y-5 sm:space-y-6">
         <GuideHeader />
-        <GuideSections guide={reusableGuide} />
+        <GuideSections guide={reusableGuide} eventId={eventId} />
       </PageContainer>
     );
   }
@@ -219,7 +219,7 @@ function Page() {
   return (
     <PageContainer width="default" className="space-y-5 sm:space-y-6">
       <GuideHeader />
-      <GuideSections guide={guideQuery.data} />
+      <GuideSections guide={guideQuery.data} eventId={eventId} />
     </PageContainer>
   );
 }
