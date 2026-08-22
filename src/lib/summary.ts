@@ -175,13 +175,13 @@ export function formatTaipeiDate(value: string | null | undefined): string {
   return `${get("year")}/${get("month")}/${get("day")}`;
 }
 
-/** 安全確認顯示句：於 YYYY/MM/DD 完成平台安全確認，當時未勾選所列緊急警訊。 */
+/** 安全確認顯示句：於 YYYY/MM/DD 完成安全確認，當時未勾選所列緊急警訊。 */
 export function safetySentence(safety: SummarySnapshot["safety"]): string {
   const date = formatTaipeiDate(safety.assessed_on ?? safety.assessed_at ?? null);
   const hasWarnings = (safety.warnings?.length ?? 0) > 0;
   return hasWarnings
-    ? `於 ${date} 完成平台安全確認，當時勾選了下列需要留意的警訊。`
-    : `於 ${date} 完成平台安全確認，當時未勾選所列緊急警訊。`;
+    ? `於 ${date} 完成安全確認，當時勾選了下列需要留意的警訊。`
+    : `於 ${date} 完成安全確認，當時未勾選所列緊急警訊。`;
 }
 
 export function backgroundContentToText(content: unknown): string {
@@ -283,17 +283,17 @@ export function deriveSummaryStats(snapshot: SummarySnapshot): SummaryStats {
   };
 }
 
-/** 平台安全確認的固定敘述（priority_care 為兩行鎖定文案）。 */
+/** 安全確認的固定敘述（priority_care 為兩行鎖定文案）。 */
 export function safetyLines(safety: SummarySnapshot["safety"]): string[] {
   const date = formatTaipeiDate(safety.assessed_on ?? safety.assessed_at ?? null);
   if (safety.result === "priority_care") {
     return [
-      `於 ${date} 完成平台安全確認，當時有勾選需要優先尋求醫療協助的警訊。`,
+      `於 ${date} 完成安全確認，當時有勾選需要優先尋求醫療協助的警訊。`,
       "當時系統建議優先尋求醫療專業協助；若目前情況緊急或快速惡化，請立即撥打 119 或前往就近急診。",
     ];
   }
   if ((safety.warnings?.length ?? 0) > 0) {
-    return [`於 ${date} 完成平台安全確認，當時勾選了下列需要留意的警訊。`];
+    return [`於 ${date} 完成安全確認，當時勾選了下列需要留意的警訊。`];
   }
-  return [`於 ${date} 完成平台安全確認，當時未勾選所列緊急警訊。`];
+  return [`於 ${date} 完成安全確認，當時未勾選所列緊急警訊。`];
 }
