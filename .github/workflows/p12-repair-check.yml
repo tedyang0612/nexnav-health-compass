@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - codex/p12-repair
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
