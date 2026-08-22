@@ -464,7 +464,17 @@ function Page() {
 
       {/* Section 3：改善建議 */}
       {showSuggestions ? (
-        <SectionCard title="已嘗試的調整" description="可勾選本次有實際嘗試的項目。">
+        <SectionCard
+          title={
+            <span className="inline-flex items-center gap-2">
+              已嘗試的調整
+              <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                選填
+              </span>
+            </span>
+          }
+          description="可勾選本次有實際嘗試的項目。"
+        >
           <div className="grid gap-2 sm:grid-cols-3">
             {suggestions.slice(0, SUGGESTION_MAX).map((suggestion, index) => (
               <label
