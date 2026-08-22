@@ -62,9 +62,9 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
         <MetricCell label="每日追蹤出現頻率">
           {stats.hasTracks && (stats.earliestFrequency || stats.latestFrequency) ? (
             <span className="whitespace-nowrap">
-              最早 {stats.earliestFrequency ?? "未記錄"}/5
+              最早 {formatFiveLevelText(stats.earliestFrequency)}
               {" → "}
-              最新 {stats.latestFrequency ?? "未記錄"}/5
+              最新 {formatFiveLevelText(stats.latestFrequency)}
             </span>
           ) : (
             "尚無每日追蹤紀錄"
@@ -338,6 +338,10 @@ function FrequencyValue({
       <FiveLevelValue level={level} label="出現頻率" compact />
     </div>
   );
+}
+
+function formatFiveLevelText(level?: number | null): string {
+  return typeof level === "number" && level >= 1 && level <= 5 ? `${level}/5` : "未記錄";
 }
 
 function hasNumericLifeContext(values?: Record<string, number> | null): boolean {
