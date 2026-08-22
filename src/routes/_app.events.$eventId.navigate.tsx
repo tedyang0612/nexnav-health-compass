@@ -219,7 +219,7 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
             </dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">今日追蹤筆數</dt>
+            <dt className="text-sm text-muted-foreground">累計追蹤筆數</dt>
             <dd className="text-base font-medium text-foreground">{tracks.length} 筆</dd>
           </div>
         </dl>
