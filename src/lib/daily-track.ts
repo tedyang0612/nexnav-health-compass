@@ -56,8 +56,8 @@ export type DailyLifeContext = {
 };
 
 export type DailyTrackFormValues = {
-  severity: number;
-  frequencyLevel: number;
+  severity: number | null;
+  frequencyLevel: number | null;
   frequencyDescription: string;
   subjectiveChange: SubjectiveChange | null;
   sleep: number | null;
@@ -71,8 +71,8 @@ export type DailyTrackFormValues = {
 /** 新增模式預設值。修改模式一律使用 DB 原值。 */
 export function createEmptyDailyTrackForm(): DailyTrackFormValues {
   return {
-    severity: 5,
-    frequencyLevel: 3,
+    severity: null,
+    frequencyLevel: null,
     frequencyDescription: "",
     subjectiveChange: null,
     sleep: null,
@@ -254,6 +254,10 @@ export function buildDailyLifeContext(values: DailyTrackFormValues): DailyLifeCo
 
 /** INSERT/UPDATE 共用的可寫欄位。track_date 一律交由 DB default（Asia/Taipei）。 */
 export function buildDailyTrackWritablePayload(values: DailyTrackFormValues) {
+  if (values.severity === null || values.frequencyLevel === null) {
+    throw new Error("invalid_daily_track_required_values");
+  }
+
   const freqDesc = values.frequencyDescription.trim();
   const notes = values.notes.trim();
   return {
