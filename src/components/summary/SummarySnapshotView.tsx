@@ -251,6 +251,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
       {isProfessional ? (
         <>
           {targetCard}
+          {overview}
           {backgroundCard}
           {notesCard}
           {lifeContextCard}
@@ -270,7 +271,6 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
           {questionsCard}
         </>
       )}
-      {isProfessional ? overview : null}
       <p className="text-sm text-muted-foreground">{snapshot.disclaimer}</p>
     </div>
   );
