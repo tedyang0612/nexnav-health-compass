@@ -9,6 +9,7 @@ export type ActiveEventItem = {
   startedOn: string;
   primarySymptomLabel: string;
   trackedDays: number;
+  trackCount: number;
   safetyState: ActiveEventSafetyState;
 };
 
@@ -88,6 +89,24 @@ export function useActiveEvents(userId: string | undefined) {
           .map((r) => r.health_event_id),
       );
 
+      const { data: trackRows, error: trackError } = await supabase
+        .from("daily_tracks")
+        .select("health_event_id")
+        .in(
+          "health_event_id",
+          events.map((e) => e.id),
+        );
+
+      if (trackError) throw trackError;
+
+      const trackCountByEvent = new Map<string, number>();
+      for (const row of trackRows ?? []) {
+        trackCountByEvent.set(
+          row.health_event_id,
+          (trackCountByEvent.get(row.health_event_id) ?? 0) + 1,
+        );
+      }
+
       const today = taipeiToday();
       return events.map((e) => ({
         id: e.id,
@@ -97,6 +116,7 @@ export function useActiveEvents(userId: string | undefined) {
           e.symptom_catalog?.display_name ||
           "未指定不適",
         trackedDays: trackedDays(e.started_on, today),
+        trackCount: trackCountByEvent.get(e.id) ?? 0,
         safetyState: completed.has(e.id) ? "completed" : "incomplete",
       }));
     },
