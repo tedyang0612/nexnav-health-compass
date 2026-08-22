@@ -200,7 +200,7 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
   const [questions, setQuestions] = useState<string[]>(["", "", ""]);
   const [dirty, setDirty] = useState(false);
   const [stage, setStage] = useState<"build" | "preview">("build");
-  const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [submissionId] = useState(() => crypto.randomUUID());
   const [previewFingerprint, setPreviewFingerprint] = useState<string | null>(null);
   const [targetError, setTargetError] = useState<string | undefined>(undefined);
   const [questionError, setQuestionError] = useState<string | undefined>(undefined);
@@ -335,7 +335,6 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
     setQuestionError(undefined);
     setSubmitError(undefined);
     setSourceChanged(false);
-    setSubmissionId(crypto.randomUUID());
     setPreviewFingerprint(fingerprint);
     setStage("preview");
   }
@@ -344,14 +343,13 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
     const next = await query.refetch();
     setSubmitError(undefined);
     setSourceChanged(false);
-    setSubmissionId(crypto.randomUUID());
     setPreviewFingerprint(
       next.data ? sourceFingerprint(next.data, backgroundKeys) : (fingerprint ?? null),
     );
   }
 
   async function confirm() {
-    if (!source || !fingerprint || !submissionId || submitLockRef.current) return;
+    if (!source || !fingerprint || submitLockRef.current) return;
     if (previewFingerprint && previewFingerprint !== fingerprint) {
       setSourceChanged(true);
       return;
