@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { taipeiToday } from "@/lib/event-wizard";
-
-export type ActiveEventSafetyState = "incomplete" | "completed";
+import {
+  resolveEventNextStep,
+  type EventNextStep,
+} from "@/lib/event-next-step";
 
 export type ActiveEventItem = {
   id: string;
@@ -10,7 +12,8 @@ export type ActiveEventItem = {
   primarySymptomLabel: string;
   trackedDays: number;
   trackCount: number;
-  safetyState: ActiveEventSafetyState;
+  latestSeverity: number | null;
+  nextStep: EventNextStep;
 };
 
 type EventRow = {
@@ -19,6 +22,8 @@ type EventRow = {
   custom_primary_symptom: string | null;
   symptom_catalog: { display_name: string } | null;
 };
+
+type SafetyResult = "normal" | "attention" | "priority_care";
 
 /** 以 Asia/Taipei 今日計算已追蹤天數（起始日當天為第 1 天）。 */
 export function trackedDays(startedOn: string, today = taipeiToday()): number {
@@ -29,7 +34,7 @@ export function trackedDays(startedOn: string, today = taipeiToday()): number {
   return diff < 0 ? 1 : diff + 1;
 }
 
-/** 讀取目前登入者的 active Health Events（RLS 限制僅回傳本人資料）。 */
+/** 讀取目前登入者的 active Health Events，並解析每筆事件目前的下一步。 */
 export function useActiveEvents(userId: string | undefined) {
   return useQuery({
     queryKey: ["active-events", userId],
@@ -49,76 +54,101 @@ export function useActiveEvents(userId: string | undefined) {
 
       const events = (data ?? []) as unknown as EventRow[];
       if (events.length === 0) return [];
+      const eventIds = events.map((event) => event.id);
 
-      const { data: safetyRows, error: safetyError } = await supabase
-        .from("safety_assessments")
-        .select("health_event_id, assessment_status, result, record_revision")
-        .in(
-          "health_event_id",
-          events.map((e) => e.id),
-        );
+      const [safetyRes, revisionsRes, guidesRes, tracksRes] = await Promise.all([
+        supabase
+          .from("safety_assessments")
+          .select("health_event_id, assessment_status, result, record_revision, created_at")
+          .in("health_event_id", eventIds)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("initial_records")
+          .select("health_event_id, revision")
+          .in("health_event_id", eventIds)
+          .order("revision", { ascending: false }),
+        supabase
+          .from("guides")
+          .select("health_event_id, record_revision, version_number")
+          .in("health_event_id", eventIds)
+          .order("version_number", { ascending: false }),
+        supabase
+          .from("daily_tracks")
+          .select("health_event_id, track_date, severity")
+          .in("health_event_id", eventIds)
+          .order("track_date", { ascending: false }),
+      ]);
 
-      if (safetyError) throw safetyError;
-
-      const { data: revisionRows, error: revisionError } = await supabase
-        .from("initial_records")
-        .select("health_event_id, revision")
-        .in(
-          "health_event_id",
-          events.map((e) => e.id),
-        )
-        .order("revision", { ascending: false });
-
-      if (revisionError) throw revisionError;
+      if (safetyRes.error) throw safetyRes.error;
+      if (revisionsRes.error) throw revisionsRes.error;
+      if (guidesRes.error) throw guidesRes.error;
+      if (tracksRes.error) throw tracksRes.error;
 
       const currentRevisionByEvent = new Map<string, number>();
-      for (const r of revisionRows ?? []) {
-        if (!currentRevisionByEvent.has(r.health_event_id)) {
-          currentRevisionByEvent.set(r.health_event_id, r.revision);
+      for (const row of revisionsRes.data ?? []) {
+        if (!currentRevisionByEvent.has(row.health_event_id)) {
+          currentRevisionByEvent.set(row.health_event_id, row.revision);
         }
       }
 
-      const completed = new Set(
-        (safetyRows ?? [])
-          .filter(
-            (r) =>
-              r.assessment_status === "completed" &&
-              r.result !== null &&
-              r.record_revision === currentRevisionByEvent.get(r.health_event_id),
-          )
-          .map((r) => r.health_event_id),
-      );
+      const safetyResultByEvent = new Map<string, SafetyResult>();
+      for (const row of safetyRes.data ?? []) {
+        const currentRevision = currentRevisionByEvent.get(row.health_event_id);
+        if (
+          !safetyResultByEvent.has(row.health_event_id) &&
+          row.assessment_status === "completed" &&
+          row.record_revision === currentRevision &&
+          (row.result === "normal" ||
+            row.result === "attention" ||
+            row.result === "priority_care")
+        ) {
+          safetyResultByEvent.set(row.health_event_id, row.result);
+        }
+      }
 
-      const { data: trackRows, error: trackError } = await supabase
-        .from("daily_tracks")
-        .select("health_event_id")
-        .in(
-          "health_event_id",
-          events.map((e) => e.id),
-        );
+      const currentGuideEvents = new Set<string>();
+      for (const row of guidesRes.data ?? []) {
+        if (
+          row.record_revision === currentRevisionByEvent.get(row.health_event_id)
+        ) {
+          currentGuideEvents.add(row.health_event_id);
+        }
+      }
 
-      if (trackError) throw trackError;
-
+      const today = taipeiToday();
       const trackCountByEvent = new Map<string, number>();
-      for (const row of trackRows ?? []) {
+      const todayTrackEvents = new Set<string>();
+      const latestSeverityByEvent = new Map<string, number>();
+      for (const row of tracksRes.data ?? []) {
         trackCountByEvent.set(
           row.health_event_id,
           (trackCountByEvent.get(row.health_event_id) ?? 0) + 1,
         );
+        if (row.track_date === today) todayTrackEvents.add(row.health_event_id);
+        if (!latestSeverityByEvent.has(row.health_event_id)) {
+          latestSeverityByEvent.set(row.health_event_id, row.severity);
+        }
       }
 
-      const today = taipeiToday();
-      return events.map((e) => ({
-        id: e.id,
-        startedOn: e.started_on,
-        primarySymptomLabel:
-          e.custom_primary_symptom?.trim() ||
-          e.symptom_catalog?.display_name ||
-          "未指定不適",
-        trackedDays: trackedDays(e.started_on, today),
-        trackCount: trackCountByEvent.get(e.id) ?? 0,
-        safetyState: completed.has(e.id) ? "completed" : "incomplete",
-      }));
+      return events.map((event) => {
+        const safetyResult = safetyResultByEvent.get(event.id) ?? null;
+        return {
+          id: event.id,
+          startedOn: event.started_on,
+          primarySymptomLabel:
+            event.custom_primary_symptom?.trim() ||
+            event.symptom_catalog?.display_name ||
+            "未指定不適",
+          trackedDays: trackedDays(event.started_on, today),
+          trackCount: trackCountByEvent.get(event.id) ?? 0,
+          latestSeverity: latestSeverityByEvent.get(event.id) ?? null,
+          nextStep: resolveEventNextStep({
+            safetyResult,
+            hasCurrentGuide: currentGuideEvents.has(event.id),
+            hasTodayTrack: todayTrackEvents.has(event.id),
+          }),
+        };
+      });
     },
   });
 }
