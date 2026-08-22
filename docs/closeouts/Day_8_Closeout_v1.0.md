@@ -1,4 +1,4 @@
-# NexNav Day 8 Closeout
+# NexNav Day 8｜P10 跨日驗收與 Final Fix＋P12 Summary／Prepare 完整實作與驗收＋GitHub 協作導入
 
 **Version:** v1.0  
 **Date:** 2026-08-22  
