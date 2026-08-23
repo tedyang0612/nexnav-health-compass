@@ -57,8 +57,20 @@ export const Route = createFileRoute("/_app/events/$eventId/track/today")({
   component: Page,
 });
 
-function TrackHeader() {
-  return <PageHeader title="今日追蹤" description="記錄目前的不適與生活狀況，方便持續觀察變化。" />;
+function TrackHeader({ completed = false }: { completed?: boolean }) {
+  return (
+    <PageHeader
+      title="今日追蹤"
+      description="記錄目前的不適與生活狀況，方便持續觀察變化。"
+      actions={
+        completed ? (
+          <span className="inline-flex items-center rounded-full border border-heal/40 bg-heal-muted px-3 py-1 text-xs font-medium text-foreground">
+            今日已完成
+          </span>
+        ) : null
+      }
+    />
+  );
 }
 
 function Page() {
@@ -353,7 +365,7 @@ function Page() {
   return (
     <PageContainer width="default" className="space-y-6">
       <UnsavedChangesGuard enabled={dirty && !saveMutation.isPending} />
-      <TrackHeader />
+      <TrackHeader completed={isUpdate || successMessage !== null} />
 
       {/* Section 1：不適與比較 */}
       <SectionCard title="今天不適症狀的困擾程度">
