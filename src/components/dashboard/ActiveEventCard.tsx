@@ -31,8 +31,10 @@ const CTA_CLASSES: Record<EventNextStepState, string> = {
 /** Dashboard active event card：依 Safety、Guide 與今日 Track 狀態顯示真正的下一步。 */
 export function ActiveEventCard({ event }: { event: ActiveEventItem }) {
   const { nextStep } = event;
-  const latestLabel =
+  const latestDesktopLabel =
     event.latestSeverity === null ? null : `最新困擾程度 ${event.latestSeverity}/10`;
+  const latestMobileLabel =
+    event.latestSeverity === null ? null : `最新困擾 ${event.latestSeverity}/10`;
 
   return (
     <Card className="gap-4 border-border bg-surface-elevated p-5 sm:grid sm:grid-cols-[minmax(0,1.35fr)_minmax(10rem,0.8fr)_auto] sm:items-center sm:gap-6 sm:p-6">
@@ -40,10 +42,19 @@ export function ActiveEventCard({ event }: { event: ActiveEventItem }) {
         <h3 className="break-words text-lg font-semibold text-foreground">
           {event.primarySymptomLabel}
         </h3>
-        <p className="text-sm text-muted-foreground">
-          開始日期 {formatDisplayDate(event.startedOn)}．累計追蹤 {event.trackCount} 筆
-          {latestLabel ? `．${latestLabel}` : ""}
-        </p>
+        <div className="space-y-0.5 text-sm text-muted-foreground">
+          <p>
+            開始日期 {formatDisplayDate(event.startedOn)}
+            <span className="hidden sm:inline">
+              ．累計追蹤 {event.trackCount} 筆
+              {latestDesktopLabel ? `．${latestDesktopLabel}` : ""}
+            </span>
+          </p>
+          <p className="sm:hidden">
+            累計追蹤 {event.trackCount} 筆
+            {latestMobileLabel ? `．${latestMobileLabel}` : ""}
+          </p>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2 sm:contents">
