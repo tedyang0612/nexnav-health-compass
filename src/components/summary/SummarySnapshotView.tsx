@@ -246,9 +246,9 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
       <SectionCard title="我選擇一併提供的紀錄備註">
         <ul className="space-y-2">
           {notes.map((note) => (
-            <li key={note.track_id} className="text-sm text-foreground">
-              <span className="font-medium">{formatTaipeiDate(note.track_date)}：</span>
-              {note.notes}
+            <li key={note.track_id} className="space-y-1 text-sm text-foreground">
+              <p className="font-medium">{formatTaipeiDate(note.track_date)}：</p>
+              <p>{note.notes}</p>
             </li>
           ))}
         </ul>
@@ -300,9 +300,15 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
       >
         <Info aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
         <p>
-          {snapshot.summary_type === "medical"
-            ? "本摘要依使用者自行記錄的資訊整理，僅供就醫溝通參考，不構成醫療診斷，不能取代醫療人員實際評估。"
-            : snapshot.disclaimer}
+          {snapshot.summary_type === "medical" ? (
+            <>
+              <span className="block sm:inline">本摘要依使用者自行記錄的資訊整理，</span>
+              <span className="block sm:inline">僅供就醫溝通參考，不構成醫療診斷，</span>
+              <span className="block sm:inline">不能取代醫療人員實際評估。</span>
+            </>
+          ) : (
+            snapshot.disclaimer
+          )}
         </p>
       </div>
     </div>
