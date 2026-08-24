@@ -7,7 +7,7 @@ import { useReassessData } from "@/hooks/useReassess";
 import { CONNECT_DEMO_FACILITIES, connectSearchTarget } from "@/lib/connect-demo";
 
 export const Route = createFileRoute("/_app/events/$eventId/connect")({
-  head: () => ({ meta: [{ title: "附近專業協助 — NexNav" }] }),
+  head: () => ({ meta: [{ title: "尋找附近醫療院所 — NexNav" }] }),
   component: Page,
 });
 
@@ -42,7 +42,7 @@ function Page() {
   if (safety?.result === "priority_care") {
     return (
       <PageContainer className="space-y-6">
-        <PageHeader title="附近專業協助" description="依目前安全確認結果，先處理需要優先注意的狀況。" />
+        <PageHeader title="尋找附近醫療院所" description="依目前安全確認結果，先處理需要優先注意的狀況。" />
         <section role="alert" className="rounded-xl border-2 border-urgent bg-urgent-muted p-5 sm:p-6">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 size-5 shrink-0 text-urgent-strong" aria-hidden="true" />
@@ -65,11 +65,7 @@ function Page() {
 
   return (
     <PageContainer className="space-y-6">
-      <PageHeader title="附近專業協助" description="依目前紀錄提供 Demo 搜尋清單，協助準備下一步。" />
-      <div role="note" className="rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm">
-        <p className="font-semibold text-foreground">Demo 模式</p>
-        <p className="mt-1 text-muted-foreground">以下為去識別化的固定展示資料，不代表即時營業、距離或醫療推薦。</p>
-      </div>
+      <PageHeader title="尋找附近醫療院所" description="以南京復興捷運站為中心，查看 5 公里內的醫療院所清單。" />
       <SectionCard title="搜尋條件">
         <dl className="grid gap-4 sm:grid-cols-3">
           <div><dt className="text-sm text-muted-foreground">搜尋中心</dt><dd className="font-medium">南京復興捷運站</dd></div>
@@ -80,7 +76,7 @@ function Page() {
       </SectionCard>
       <section aria-labelledby="connect-results" className="space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div><h2 id="connect-results" className="text-xl font-semibold">附近 Demo 清單</h2><p className="text-sm text-muted-foreground">預設顯示 5 筆，共 20 筆。</p></div>
+          <div><h2 id="connect-results" className="text-xl font-semibold">附近院所清單</h2><p className="text-sm text-muted-foreground">預設顯示 5 筆，共 20 筆。</p></div>
           <label className="flex items-center gap-2 text-sm">排序
             <select className="min-h-11 rounded-lg border border-border bg-surface px-3" value={sort} onChange={(e) => setSort(e.target.value as "match" | "distance")}>
               <option value="match">符合程度</option><option value="distance">距離優先</option>
@@ -92,7 +88,7 @@ function Page() {
             <article key={facility.id} className="rounded-xl border border-border bg-card p-4 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-5">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2"><span className="text-xs text-muted-foreground">#{index + 1}</span><h3 className="font-semibold">{facility.name}</h3><span className="rounded-full bg-muted px-2 py-0.5 text-xs">{facility.specialty}</span></div>
-                <p className="mt-2 flex items-center gap-1 text-sm text-muted-foreground"><MapPin className="size-4" /> 約 {facility.distanceKm.toFixed(1)} km・{facility.area}・Demo</p>
+                <p className="mt-2 flex items-center gap-1 text-sm text-muted-foreground"><MapPin className="size-4" /> 約 {facility.distanceKm.toFixed(1)} km・{facility.area}</p>
               </div>
               <Button asChild variant="outline" className="mt-3 min-h-11 w-full sm:mt-0 sm:w-auto"><a href={mapsUrl(facility.specialty)} target="_blank" rel="noreferrer">在 Google Maps 搜尋 <ExternalLink className="ml-2 size-4" /></a></Button>
             </article>
@@ -100,7 +96,7 @@ function Page() {
         </div>
         <Button type="button" variant="outline" className="min-h-11 w-full" onClick={() => setShowAll((value) => !value)}>{showAll ? "收合為 5 筆" : "展開全部 20 筆"}</Button>
       </section>
-      <p className="text-sm text-muted-foreground">本頁僅協助尋找可能的專業資源，不構成診斷、推薦或即時院所資訊。</p>
+      <p className="text-sm text-muted-foreground">院所資訊可能有所變動，實際資訊請以 Google Maps 顯示內容為準。</p>
     </PageContainer>
   );
 }
