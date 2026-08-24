@@ -379,7 +379,7 @@ function LifeContextComparison({
         values: track.life_context,
       })),
     ...(hasNumericLifeContext(initialValues)
-      ? [{ key: "initial", label: "初始紀錄（基準）", values: initialValues }]
+      ? [{ key: "initial", label: "建立狀況追蹤當日", values: initialValues }]
       : []),
   ];
 
