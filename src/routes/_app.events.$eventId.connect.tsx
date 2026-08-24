@@ -132,25 +132,23 @@ function Page() {
       </section>
 
       <section aria-labelledby="connect-results" className="space-y-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <h2 id="connect-results" className="text-xl font-semibold">結果</h2>
-            <p className="text-sm text-muted-foreground">共 {ranked.length} 筆。</p>
+        <div>
+          <h2 id="connect-results" className="text-xl font-semibold">結果</h2>
+          <p className="text-sm text-muted-foreground">共 {ranked.length} 筆。</p>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap gap-2" aria-label="院所篩選">
+            {filterOptions.map((option) => (
+              <Button key={option.value} type="button" size="sm" variant={filter === option.value ? "default" : "outline"} aria-pressed={filter === option.value} onClick={() => selectFilter(option.value)}>
+                {option.label}
+              </Button>
+            ))}
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="flex flex-wrap gap-2" aria-label="院所篩選">
-              {filterOptions.map((option) => (
-                <Button key={option.value} type="button" size="sm" variant={filter === option.value ? "default" : "outline"} aria-pressed={filter === option.value} onClick={() => selectFilter(option.value)}>
-                  {option.label}
-                </Button>
-              ))}
-            </div>
-            <label className="flex items-center gap-2 text-sm">排序
-              <select className="min-h-10 rounded-lg border border-border bg-surface px-3" value={sort} onChange={(event) => setSort(event.target.value as "match" | "distance")}>
-                <option value="match">符合程度</option><option value="distance">距離優先</option>
-              </select>
-            </label>
-          </div>
+          <label className="flex shrink-0 items-center gap-2 text-sm sm:ml-auto">排序
+            <select className="min-h-10 rounded-lg border border-border bg-surface px-3" value={sort} onChange={(event) => setSort(event.target.value as "match" | "distance")}>
+              <option value="match">符合程度</option><option value="distance">距離優先</option>
+            </select>
+          </label>
         </div>
 
         <div className="space-y-3">
