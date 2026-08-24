@@ -121,7 +121,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
 
   const targetCard = snapshot.target_professional ? (
     <SectionCard title="想諮詢的對象">
-      <p className="text-sm font-medium text-foreground">{snapshot.target_professional.label}</p>
+      <p className="mt-3 text-sm font-medium text-foreground">{snapshot.target_professional.label}</p>
     </SectionCard>
   ) : null;
 
@@ -140,7 +140,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const actionsCard =
     actions.length > 0 ? (
       <SectionCard title="已嘗試的調整">
-        <ul className="space-y-2">
+        <ul className="mt-3 space-y-2">
           {actions.map((track) => (
             <li key={`act-${track.track_id}`} className="text-sm text-foreground">
               <span className="font-medium">{formatTaipeiDate(track.track_date)}：</span>
@@ -258,7 +258,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const questionsCard =
     questions.length > 0 ? (
       <SectionCard title="我想問的問題">
-        <ol className="space-y-1 text-sm text-foreground">
+        <ol className="mt-3 space-y-1 text-sm text-foreground">
           {questions.map((question, index) => (
             <li key={index} className="flex items-start gap-2 leading-6">
               <span aria-hidden="true" className="w-5 shrink-0 text-right">
