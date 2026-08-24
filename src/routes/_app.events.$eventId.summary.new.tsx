@@ -423,7 +423,7 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
                     setTarget(v as TargetProfessional);
                     setTargetError(undefined);
                   }}
-                  className="grid gap-2 sm:grid-cols-2"
+                  className="mt-3 grid gap-2 sm:grid-cols-2"
                 >
                   {TARGET_PROFESSIONALS.map((option) => (
                     <label
@@ -441,15 +441,17 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
           ) : null}
 
           <SectionCard title="可選填的私人資訊">
-            {PRIVACY_COPY_LINES.map((line) => (
-              <p key={line} className="text-sm text-muted-foreground">
-                {line}
-              </p>
-            ))}
+            <div className="mt-3 space-y-1">
+              {PRIVACY_COPY_LINES.map((line) => (
+                <p key={line} className="text-sm text-muted-foreground">
+                  {line}
+                </p>
+              ))}
+            </div>
           </SectionCard>
 
           <SectionCard title="健康背景" description="只有你勾選的項目會出現在摘要中。">
-            <div className="space-y-2">
+            <div className="mt-3 space-y-2">
               {HEALTH_BACKGROUND_KEYS.map((option) => {
                 const content = backgroundContentToText(source.healthBackground[option.value]);
                 return (
@@ -483,9 +485,9 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
             description="困擾程度與變化趨勢一律完整呈現；備註屬於私人內容，只有勾選的才會加入。"
           >
             {notesTracks.length === 0 ? (
-              <p className="text-sm text-muted-foreground">目前沒有含備註的追蹤紀錄。</p>
+              <p className="mt-3 text-sm text-muted-foreground">目前沒有含備註的追蹤紀錄。</p>
             ) : (
-              <div className="space-y-2">
+              <div className="mt-3 space-y-2">
                 {notesTracks.map((track) => (
                   <label
                     key={track.id}
