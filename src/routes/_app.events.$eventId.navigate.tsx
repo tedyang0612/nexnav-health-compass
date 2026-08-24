@@ -237,7 +237,7 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
         </div>
       </SectionCard>
 
-      <SectionCard title="建立摘要" description="摘要可協助你整理目前紀錄，方便與專業人員溝通。">
+      <SectionCard title="建立摘要" description="整理目前紀錄，方便與專業人員溝通。">
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild className="min-h-11 w-full sm:w-auto">
             <Link
