@@ -395,14 +395,16 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
   return (
     <PageContainer className="space-y-6">
       <UnsavedChangesGuard enabled={dirty && !confirmed} bypassRef={successNavigationRef} />
-      <PageHeader
-        title={SUMMARY_TYPE_LABEL[summaryType]}
-        description={
-          stage === "build"
+      <header className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-6">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          {SUMMARY_TYPE_LABEL[summaryType]}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {stage === "build"
             ? "選擇你願意一併提供的內容，下一步可以先預覽再確認。"
-            : "以下是確認後會保存的內容，確認後就不會再變動。"
-        }
-      />
+            : "以下是確認後會保存的內容，確認後就不會再變動。"}
+        </p>
+      </header>
 
       {stage === "build" ? (
         <>
