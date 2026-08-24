@@ -137,7 +137,7 @@ function SelectionPage({ eventId }: { eventId: string }) {
               type === "professional_support" ? (
                 <>
                   <span className="block">整理生活狀況、已嘗試的調整與追蹤紀錄，</span>
-                  <span className="mt-2 block">方便與其他健康專業人員討論。</span>
+                  <span className="mt-3 block">方便與其他健康專業人員討論。</span>
                 </>
               ) : (
                 SUMMARY_TYPE_DESCRIPTION[type]
