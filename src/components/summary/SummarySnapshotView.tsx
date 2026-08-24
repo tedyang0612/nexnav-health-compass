@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { AlertTriangle, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { SectionCard } from "@/components/shell";
 import {
   backgroundContentToText,
@@ -25,12 +27,19 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   };
   const stats = deriveSummaryStats(snapshot);
   const isProfessional = snapshot.summary_type === "professional_support";
+  const [showAllTrackDetails, setShowAllTrackDetails] = useState(false);
+  const [showAllLifeContext, setShowAllLifeContext] = useState(false);
   const tracks = [...(snapshot.daily_tracks ?? [])].sort((a, b) =>
-    a.track_date.localeCompare(b.track_date),
+    b.track_date.localeCompare(a.track_date),
   );
   const notes = [...(snapshot.selected_track_notes ?? [])].sort((a, b) =>
     b.track_date.localeCompare(a.track_date),
   );
+  const visibleTrackDetails = showAllTrackDetails ? tracks : tracks.slice(0, 5);
+  const lifeContextTracks = tracks.filter((track) => hasNumericLifeContext(track.life_context));
+  const visibleLifeContextTracks = showAllLifeContext
+    ? lifeContextTracks
+    : lifeContextTracks.slice(0, 5);
   const questions = snapshot.questions ?? [];
   const background = snapshot.health_background ?? [];
   const associatedSymptoms = (snapshot.initial_record.associated_symptoms ?? [])
@@ -38,8 +47,8 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
     .filter((label): label is string => Boolean(label));
 
   const overview = (
-    <SectionCard title="狀況重點">
-      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <SectionCard title="狀況重點" className="gap-5">
+      <dl className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MetricCell label="主要不適">
           {snapshot.event.primary_symptom_label ?? "未記錄"}
         </MetricCell>
@@ -54,48 +63,48 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
           ) : null}
         </MetricCell>
         <MetricCell label="困擾程度">
-          <span className="whitespace-nowrap">
-            初始 {stats.initialSeverity}/10
-            {stats.hasTracks ? ` → 最新 ${stats.latestSeverity}/10` : ""}
+          <span className="flex flex-col gap-0.5 sm:block">
+            <span className="whitespace-nowrap">初始 {stats.initialSeverity}/10</span>
+            {stats.hasTracks ? (
+              <>
+                <span className="hidden sm:inline"> → </span>
+                <span className="whitespace-nowrap">最新 {stats.latestSeverity}/10</span>
+              </>
+            ) : null}
           </span>
         </MetricCell>
-        <MetricCell label="每日追蹤出現頻率">
-          {stats.hasTracks && (stats.earliestFrequency || stats.latestFrequency) ? (
-            <span className="whitespace-nowrap">
-              最早 {formatFiveLevelText(stats.earliestFrequency)}
-              {" → "}
-              最新 {formatFiveLevelText(stats.latestFrequency)}
+        <MetricCell label="出現頻率">
+          {snapshot.initial_record.frequency_level || stats.latestFrequency ? (
+            <span className="flex flex-col gap-0.5 sm:block">
+              <span className="whitespace-nowrap">
+                初始 {formatFiveLevelText(snapshot.initial_record.frequency_level)}
+              </span>
+              {stats.hasTracks ? (
+                <>
+                  <span className="hidden sm:inline"> → </span>
+                  <span className="whitespace-nowrap">
+                    最新 {formatFiveLevelText(stats.latestFrequency)}
+                  </span>
+                </>
+              ) : null}
             </span>
           ) : (
-            "尚無每日追蹤紀錄"
+            "未記錄"
           )}
         </MetricCell>
       </dl>
 
-      <div className="rounded-lg bg-muted px-3 py-2">
+      <div className="mt-3 rounded-lg bg-muted px-3 py-2">
         <p className="text-xs text-muted-foreground">最新自覺變化</p>
         <p className="text-sm font-medium text-foreground">
           {stats.latestSubjectiveLabel ?? (stats.hasTracks ? "未填寫" : "尚無每日追蹤紀錄")}
         </p>
       </div>
 
-      {snapshot.initial_record.frequency_level ? (
-        <div className="space-y-1">
-          <p className="text-xs text-muted-foreground">初始紀錄頻率</p>
-          <FrequencyValue
-            level={snapshot.initial_record.frequency_level}
-            wording={
-              snapshot.initial_record.frequency_label ??
-              frequencyLabel(snapshot.initial_record.frequency_level)
-            }
-          />
-        </div>
-      ) : null}
-
       {stats.mismatch ? <MismatchCallout /> : null}
 
       {associatedSymptoms.length > 0 ? (
-        <p className="text-sm text-foreground">
+        <p className="mt-3 text-sm text-foreground">
           <span className="font-medium">一併出現的狀況：</span>
           {associatedSymptoms.join("、")}
         </p>
@@ -112,15 +121,18 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
 
   const targetCard = snapshot.target_professional ? (
     <SectionCard title="想諮詢的對象">
-      <p className="text-sm font-medium text-foreground">{snapshot.target_professional.label}</p>
+      <p className="mt-3 text-base font-semibold text-foreground">{snapshot.target_professional.label}</p>
     </SectionCard>
   ) : null;
 
   const lifeContextCard = hasAnyLifeContext(snapshot.initial_record.life_context, tracks) ? (
     <LifeContextComparison
       initialValues={snapshot.initial_record.life_context}
-      tracks={tracks}
+      tracks={visibleLifeContextTracks}
       labels={lifeLabels}
+      hiddenCount={Math.max(0, lifeContextTracks.length - 5)}
+      expanded={showAllLifeContext}
+      onToggle={() => setShowAllLifeContext((current) => !current)}
     />
   ) : null;
 
@@ -128,7 +140,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const actionsCard =
     actions.length > 0 ? (
       <SectionCard title="已嘗試的調整">
-        <ul className="space-y-2">
+        <ul className="mt-3 space-y-2">
           {actions.map((track) => (
             <li key={`act-${track.track_id}`} className="text-sm text-foreground">
               <span className="font-medium">{formatTaipeiDate(track.track_date)}：</span>
@@ -144,6 +156,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const tracksCard = (
     <SectionCard
       title="每日追蹤變化"
+      className="gap-5"
       description={
         stats.hasTracks
           ? `共 ${stats.trackCount} 筆紀錄，最後一次為 ${formatTaipeiDate(stats.latestTrackDate)}。`
@@ -151,8 +164,8 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
       }
     >
       {stats.hasTracks ? (
-        <ul className="space-y-3">
-          {tracks.map((track) => (
+        <ul className="mt-3 space-y-3">
+          {visibleTrackDetails.map((track) => (
             <li
               key={track.track_id}
               className="space-y-2 rounded-lg border border-border bg-surface p-3"
@@ -199,6 +212,16 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
           ))}
         </ul>
       ) : null}
+      {tracks.length > 5 ? (
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto"
+          onClick={() => setShowAllTrackDetails((current) => !current)}
+        >
+          {showAllTrackDetails ? "收合至最新 5 筆" : `展開其餘 ${tracks.length - 5} 筆`}
+        </Button>
+      ) : null}
     </SectionCard>
   );
 
@@ -221,11 +244,11 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const notesCard =
     notes.length > 0 ? (
       <SectionCard title="我選擇一併提供的紀錄備註">
-        <ul className="space-y-2">
+        <ul className="mt-3 space-y-3">
           {notes.map((note) => (
-            <li key={note.track_id} className="text-sm text-foreground">
-              <span className="font-medium">{formatTaipeiDate(note.track_date)}：</span>
-              {note.notes}
+            <li key={note.track_id} className="space-y-1 text-sm text-foreground">
+              <p className="font-medium">{formatTaipeiDate(note.track_date)}：</p>
+              <p>{note.notes}</p>
             </li>
           ))}
         </ul>
@@ -235,9 +258,14 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const questionsCard =
     questions.length > 0 ? (
       <SectionCard title="我想問的問題">
-        <ol className="list-decimal space-y-1 pl-5 text-sm text-foreground">
+        <ol className="mt-3 space-y-1 text-sm text-foreground">
           {questions.map((question, index) => (
-            <li key={index}>{question}</li>
+            <li key={index} className="flex items-start gap-2 leading-6">
+              <span aria-hidden="true" className="w-5 shrink-0 text-right">
+                {index + 1}.
+              </span>
+              <span className="min-w-0 flex-1">{question}</span>
+            </li>
           ))}
         </ol>
       </SectionCard>
@@ -271,7 +299,23 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
           {questionsCard}
         </>
       )}
-      <p className="text-sm text-muted-foreground">{snapshot.disclaimer}</p>
+      <div
+        role="note"
+        className="flex items-start gap-3 rounded-lg border border-border bg-muted px-4 py-3 text-sm text-foreground"
+      >
+        <Info aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+        <p>
+          {snapshot.summary_type === "medical" ? (
+            <>
+              <span className="block sm:inline">本摘要依使用者自行記錄的資訊整理，</span>
+              <span className="block sm:inline">僅供就醫溝通參考，不構成醫療診斷，</span>
+              <span className="block sm:inline">不能取代醫療人員實際評估。</span>
+            </>
+          ) : (
+            snapshot.disclaimer
+          )}
+        </p>
+      </div>
     </div>
   );
 }
@@ -365,15 +409,18 @@ function LifeContextComparison({
   initialValues,
   tracks,
   labels,
+  hiddenCount,
+  expanded,
+  onToggle,
 }: {
   initialValues: Record<string, number> | null | undefined;
   tracks: SnapshotTrack[];
   labels: Record<string, string>;
+  hiddenCount: number;
+  expanded: boolean;
+  onToggle: () => void;
 }) {
   const sources = [
-    ...(hasNumericLifeContext(initialValues)
-      ? [{ key: "initial", label: "初始紀錄", values: initialValues }]
-      : []),
     ...tracks
       .filter((track) => hasNumericLifeContext(track.life_context))
       .map((track) => ({
@@ -381,13 +428,20 @@ function LifeContextComparison({
         label: formatTaipeiDate(track.track_date),
         values: track.life_context,
       })),
+    ...(hasNumericLifeContext(initialValues)
+      ? [{ key: "initial", label: "建立狀況追蹤當日", values: initialValues }]
+      : []),
   ];
 
   if (sources.length === 0) return null;
 
   return (
-    <SectionCard title="生活狀況" description="依你在紀錄中填寫的生活因素整理。">
-      <div className="hidden overflow-x-auto md:block">
+    <SectionCard
+      title="生活狀況"
+      description="依你在紀錄中填寫的生活因素整理。"
+      className="gap-5"
+    >
+      <div className="mt-3 hidden overflow-x-auto md:block">
         <table className="min-w-max border-separate border-spacing-0 text-left">
           <thead>
             <tr>
@@ -397,7 +451,7 @@ function LifeContextComparison({
               {sources.map((source) => (
                 <th
                   key={source.key}
-                  className="min-w-36 border-b border-border px-3 py-2 text-xs font-medium text-muted-foreground"
+                  className="min-w-28 border-b border-border px-2 py-2 text-xs font-medium text-muted-foreground"
                 >
                   {source.label}
                 </th>
@@ -425,7 +479,7 @@ function LifeContextComparison({
         </table>
       </div>
 
-      <div className="space-y-3 md:hidden">
+      <div className="mt-3 space-y-3 md:hidden">
         {sources.map((source) => (
           <section key={source.key} className="rounded-lg border border-border bg-surface p-3">
             <h3 className="text-sm font-semibold text-foreground">{source.label}</h3>
@@ -444,6 +498,12 @@ function LifeContextComparison({
           </section>
         ))}
       </div>
+
+      {hiddenCount > 0 ? (
+        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onToggle}>
+          {expanded ? "收合至最新 5 筆" : `展開其餘 ${hiddenCount} 筆`}
+        </Button>
+      ) : null}
     </SectionCard>
   );
 }
@@ -486,18 +546,20 @@ function SafetyCard({ safety }: { safety: SummarySnapshot["safety"] }) {
 
   return (
     <SectionCard title="安全確認">
-      {lines.map((line) => (
-        <p key={line} className="text-sm text-foreground">
-          {line}
-        </p>
-      ))}
-      {warnings.length > 0 ? (
-        <ul className="list-disc space-y-1 pl-5 text-sm text-foreground">
-          {warnings.map((warning) => (
-            <li key={warning.code}>{warning.label}</li>
-          ))}
-        </ul>
-      ) : null}
+      <div className="mt-2 space-y-2">
+        {lines.map((line) => (
+          <p key={line} className="text-sm text-foreground">
+            {line}
+          </p>
+        ))}
+        {warnings.length > 0 ? (
+          <ul className="list-disc space-y-1 pl-5 text-sm text-foreground">
+            {warnings.map((warning) => (
+              <li key={warning.code}>{warning.label}</li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
     </SectionCard>
   );
 }

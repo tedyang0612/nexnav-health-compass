@@ -237,7 +237,7 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
         </div>
       </SectionCard>
 
-      <SectionCard title="建立摘要" description="摘要可協助你整理目前紀錄，方便與專業人員溝通。">
+      <SectionCard title="建立摘要" description="整理目前紀錄，方便與專業人員溝通。">
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild className="min-h-11 w-full sm:w-auto">
             <Link
@@ -260,6 +260,17 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
             </Button>
           ) : null}
         </div>
+      </SectionCard>
+
+      <SectionCard
+        title="尋找附近醫療院所"
+        description="以南京復興捷運站為中心，查看 5 公里內的醫療院所清單。"
+      >
+        <Button asChild className="min-h-11 w-full sm:w-auto">
+          <Link to="/events/$eventId/connect" params={{ eventId }}>
+            查看附近院所
+          </Link>
+        </Button>
       </SectionCard>
 
       <p className="text-sm text-muted-foreground">{NAVIGATE_DISCLAIMER}</p>

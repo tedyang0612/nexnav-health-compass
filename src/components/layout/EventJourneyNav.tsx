@@ -16,6 +16,7 @@ export const EVENT_JOURNEY = [
   { to: "/events/$eventId/reassess", label: "追蹤變化", exact: false },
   { to: "/events/$eventId/navigate", label: "就醫與專業協助", exact: false },
   { to: "/events/$eventId/summary/new", label: "摘要", exact: false },
+  { to: "/events/$eventId/connect", label: "尋找醫療資源", exact: false },
 ] as const;
 
 export function EventJourneyNav({ eventId }: { eventId: string }) {

@@ -63,7 +63,7 @@ export function SectionCard({
   className,
 }: {
   title?: ReactNode;
-  description?: string;
+  description?: ReactNode;
   children?: ReactNode;
   footer?: ReactNode;
   className?: string;
@@ -77,7 +77,7 @@ export function SectionCard({
         </div>
       ) : null}
       {children}
-      {footer ? <div className="pt-1">{footer}</div> : null}
+      {footer ? <div className="mt-auto pt-1">{footer}</div> : null}
     </Card>
   );
 }

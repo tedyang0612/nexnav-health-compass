@@ -5,7 +5,7 @@ import {
 } from "@/lib/daily-track";
 
 /**
- * 和前一次相比的主觀變化。初始不預選，選取狀態同時以邊框、底色與勾選符號呈現。
+ * 和前一次相比的主觀變化。初始不預選，選取狀態以 radio、邊框與底色一致呈現。
  */
 export function SubjectiveChangeField({
   value,
@@ -36,7 +36,7 @@ export function SubjectiveChangeField({
           return (
             <label
               key={option.value}
-              className="flex min-h-11 cursor-pointer items-center justify-between gap-2 rounded-md border border-input px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-accent has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring"
+              className="flex min-h-11 cursor-pointer items-center gap-2 rounded-md border border-input px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-accent has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring"
             >
               <span className="flex items-center gap-2">
                 <input
@@ -51,11 +51,6 @@ export function SubjectiveChangeField({
                 />
                 <span>{option.label}</span>
               </span>
-              {selected ? (
-                <span aria-hidden="true" className="text-xs font-medium text-primary">
-                  已選
-                </span>
-              ) : null}
             </label>
           );
         })}

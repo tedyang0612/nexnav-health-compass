@@ -27,7 +27,6 @@ import {
   frequencyLabel,
   HEALTH_BACKGROUND_KEYS,
   normalizeQuestions,
-  PRIVACY_COPY_LINES,
   QUESTION_MAX_COUNT,
   QUESTION_MAX_LENGTH,
   subjectiveLabel,
@@ -133,8 +132,21 @@ function SelectionPage({ eventId }: { eventId: string }) {
         {types.map((type) => (
           <SectionCard
             key={type}
-            title={SUMMARY_TYPE_LABEL[type]}
-            description={SUMMARY_TYPE_DESCRIPTION[type]}
+            className="flex h-full flex-col"
+            title={<span className="block pb-2">{SUMMARY_TYPE_LABEL[type]}</span>}
+            description={
+              type === "professional_support" ? (
+                <>
+                  <span className="block">整理生活狀況、已嘗試的調整與追蹤紀錄，</span>
+                  <span className="mt-3 block">方便與其他健康專業人員討論。</span>
+                </>
+              ) : (
+                <>
+                  <span className="block sm:inline">整理症狀、安全確認與追蹤變化，</span>
+                  <span className="mt-3 block sm:mt-0 sm:inline">方便就醫時溝通。</span>
+                </>
+              )
+            }
             footer={
               <Button asChild className="min-h-11 w-full sm:w-auto">
                 <Link
@@ -197,7 +209,7 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
   const [backgroundKeys, setBackgroundKeys] = useState<HealthBackgroundKey[]>([]);
   const [trackIds, setTrackIds] = useState<string[]>([]);
   const [target, setTarget] = useState<TargetProfessional | "">("");
-  const [questions, setQuestions] = useState<string[]>(["", "", ""]);
+  const [questions, setQuestions] = useState<string[]>([""]);
   const [dirty, setDirty] = useState(false);
   const [stage, setStage] = useState<"build" | "preview">("build");
   const [submissionId] = useState(() => crypto.randomUUID());
@@ -396,14 +408,16 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
   return (
     <PageContainer className="space-y-6">
       <UnsavedChangesGuard enabled={dirty && !confirmed} bypassRef={successNavigationRef} />
-      <PageHeader
-        title={SUMMARY_TYPE_LABEL[summaryType]}
-        description={
-          stage === "build"
+      <header className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-6">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          {SUMMARY_TYPE_LABEL[summaryType]}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {stage === "build"
             ? "選擇你願意一併提供的內容，下一步可以先預覽再確認。"
-            : "以下是確認後會保存的內容，確認後就不會再變動。"
-        }
-      />
+            : "以下是確認後會保存的內容，確認後就不會再變動。"}
+        </p>
+      </header>
 
       {stage === "build" ? (
         <>
@@ -423,7 +437,7 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
                     setTarget(v as TargetProfessional);
                     setTargetError(undefined);
                   }}
-                  className="grid gap-2 sm:grid-cols-2"
+                  className="mt-3 grid gap-2 sm:grid-cols-2"
                 >
                   {TARGET_PROFESSIONALS.map((option) => (
                     <label
@@ -440,16 +454,32 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
             </div>
           ) : null}
 
-          <SectionCard title="可選填的私人資訊">
-            {PRIVACY_COPY_LINES.map((line) => (
-              <p key={line} className="text-sm text-muted-foreground">
-                {line}
+          <div
+            role="note"
+            aria-label="可選填的私人資訊"
+            className="flex items-start gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3"
+          >
+            <span
+              aria-hidden="true"
+              className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border border-primary/40 text-xs font-semibold text-primary"
+            >
+              i
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-foreground">可選填的私人資訊</p>
+              <p className="mt-1 hidden text-sm text-muted-foreground sm:block">
+                以下資訊預設不會帶入。只有你勾選的內容會出現在這份摘要中，不會修改個人資料或其他版本。
               </p>
-            ))}
-          </SectionCard>
+              <p className="mt-1 text-sm text-muted-foreground sm:hidden">
+                <span className="block">以下資訊預設不會帶入。</span>
+                <span className="block">只有你勾選的內容會出現在這份摘要中，</span>
+                <span className="block">不會修改個人資料或其他版本。</span>
+              </p>
+            </div>
+          </div>
 
           <SectionCard title="健康背景" description="只有你勾選的項目會出現在摘要中。">
-            <div className="space-y-2">
+            <div className="mt-3 space-y-2">
               {HEALTH_BACKGROUND_KEYS.map((option) => {
                 const content = backgroundContentToText(source.healthBackground[option.value]);
                 return (
@@ -483,9 +513,9 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
             description="困擾程度與變化趨勢一律完整呈現；備註屬於私人內容，只有勾選的才會加入。"
           >
             {notesTracks.length === 0 ? (
-              <p className="text-sm text-muted-foreground">目前沒有含備註的追蹤紀錄。</p>
+              <p className="mt-3 text-sm text-muted-foreground">目前沒有含備註的追蹤紀錄。</p>
             ) : (
-              <div className="space-y-2">
+              <div className="mt-3 space-y-2">
                 {notesTracks.map((track) => (
                   <label
                     key={track.id}
@@ -511,17 +541,19 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
           </SectionCard>
 
           <SectionCard
-            title="我想問的問題"
+            title="我想問的問題（選填）"
             description={`最多 ${QUESTION_MAX_COUNT} 則，每則 ${QUESTION_MAX_LENGTH} 字以內。`}
           >
-            <div className="space-y-3">
+            <div className="mt-3 space-y-3">
               {questions.map((value, index) => (
-                <FormField key={index} id={`question-${index}`} label={`問題 ${index + 1}`}>
+                <div key={index} className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <Input
                     id={`question-${index}`}
+                    aria-label={`問題 ${index + 1}`}
+                    placeholder={`問題 ${index + 1}`}
                     value={value}
                     maxLength={QUESTION_MAX_LENGTH}
-                    className="min-h-11"
+                    className="min-h-11 min-w-0 flex-1"
                     onChange={(e) => {
                       markDirty();
                       setQuestionError(undefined);
@@ -530,8 +562,38 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
                       );
                     }}
                   />
-                </FormField>
+                  {index > 0 ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="min-h-11 self-start px-3 text-muted-foreground sm:w-14 sm:self-auto"
+                      aria-label={`移除問題 ${index + 1}`}
+                      onClick={() => {
+                        markDirty();
+                        setQuestionError(undefined);
+                        setQuestions((prev) => prev.filter((_, i) => i !== index));
+                      }}
+                    >
+                      移除
+                    </Button>
+                  ) : (
+                    <span aria-hidden="true" className="hidden min-h-11 w-14 shrink-0 sm:block" />
+                  )}
+                </div>
               ))}
+              {questions.length < QUESTION_MAX_COUNT ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="min-h-11"
+                  onClick={() => {
+                    markDirty();
+                    setQuestions((prev) => [...prev, ""]);
+                  }}
+                >
+                  ＋ 新增問題
+                </Button>
+              ) : null}
               <FieldError id="question-error" message={questionError} />
             </div>
           </SectionCard>
@@ -556,7 +618,7 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
           <StatusBanner
             tone="note"
             title="這只是預覽"
-            description="確認後會保存為固定版本，之後不會再隨紀錄變動。"
+            description="確認後會保存為固定版本，不再隨紀錄變動。"
           />
           <SummarySnapshotView snapshot={previewSnapshot} />
 

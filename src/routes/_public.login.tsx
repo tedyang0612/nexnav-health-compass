@@ -60,14 +60,25 @@ function LoginPage() {
     setErrors((prev) => (prev[field] ? { ...prev, [field]: undefined } : prev));
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (submitting.current) return;
     setFormError(null);
 
+    // 直接讀取畫面上的實際值，避免瀏覽器自動填入未同步至 React state。
+    const formData = new FormData(e.currentTarget);
+    const submittedEmail = String(formData.get("email") ?? "").trim();
+    const submittedPassword = String(formData.get("password") ?? "");
+    const submittedValues = {
+      email: submittedEmail,
+      password: submittedPassword,
+    };
+    setEmail(submittedEmail);
+    setPassword(submittedPassword);
+
     const next: Errors = {
-      email: validateField("email", { email, password }),
-      password: validateField("password", { email, password }),
+      email: validateField("email", submittedValues),
+      password: validateField("password", submittedValues),
     };
     setErrors(next);
     if (next.email) {
@@ -83,12 +94,12 @@ function LoginPage() {
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
+        email: submittedEmail,
+        password: submittedPassword,
       });
 
       if (error || !data.user) {
-        // 憑證相關錯誤一律使用同一則訊息。
+        // 憑證相關錯誤一律使用同一則訊息，系統錯誤則保留輸入內容。
         const msg = (error?.message ?? "").toLowerCase();
         const isCredentialIssue =
           !error ||
@@ -98,20 +109,12 @@ function LoginPage() {
           msg.includes("user not found") ||
           msg.includes("email not confirmed");
         setFormError(isCredentialIssue ? CREDENTIALS_ERROR : GENERIC_ERROR);
-        setPassword("");
+        if (isCredentialIssue) setPassword("");
         return;
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("onboarding_completed")
-        .eq("id", data.user.id)
-        .maybeSingle();
-
-      navigate({
-        to: profile?.onboarding_completed ? "/dashboard" : "/onboarding",
-        replace: true,
-      });
+      // Profile／Onboarding 判定統一交由 Protected Route，避免登入頁重複查詢。
+      navigate({ to: "/dashboard", replace: true });
     } catch {
       setFormError(GENERIC_ERROR);
     } finally {
@@ -149,6 +152,7 @@ function LoginPage() {
             </label>
             <input
               id="email"
+              name="email"
               ref={emailRef}
               type="email"
               inputMode="email"
@@ -181,6 +185,7 @@ function LoginPage() {
             </label>
             <input
               id="password"
+              name="password"
               ref={passwordRef}
               type="password"
               autoComplete="current-password"
