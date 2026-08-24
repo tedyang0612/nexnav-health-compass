@@ -104,7 +104,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
       {stats.mismatch ? <MismatchCallout /> : null}
 
       {associatedSymptoms.length > 0 ? (
-        <p className="text-sm text-foreground">
+        <p className="mt-3 text-sm text-foreground">
           <span className="font-medium">一併出現的狀況：</span>
           {associatedSymptoms.join("、")}
         </p>
@@ -541,18 +541,20 @@ function SafetyCard({ safety }: { safety: SummarySnapshot["safety"] }) {
 
   return (
     <SectionCard title="安全確認">
-      {lines.map((line) => (
-        <p key={line} className="text-sm text-foreground">
-          {line}
-        </p>
-      ))}
-      {warnings.length > 0 ? (
-        <ul className="list-disc space-y-1 pl-5 text-sm text-foreground">
-          {warnings.map((warning) => (
-            <li key={warning.code}>{warning.label}</li>
-          ))}
-        </ul>
-      ) : null}
+      <div className="mt-2 space-y-2">
+        {lines.map((line) => (
+          <p key={line} className="text-sm text-foreground">
+            {line}
+          </p>
+        ))}
+        {warnings.length > 0 ? (
+          <ul className="list-disc space-y-1 pl-5 text-sm text-foreground">
+            {warnings.map((warning) => (
+              <li key={warning.code}>{warning.label}</li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
     </SectionCard>
   );
 }
