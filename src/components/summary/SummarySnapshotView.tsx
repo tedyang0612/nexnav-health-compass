@@ -121,7 +121,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
 
   const targetCard = snapshot.target_professional ? (
     <SectionCard title="想諮詢的對象">
-      <p className="mt-3 text-sm font-medium text-foreground">{snapshot.target_professional.label}</p>
+      <p className="mt-3 text-base font-semibold text-foreground">{snapshot.target_professional.label}</p>
     </SectionCard>
   ) : null;
 
