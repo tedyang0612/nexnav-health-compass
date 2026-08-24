@@ -133,7 +133,16 @@ function SelectionPage({ eventId }: { eventId: string }) {
           <SectionCard
             key={type}
             title={SUMMARY_TYPE_LABEL[type]}
-            description={SUMMARY_TYPE_DESCRIPTION[type]}
+            description={
+              type === "professional_support" ? (
+                <>
+                  <span className="block">整理生活狀況、已嘗試的調整與追蹤紀錄，</span>
+                  <span className="mt-2 block">方便與其他健康專業人員討論。</span>
+                </>
+              ) : (
+                SUMMARY_TYPE_DESCRIPTION[type]
+              )
+            }
             footer={
               <Button asChild className="min-h-11 w-full sm:w-auto">
                 <Link
