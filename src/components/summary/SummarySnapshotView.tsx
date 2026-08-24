@@ -54,17 +54,26 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
           ) : null}
         </MetricCell>
         <MetricCell label="困擾程度">
-          <span className="whitespace-nowrap">
-            初始 {stats.initialSeverity}/10
-            {stats.hasTracks ? ` → 最新 ${stats.latestSeverity}/10` : ""}
+          <span className="flex flex-col gap-0.5 sm:block">
+            <span className="whitespace-nowrap">初始 {stats.initialSeverity}/10</span>
+            {stats.hasTracks ? (
+              <>
+                <span className="hidden sm:inline"> → </span>
+                <span className="whitespace-nowrap">最新 {stats.latestSeverity}/10</span>
+              </>
+            ) : null}
           </span>
         </MetricCell>
         <MetricCell label="每日追蹤出現頻率">
           {stats.hasTracks && (stats.earliestFrequency || stats.latestFrequency) ? (
-            <span className="whitespace-nowrap">
-              最早 {formatFiveLevelText(stats.earliestFrequency)}
-              {" → "}
-              最新 {formatFiveLevelText(stats.latestFrequency)}
+            <span className="flex flex-col gap-0.5 sm:block">
+              <span className="whitespace-nowrap">
+                最早 {formatFiveLevelText(stats.earliestFrequency)}
+              </span>
+              <span className="hidden sm:inline"> → </span>
+              <span className="whitespace-nowrap">
+                最新 {formatFiveLevelText(stats.latestFrequency)}
+              </span>
             </span>
           ) : (
             "尚無每日追蹤紀錄"
@@ -80,7 +89,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
       </div>
 
       {snapshot.initial_record.frequency_level ? (
-        <div className="space-y-1">
+        <div className="mt-3 space-y-1 px-3">
           <p className="text-xs text-muted-foreground">初始紀錄頻率</p>
           <FrequencyValue
             level={snapshot.initial_record.frequency_level}
