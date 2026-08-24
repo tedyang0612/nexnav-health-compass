@@ -107,6 +107,18 @@ function Page() {
         </div>
       </header>
       <SummarySnapshotView snapshot={snapshot} />
+      <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-4">
+        <div>
+          <h2 className="font-semibold text-foreground">需要尋找附近的專業協助？</h2>
+          <p className="mt-1 text-sm text-muted-foreground">可查看 Demo 院所清單，或前往 Google Maps 搜尋。</p>
+        </div>
+        <Button asChild className="mt-3 min-h-11 w-full sm:mt-0 sm:w-auto">
+          <Link to="/events/$eventId/connect" params={{ eventId: row.health_event_id }}>
+            查看附近專業協助
+          </Link>
+        </Button>
+      </section>
+
     </PageContainer>
   );
 }
