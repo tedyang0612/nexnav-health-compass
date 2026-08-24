@@ -140,7 +140,10 @@ function SelectionPage({ eventId }: { eventId: string }) {
                   <span className="mt-3 block">方便與其他健康專業人員討論。</span>
                 </>
               ) : (
-                SUMMARY_TYPE_DESCRIPTION[type]
+                <>
+                  <span className="block sm:inline">整理症狀、安全確認與追蹤變化，</span>
+                  <span className="mt-3 block sm:mt-0 sm:inline">方便就醫時溝通。</span>
+                </>
               )
             }
             footer={
