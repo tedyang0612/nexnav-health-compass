@@ -1,13 +1,17 @@
 import { useMemo, useState } from "react";
+import type { FormEvent } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertTriangle, ExternalLink, MapPin } from "lucide-react";
+import { AlertTriangle, ExternalLink, MapPin, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { EmptyState, ErrorState, LoadingState, PageContainer, PageHeader, SectionCard } from "@/components/shell";
+import { EmptyState, ErrorState, LoadingState, PageContainer, PageHeader } from "@/components/shell";
 import { useReassessData } from "@/hooks/useReassess";
 import { CONNECT_DEMO_FACILITIES, connectSearchTarget } from "@/lib/connect-demo";
 
+const DEFAULT_LOCATION = "南京復興捷運站";
+type Filter = "recommended" | "nearby" | "open" | "all";
+
 export const Route = createFileRoute("/_app/events/$eventId/connect")({
-  head: () => ({ meta: [{ title: "尋找附近醫療院所 — NexNav" }] }),
+  head: () => ({ meta: [{ title: "尋找醫療資源 — NexNav" }] }),
   component: Page,
 });
 
@@ -16,6 +20,9 @@ function Page() {
   const query = useReassessData(eventId);
   const [showAll, setShowAll] = useState(false);
   const [sort, setSort] = useState<"match" | "distance">("match");
+  const [filter, setFilter] = useState<Filter>("recommended");
+  const [location, setLocation] = useState(DEFAULT_LOCATION);
+  const [placeType, setPlaceType] = useState("醫院或診所");
 
   const safety = useMemo(() => {
     if (!query.data?.initial) return null;
@@ -29,20 +36,41 @@ function Page() {
   const symptom = query.data.event.symptomName;
   const target = connectSearchTarget(symptom);
   const targetWords = target.split(" ");
-  const ranked = [...CONNECT_DEMO_FACILITIES].sort((a, b) => {
+  const isRecommended = (specialty: string) => targetWords.some((word) => specialty.includes(word));
+  const filtered = CONNECT_DEMO_FACILITIES.filter((facility) => {
+    if (filter === "recommended") return isRecommended(facility.specialty);
+    if (filter === "nearby") return facility.distanceKm <= 2;
+    if (filter === "open") return facility.openToday;
+    return true;
+  });
+  const ranked = [...filtered].sort((a, b) => {
     if (sort === "distance") return a.distanceKm - b.distanceKm;
-    const aMatch = targetWords.some((word) => a.specialty.includes(word)) ? 1 : 0;
-    const bMatch = targetWords.some((word) => b.specialty.includes(word)) ? 1 : 0;
-    return bMatch - aMatch || a.distanceKm - b.distanceKm;
+    return Number(isRecommended(b.specialty)) - Number(isRecommended(a.specialty)) || a.distanceKm - b.distanceKm;
   });
   const visible = showAll ? ranked : ranked.slice(0, 5);
-  const mapsUrl = (specialty: string) =>
-    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`南京復興捷運站 ${specialty}`)}`;
+  const mapsUrl = (searchQuery: string) =>
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`;
+
+  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const normalizedLocation = location.trim() || DEFAULT_LOCATION;
+    if (normalizedLocation === DEFAULT_LOCATION) {
+      setLocation(DEFAULT_LOCATION);
+      setShowAll(false);
+      return;
+    }
+    window.open(mapsUrl(`${normalizedLocation} ${placeType}`), "_blank", "noopener,noreferrer");
+  };
+
+  const selectFilter = (nextFilter: Filter) => {
+    setFilter(nextFilter);
+    setShowAll(false);
+  };
 
   if (safety?.result === "priority_care") {
     return (
       <PageContainer className="space-y-6">
-        <PageHeader title="尋找附近醫療院所" description="依目前安全確認結果，先處理需要優先注意的狀況。" />
+        <PageHeader title="尋找醫療資源" description="依目前安全確認結果，先處理需要優先注意的狀況。" />
         <section role="alert" className="rounded-xl border-2 border-urgent bg-urgent-muted p-5 sm:p-6">
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 size-5 shrink-0 text-urgent-strong" aria-hidden="true" />
@@ -52,7 +80,7 @@ function Page() {
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button asChild className="min-h-11 bg-urgent text-white hover:bg-urgent/90"><a href="tel:119">撥打 119</a></Button>
                 <Button asChild variant="outline" className="min-h-11 border-urgent text-urgent-strong">
-                  <a href={mapsUrl("急診")} target="_blank" rel="noreferrer">搜尋附近急診 <ExternalLink className="ml-2 size-4" /></a>
+                  <a href={mapsUrl(`${DEFAULT_LOCATION} 急診`)} target="_blank" rel="noreferrer">搜尋附近急診 <ExternalLink className="ml-2 size-4" /></a>
                 </Button>
               </div>
             </div>
@@ -63,38 +91,85 @@ function Page() {
     );
   }
 
+  const filterOptions: Array<{ value: Filter; label: string }> = [
+    { value: "recommended", label: "建議科別" },
+    { value: "nearby", label: "2 公里內" },
+    { value: "open", label: "今日有看診" },
+    { value: "all", label: "全部" },
+  ];
+
   return (
     <PageContainer className="space-y-6">
-      <PageHeader title="尋找附近醫療院所" description="以南京復興捷運站為中心，查看 5 公里內的醫療院所清單。" />
-      <SectionCard title="搜尋條件">
-        <dl className="grid gap-4 sm:grid-cols-3">
-          <div><dt className="text-sm text-muted-foreground">搜尋中心</dt><dd className="font-medium">南京復興捷運站</dd></div>
-          <div><dt className="text-sm text-muted-foreground">範圍</dt><dd className="font-medium">方圓 5 公里</dd></div>
-          <div><dt className="text-sm text-muted-foreground">目前狀況</dt><dd className="font-medium">{symptom}</dd></div>
-        </dl>
-        <p className="mt-4 text-sm text-muted-foreground">參考方向：{target.replaceAll(" ", "／")}</p>
-      </SectionCard>
-      <section aria-labelledby="connect-results" className="space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div><h2 id="connect-results" className="text-xl font-semibold">附近院所清單</h2><p className="text-sm text-muted-foreground">預設顯示 5 筆，共 20 筆。</p></div>
-          <label className="flex items-center gap-2 text-sm">排序
-            <select className="min-h-11 rounded-lg border border-border bg-surface px-3" value={sort} onChange={(e) => setSort(e.target.value as "match" | "distance")}>
-              <option value="match">符合程度</option><option value="distance">距離優先</option>
+      <PageHeader title="尋找醫療資源" />
+
+      <section aria-label="搜尋醫療院所" className="rounded-xl border border-border bg-card p-4 shadow-sm sm:p-5">
+        <form className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem_auto] sm:items-end" onSubmit={handleSearch}>
+          <label className="grid gap-1.5 text-sm font-medium">
+            位置
+            <input
+              className="min-h-11 rounded-lg border border-border bg-surface px-3 font-normal"
+              value={location}
+              onChange={(event) => setLocation(event.target.value)}
+              placeholder="輸入地點或捷運站"
+            />
+          </label>
+          <label className="grid gap-1.5 text-sm font-medium">
+            搜尋類型
+            <select className="min-h-11 rounded-lg border border-border bg-surface px-3 font-normal" value={placeType} onChange={(event) => setPlaceType(event.target.value)}>
+              <option>醫院或診所</option>
+              <option>醫院</option>
+              <option>診所</option>
             </select>
           </label>
+          <Button type="submit" className="min-h-11"><Search className="mr-2 size-4" />搜尋</Button>
+        </form>
+        <p className="mt-3 text-sm text-muted-foreground">更換位置後，將前往 Google Maps 查看該地點的即時搜尋結果。</p>
+      </section>
+
+      <section aria-labelledby="connect-results" className="space-y-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h2 id="connect-results" className="text-xl font-semibold">南京復興周邊院所</h2>
+            <p className="text-sm text-muted-foreground">依目前狀況「{symptom}」整理，符合此條件共 {ranked.length} 筆。</p>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex flex-wrap gap-2" aria-label="院所篩選">
+              {filterOptions.map((option) => (
+                <Button key={option.value} type="button" size="sm" variant={filter === option.value ? "default" : "outline"} aria-pressed={filter === option.value} onClick={() => selectFilter(option.value)}>
+                  {option.label}
+                </Button>
+              ))}
+            </div>
+            <label className="flex items-center gap-2 text-sm">排序
+              <select className="min-h-10 rounded-lg border border-border bg-surface px-3" value={sort} onChange={(event) => setSort(event.target.value as "match" | "distance")}>
+                <option value="match">符合程度</option><option value="distance">距離優先</option>
+              </select>
+            </label>
+          </div>
         </div>
+
         <div className="space-y-3">
           {visible.map((facility, index) => (
             <article key={facility.id} className="rounded-xl border border-border bg-card p-4 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-5">
               <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2"><span className="text-xs text-muted-foreground">#{index + 1}</span><h3 className="font-semibold">{facility.name}</h3><span className="rounded-full bg-muted px-2 py-0.5 text-xs">{facility.specialty}</span></div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-muted-foreground">#{index + 1}</span>
+                  <h3 className="font-semibold">{facility.name}</h3>
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-xs">{facility.specialty}</span>
+                  {facility.openToday && <span className="rounded-full border border-primary/30 bg-primary/5 px-2 py-0.5 text-xs text-primary">今日有看診</span>}
+                </div>
                 <p className="mt-2 flex items-center gap-1 text-sm text-muted-foreground"><MapPin className="size-4" /> 約 {facility.distanceKm.toFixed(1)} km・{facility.area}</p>
               </div>
-              <Button asChild variant="outline" className="mt-3 min-h-11 w-full sm:mt-0 sm:w-auto"><a href={mapsUrl(facility.specialty)} target="_blank" rel="noreferrer">在 Google Maps 搜尋 <ExternalLink className="ml-2 size-4" /></a></Button>
+              <Button asChild variant="outline" className="mt-3 min-h-11 w-full sm:mt-0 sm:w-auto">
+                <a href={mapsUrl(`${DEFAULT_LOCATION} ${facility.specialty}`)} target="_blank" rel="noreferrer">在 Google Maps 搜尋 <ExternalLink className="ml-2 size-4" /></a>
+              </Button>
             </article>
           ))}
         </div>
-        <Button type="button" variant="outline" className="min-h-11 w-full" onClick={() => setShowAll((value) => !value)}>{showAll ? "收合為 5 筆" : "展開全部 20 筆"}</Button>
+
+        {ranked.length > 5 && (
+          <Button type="button" variant="outline" className="min-h-11 w-full" onClick={() => setShowAll((value) => !value)}>{showAll ? "收合為 5 筆" : `展開全部 ${ranked.length} 筆`}</Button>
+        )}
       </section>
       <p className="text-sm text-muted-foreground">院所資訊可能有所變動，實際資訊請以 Google Maps 顯示內容為準。</p>
     </PageContainer>
