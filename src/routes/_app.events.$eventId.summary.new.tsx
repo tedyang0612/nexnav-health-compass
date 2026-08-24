@@ -27,7 +27,6 @@ import {
   frequencyLabel,
   HEALTH_BACKGROUND_KEYS,
   normalizeQuestions,
-  PRIVACY_COPY_LINES,
   QUESTION_MAX_COUNT,
   QUESTION_MAX_LENGTH,
   subjectiveLabel,
@@ -440,15 +439,29 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
             </div>
           ) : null}
 
-          <SectionCard title="可選填的私人資訊">
-            <div className="mt-3 space-y-1">
-              {PRIVACY_COPY_LINES.map((line) => (
-                <p key={line} className="text-sm text-muted-foreground">
-                  {line}
-                </p>
-              ))}
+          <div
+            role="note"
+            aria-label="可選填的私人資訊"
+            className="flex items-start gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3"
+          >
+            <span
+              aria-hidden="true"
+              className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border border-primary/40 text-xs font-semibold text-primary"
+            >
+              i
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-foreground">可選填的私人資訊</p>
+              <p className="mt-1 hidden text-sm text-muted-foreground sm:block">
+                以下資訊預設不會帶入。只有你勾選的內容會出現在這份摘要中，不會修改個人資料或其他版本。
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground sm:hidden">
+                <span className="block">以下資訊預設不會帶入。</span>
+                <span className="block">只有你勾選的內容會出現在這份摘要中，</span>
+                <span className="block">不會修改個人資料或其他版本。</span>
+              </p>
             </div>
-          </SectionCard>
+          </div>
 
           <SectionCard title="健康背景" description="只有你勾選的項目會出現在摘要中。">
             <div className="mt-3 space-y-2">
