@@ -48,7 +48,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
 
   const overview = (
     <SectionCard title="狀況重點" className="gap-5">
-      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <dl className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MetricCell label="主要不適">
           {snapshot.event.primary_symptom_label ?? "未記錄"}
         </MetricCell>
@@ -164,7 +164,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
       }
     >
       {stats.hasTracks ? (
-        <ul className="space-y-3">
+        <ul className="mt-3 space-y-3">
           {visibleTrackDetails.map((track) => (
             <li
               key={track.track_id}
@@ -436,7 +436,7 @@ function LifeContextComparison({
       description="依你在紀錄中填寫的生活因素整理。"
       className="gap-5"
     >
-      <div className="hidden overflow-x-auto md:block">
+      <div className="mt-3 hidden overflow-x-auto md:block">
         <table className="min-w-max border-separate border-spacing-0 text-left">
           <thead>
             <tr>
@@ -474,7 +474,7 @@ function LifeContextComparison({
         </table>
       </div>
 
-      <div className="space-y-3 md:hidden">
+      <div className="mt-3 space-y-3 md:hidden">
         {sources.map((source) => (
           <section key={source.key} className="rounded-lg border border-border bg-surface p-3">
             <h3 className="text-sm font-semibold text-foreground">{source.label}</h3>
