@@ -556,7 +556,7 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
           <StatusBanner
             tone="note"
             title="這只是預覽"
-            description="確認後會保存為固定版本，之後不會再隨紀錄變動。"
+            description="確認後會保存為固定版本，不再隨紀錄變動。"
           />
           <SummarySnapshotView snapshot={previewSnapshot} />
 
