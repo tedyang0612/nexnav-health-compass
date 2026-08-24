@@ -511,10 +511,10 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
           </SectionCard>
 
           <SectionCard
-            title="我想問的問題"
+            title="我想問的問題（選填）"
             description={`最多 ${QUESTION_MAX_COUNT} 則，每則 ${QUESTION_MAX_LENGTH} 字以內。`}
           >
-            <div className="space-y-3">
+            <div className="mt-3 space-y-3">
               {questions.map((value, index) => (
                 <div key={index} className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <Input
