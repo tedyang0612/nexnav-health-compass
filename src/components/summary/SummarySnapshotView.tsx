@@ -258,9 +258,14 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const questionsCard =
     questions.length > 0 ? (
       <SectionCard title="我想問的問題">
-        <ol className="list-decimal space-y-1 pl-5 text-sm text-foreground">
+        <ol className="space-y-1 text-sm text-foreground">
           {questions.map((question, index) => (
-            <li key={index}>{question}</li>
+            <li key={index} className="flex items-start gap-2 leading-6">
+              <span aria-hidden="true" className="w-5 shrink-0 text-right">
+                {index + 1}.
+              </span>
+              <span className="min-w-0 flex-1">{question}</span>
+            </li>
           ))}
         </ol>
       </SectionCard>
