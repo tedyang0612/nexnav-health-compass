@@ -64,7 +64,7 @@ function Page() {
       return;
     }
     const placeQuery = placeType === "全部" ? "醫院 診所" : placeType;
-    window.open(mapsUrl(`${normalizedLocation} ${placeQuery}`), "_blank", "noopener,noreferrer");
+    window.open(mapsUrl(`${normalizedLocation}附近的${placeQuery}`), "_blank", "noopener,noreferrer");
   };
 
   const selectFilter = (nextFilter: Filter) => {
