@@ -132,9 +132,16 @@ function Page() {
       </section>
 
       <section aria-labelledby="connect-results" className="space-y-4">
-        <div>
-          <h2 id="connect-results" className="text-xl font-semibold">結果</h2>
-          <p className="text-sm text-muted-foreground">共 {ranked.length} 筆。</p>
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <h2 id="connect-results" className="text-xl font-semibold">結果</h2>
+            <p className="text-sm text-muted-foreground">共 {ranked.length} 筆。</p>
+          </div>
+          <label className="flex shrink-0 items-center gap-2 text-sm sm:hidden">排序
+            <select className="min-h-10 rounded-lg border border-border bg-surface px-3" value={sort} onChange={(event) => setSort(event.target.value as "match" | "distance")}>
+              <option value="match">符合程度</option><option value="distance">距離優先</option>
+            </select>
+          </label>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap gap-2" aria-label="院所篩選">
@@ -144,7 +151,7 @@ function Page() {
               </Button>
             ))}
           </div>
-          <label className="flex shrink-0 items-center gap-2 text-sm sm:ml-auto">排序
+          <label className="hidden shrink-0 items-center gap-2 text-sm sm:ml-auto sm:flex">排序
             <select className="min-h-10 rounded-lg border border-border bg-surface px-3" value={sort} onChange={(event) => setSort(event.target.value as "match" | "distance")}>
               <option value="match">符合程度</option><option value="distance">距離優先</option>
             </select>
@@ -159,12 +166,15 @@ function Page() {
                   <span className="text-xs text-muted-foreground">#{index + 1}</span>
                   <h3 className="font-semibold">{facility.name}</h3>
                   <span className="rounded-full bg-muted px-2 py-0.5 text-xs">{facility.specialty}</span>
-                  <span className={facility.openToday
+                  <span className={`${facility.openToday
                     ? "rounded-full border border-emerald-600 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800"
                     : "rounded-full border border-amber-500 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:border-amber-400 dark:bg-amber-950/40 dark:text-amber-200"
-                  }>{facility.openToday ? "今日有看診" : "今日休診"}</span>
+                  } hidden sm:inline-flex`}>{facility.openToday ? "今日有看診" : "今日休診"}</span>
                 </div>
-                <p className="mt-2 flex items-center gap-1 text-sm text-muted-foreground"><MapPin className="size-4" /> 約 <strong className="font-semibold text-primary">{facility.distanceKm.toFixed(1)} km</strong><span aria-hidden="true">・</span>{facility.area}</p>
+                <p className="mt-2 flex flex-wrap items-center gap-1 text-sm text-muted-foreground"><MapPin className="size-4" /> 約 <strong className="font-semibold text-primary">{facility.distanceKm.toFixed(1)} km</strong><span aria-hidden="true">・</span>{facility.area}<span className={`${facility.openToday
+                    ? "rounded-full border border-emerald-600 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800"
+                    : "rounded-full border border-amber-500 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:border-amber-400 dark:bg-amber-950/40 dark:text-amber-200"
+                  } ml-1 inline-flex sm:hidden`}>{facility.openToday ? "今日有看診" : "今日休診"}</span></p>
               </div>
               <Button asChild variant="outline" className="mt-3 min-h-11 w-full sm:mt-0 sm:w-auto">
                 <a href={mapsUrl(`${DEFAULT_LOCATION} ${facility.specialty}`)} target="_blank" rel="noreferrer">在 Google Maps 中顯示 <GoogleMapsIcon className="ml-2 size-4" /></a>
