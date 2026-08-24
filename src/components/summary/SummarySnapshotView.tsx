@@ -244,7 +244,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const notesCard =
     notes.length > 0 ? (
       <SectionCard title="我選擇一併提供的紀錄備註">
-        <ul className="space-y-2">
+        <ul className="mt-3 space-y-3">
           {notes.map((note) => (
             <li key={note.track_id} className="space-y-1 text-sm text-foreground">
               <p className="font-medium">{formatTaipeiDate(note.track_date)}：</p>
