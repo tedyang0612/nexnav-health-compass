@@ -132,6 +132,7 @@ function SelectionPage({ eventId }: { eventId: string }) {
         {types.map((type) => (
           <SectionCard
             key={type}
+            className="flex h-full flex-col"
             title={SUMMARY_TYPE_LABEL[type]}
             description={
               type === "professional_support" ? (
