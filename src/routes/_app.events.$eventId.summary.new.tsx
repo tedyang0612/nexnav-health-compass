@@ -133,7 +133,7 @@ function SelectionPage({ eventId }: { eventId: string }) {
           <SectionCard
             key={type}
             className="flex h-full flex-col"
-            title={SUMMARY_TYPE_LABEL[type]}
+            title={<span className="block pb-2">{SUMMARY_TYPE_LABEL[type]}</span>}
             description={
               type === "professional_support" ? (
                 <>
