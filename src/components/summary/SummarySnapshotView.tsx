@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { AlertTriangle, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { SectionCard } from "@/components/shell";
 import {
   backgroundContentToText,
@@ -25,12 +27,19 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   };
   const stats = deriveSummaryStats(snapshot);
   const isProfessional = snapshot.summary_type === "professional_support";
+  const [showAllTrackDetails, setShowAllTrackDetails] = useState(false);
+  const [showAllLifeContext, setShowAllLifeContext] = useState(false);
   const tracks = [...(snapshot.daily_tracks ?? [])].sort((a, b) =>
     b.track_date.localeCompare(a.track_date),
   );
   const notes = [...(snapshot.selected_track_notes ?? [])].sort((a, b) =>
     b.track_date.localeCompare(a.track_date),
   );
+  const visibleTrackDetails = showAllTrackDetails ? tracks : tracks.slice(0, 5);
+  const lifeContextTracks = tracks.filter((track) => hasNumericLifeContext(track.life_context));
+  const visibleLifeContextTracks = showAllLifeContext
+    ? lifeContextTracks
+    : lifeContextTracks.slice(0, 5);
   const questions = snapshot.questions ?? [];
   const background = snapshot.health_background ?? [];
   const associatedSymptoms = (snapshot.initial_record.associated_symptoms ?? [])
@@ -38,7 +47,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
     .filter((label): label is string => Boolean(label));
 
   const overview = (
-    <SectionCard title="狀況重點">
+    <SectionCard title="狀況重點" className="gap-5">
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <MetricCell label="主要不適">
           {snapshot.event.primary_symptom_label ?? "未記錄"}
@@ -119,8 +128,11 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const lifeContextCard = hasAnyLifeContext(snapshot.initial_record.life_context, tracks) ? (
     <LifeContextComparison
       initialValues={snapshot.initial_record.life_context}
-      tracks={tracks}
+      tracks={visibleLifeContextTracks}
       labels={lifeLabels}
+      hiddenCount={Math.max(0, lifeContextTracks.length - 5)}
+      expanded={showAllLifeContext}
+      onToggle={() => setShowAllLifeContext((current) => !current)}
     />
   ) : null;
 
@@ -144,6 +156,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const tracksCard = (
     <SectionCard
       title="每日追蹤變化"
+      className="gap-5"
       description={
         stats.hasTracks
           ? `共 ${stats.trackCount} 筆紀錄，最後一次為 ${formatTaipeiDate(stats.latestTrackDate)}。`
@@ -152,7 +165,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
     >
       {stats.hasTracks ? (
         <ul className="space-y-3">
-          {tracks.map((track) => (
+          {visibleTrackDetails.map((track) => (
             <li
               key={track.track_id}
               className="space-y-2 rounded-lg border border-border bg-surface p-3"
@@ -198,6 +211,16 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
             </li>
           ))}
         </ul>
+      ) : null}
+      {tracks.length > 5 ? (
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto"
+          onClick={() => setShowAllTrackDetails((current) => !current)}
+        >
+          {showAllTrackDetails ? "收合至最新 5 筆" : `展開其餘 ${tracks.length - 5} 筆`}
+        </Button>
       ) : null}
     </SectionCard>
   );
@@ -271,7 +294,17 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
           {questionsCard}
         </>
       )}
-      <p className="text-sm text-muted-foreground">{snapshot.disclaimer}</p>
+      <div
+        role="note"
+        className="flex items-start gap-3 rounded-lg border border-border bg-muted px-4 py-3 text-sm text-foreground"
+      >
+        <Info aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+        <p>
+          {snapshot.summary_type === "medical"
+            ? "本摘要依使用者自行記錄的資訊整理，僅供就醫溝通參考，不構成醫療診斷，不能取代醫療人員實際評估。"
+            : snapshot.disclaimer}
+        </p>
+      </div>
     </div>
   );
 }
@@ -365,10 +398,16 @@ function LifeContextComparison({
   initialValues,
   tracks,
   labels,
+  hiddenCount,
+  expanded,
+  onToggle,
 }: {
   initialValues: Record<string, number> | null | undefined;
   tracks: SnapshotTrack[];
   labels: Record<string, string>;
+  hiddenCount: number;
+  expanded: boolean;
+  onToggle: () => void;
 }) {
   const sources = [
     ...tracks
@@ -386,7 +425,11 @@ function LifeContextComparison({
   if (sources.length === 0) return null;
 
   return (
-    <SectionCard title="生活狀況" description="依你在紀錄中填寫的生活因素整理。">
+    <SectionCard
+      title="生活狀況"
+      description="依你在紀錄中填寫的生活因素整理。"
+      className="gap-5"
+    >
       <div className="hidden overflow-x-auto md:block">
         <table className="min-w-max border-separate border-spacing-0 text-left">
           <thead>
@@ -444,6 +487,12 @@ function LifeContextComparison({
           </section>
         ))}
       </div>
+
+      {hiddenCount > 0 ? (
+        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onToggle}>
+          {expanded ? "收合至最新 5 筆" : `展開其餘 ${hiddenCount} 筆`}
+        </Button>
+      ) : null}
     </SectionCard>
   );
 }
