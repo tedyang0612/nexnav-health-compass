@@ -197,7 +197,7 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
   const [backgroundKeys, setBackgroundKeys] = useState<HealthBackgroundKey[]>([]);
   const [trackIds, setTrackIds] = useState<string[]>([]);
   const [target, setTarget] = useState<TargetProfessional | "">("");
-  const [questions, setQuestions] = useState<string[]>(["", "", ""]);
+  const [questions, setQuestions] = useState<string[]>([""]);
   const [dirty, setDirty] = useState(false);
   const [stage, setStage] = useState<"build" | "preview">("build");
   const [submissionId] = useState(() => crypto.randomUUID());
@@ -516,12 +516,14 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
           >
             <div className="space-y-3">
               {questions.map((value, index) => (
-                <FormField key={index} id={`question-${index}`} label={`問題 ${index + 1}`}>
+                <div key={index} className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <Input
                     id={`question-${index}`}
+                    aria-label={`問題 ${index + 1}`}
+                    placeholder={`問題 ${index + 1}`}
                     value={value}
                     maxLength={QUESTION_MAX_LENGTH}
-                    className="min-h-11"
+                    className="min-h-11 flex-1"
                     onChange={(e) => {
                       markDirty();
                       setQuestionError(undefined);
@@ -530,8 +532,36 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
                       );
                     }}
                   />
-                </FormField>
+                  {index > 0 ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="min-h-11 self-start px-3 text-muted-foreground sm:self-auto"
+                      aria-label={`移除問題 ${index + 1}`}
+                      onClick={() => {
+                        markDirty();
+                        setQuestionError(undefined);
+                        setQuestions((prev) => prev.filter((_, i) => i !== index));
+                      }}
+                    >
+                      移除
+                    </Button>
+                  ) : null}
+                </div>
               ))}
+              {questions.length < QUESTION_MAX_COUNT ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="min-h-11"
+                  onClick={() => {
+                    markDirty();
+                    setQuestions((prev) => [...prev, ""]);
+                  }}
+                >
+                  ＋ 新增問題
+                </Button>
+              ) : null}
               <FieldError id="question-error" message={questionError} />
             </div>
           </SectionCard>
