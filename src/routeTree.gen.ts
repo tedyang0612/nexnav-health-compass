@@ -21,6 +21,7 @@ import { Route as AppEventsEventIdRouteImport } from './routes/_app.events.$even
 import { Route as AppEventsNewRouteImport } from './routes/_app.events.new'
 import { Route as AppSummariesSummaryIdRouteImport } from './routes/_app.summaries.$summaryId'
 import { Route as AppEventsEventIdIndexRouteImport } from './routes/_app.events.$eventId.index'
+import { Route as AppEventsEventIdConnectRouteImport } from './routes/_app.events.$eventId.connect'
 import { Route as AppEventsEventIdEditRouteImport } from './routes/_app.events.$eventId.edit'
 import { Route as AppEventsEventIdGuideRouteImport } from './routes/_app.events.$eventId.guide'
 import { Route as AppEventsEventIdNavigateRouteImport } from './routes/_app.events.$eventId.navigate'
@@ -87,6 +88,11 @@ const AppEventsEventIdIndexRoute = AppEventsEventIdIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppEventsEventIdRoute,
 } as any)
+const AppEventsEventIdConnectRoute = AppEventsEventIdConnectRouteImport.update({
+  id: '/connect',
+  path: '/connect',
+  getParentRoute: () => AppEventsEventIdRoute,
+} as any)
 const AppEventsEventIdEditRoute = AppEventsEventIdEditRouteImport.update({
   id: '/edit',
   path: '/edit',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/events/$eventId': typeof AppEventsEventIdRouteWithChildren
   '/events/new': typeof AppEventsNewRoute
   '/summaries/$summaryId': typeof AppSummariesSummaryIdRoute
+  '/events/$eventId/connect': typeof AppEventsEventIdConnectRoute
   '/events/$eventId/edit': typeof AppEventsEventIdEditRoute
   '/events/$eventId/guide': typeof AppEventsEventIdGuideRoute
   '/events/$eventId/navigate': typeof AppEventsEventIdNavigateRoute
@@ -155,6 +162,7 @@ export interface FileRoutesByTo {
   '/register': typeof PublicRegisterRoute
   '/events/new': typeof AppEventsNewRoute
   '/summaries/$summaryId': typeof AppSummariesSummaryIdRoute
+  '/events/$eventId/connect': typeof AppEventsEventIdConnectRoute
   '/events/$eventId/edit': typeof AppEventsEventIdEditRoute
   '/events/$eventId/guide': typeof AppEventsEventIdGuideRoute
   '/events/$eventId/navigate': typeof AppEventsEventIdNavigateRoute
@@ -177,6 +185,7 @@ export interface FileRoutesById {
   '/_app/events/$eventId': typeof AppEventsEventIdRouteWithChildren
   '/_app/events/new': typeof AppEventsNewRoute
   '/_app/summaries/$summaryId': typeof AppSummariesSummaryIdRoute
+  '/_app/events/$eventId/connect': typeof AppEventsEventIdConnectRoute
   '/_app/events/$eventId/edit': typeof AppEventsEventIdEditRoute
   '/_app/events/$eventId/guide': typeof AppEventsEventIdGuideRoute
   '/_app/events/$eventId/navigate': typeof AppEventsEventIdNavigateRoute
@@ -198,6 +207,7 @@ export interface FileRouteTypes {
     | '/events/$eventId'
     | '/events/new'
     | '/summaries/$summaryId'
+    | '/events/$eventId/connect'
     | '/events/$eventId/edit'
     | '/events/$eventId/guide'
     | '/events/$eventId/navigate'
@@ -216,6 +226,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/events/new'
     | '/summaries/$summaryId'
+    | '/events/$eventId/connect'
     | '/events/$eventId/edit'
     | '/events/$eventId/guide'
     | '/events/$eventId/navigate'
@@ -237,6 +248,7 @@ export interface FileRouteTypes {
     | '/_app/events/$eventId'
     | '/_app/events/new'
     | '/_app/summaries/$summaryId'
+    | '/_app/events/$eventId/connect'
     | '/_app/events/$eventId/edit'
     | '/_app/events/$eventId/guide'
     | '/_app/events/$eventId/navigate'
@@ -338,6 +350,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEventsEventIdIndexRouteImport
       parentRoute: typeof AppEventsEventIdRoute
     }
+    '/_app/events/$eventId/connect': {
+      id: '/_app/events/$eventId/connect'
+      path: '/connect'
+      fullPath: '/events/$eventId/connect'
+      preLoaderRoute: typeof AppEventsEventIdConnectRouteImport
+      parentRoute: typeof AppEventsEventIdRoute
+    }
     '/_app/events/$eventId/edit': {
       id: '/_app/events/$eventId/edit'
       path: '/edit'
@@ -391,6 +410,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppEventsEventIdRouteChildren {
+  AppEventsEventIdConnectRoute: typeof AppEventsEventIdConnectRoute
   AppEventsEventIdEditRoute: typeof AppEventsEventIdEditRoute
   AppEventsEventIdGuideRoute: typeof AppEventsEventIdGuideRoute
   AppEventsEventIdNavigateRoute: typeof AppEventsEventIdNavigateRoute
@@ -402,6 +422,7 @@ interface AppEventsEventIdRouteChildren {
 }
 
 const AppEventsEventIdRouteChildren: AppEventsEventIdRouteChildren = {
+  AppEventsEventIdConnectRoute: AppEventsEventIdConnectRoute,
   AppEventsEventIdEditRoute: AppEventsEventIdEditRoute,
   AppEventsEventIdGuideRoute: AppEventsEventIdGuideRoute,
   AppEventsEventIdNavigateRoute: AppEventsEventIdNavigateRoute,
