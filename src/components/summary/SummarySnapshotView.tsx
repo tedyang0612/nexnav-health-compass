@@ -446,7 +446,7 @@ function LifeContextComparison({
               {sources.map((source) => (
                 <th
                   key={source.key}
-                  className="min-w-36 border-b border-border px-3 py-2 text-xs font-medium text-muted-foreground"
+                  className="min-w-28 border-b border-border px-2 py-2 text-xs font-medium text-muted-foreground"
                 >
                   {source.label}
                 </th>
