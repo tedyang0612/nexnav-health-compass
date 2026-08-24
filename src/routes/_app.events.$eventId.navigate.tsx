@@ -237,6 +237,17 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
         </div>
       </SectionCard>
 
+      <SectionCard
+        title="附近專業協助"
+        description="查看南京復興捷運站周邊的 Demo 專業資源清單。"
+      >
+        <Button asChild className="min-h-11 w-full sm:w-auto">
+          <Link to="/events/$eventId/connect" params={{ eventId }}>
+            查看附近專業協助
+          </Link>
+        </Button>
+      </SectionCard>
+
       <SectionCard title="建立摘要" description="整理目前紀錄，方便與專業人員溝通。">
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button asChild className="min-h-11 w-full sm:w-auto">
