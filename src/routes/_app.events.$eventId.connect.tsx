@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertTriangle, ExternalLink, MapPin, Search } from "lucide-react";
+import { AlertTriangle, MapPin, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState, ErrorState, LoadingState, PageContainer, PageHeader } from "@/components/shell";
 import { useReassessData } from "@/hooks/useReassess";
@@ -22,7 +22,7 @@ function Page() {
   const [sort, setSort] = useState<"match" | "distance">("match");
   const [filter, setFilter] = useState<Filter>("recommended");
   const [location, setLocation] = useState(DEFAULT_LOCATION);
-  const [placeType, setPlaceType] = useState("醫院或診所");
+  const [placeType, setPlaceType] = useState("全部");
 
   const safety = useMemo(() => {
     if (!query.data?.initial) return null;
@@ -38,6 +38,10 @@ function Page() {
   const targetWords = target.split(" ");
   const isRecommended = (specialty: string) => targetWords.some((word) => specialty.includes(word));
   const filtered = CONNECT_DEMO_FACILITIES.filter((facility) => {
+    const matchesPlaceType = placeType === "全部"
+      || (placeType === "醫院" && facility.name.includes("醫院"))
+      || (placeType === "診所" && facility.name.includes("診所"));
+    if (!matchesPlaceType) return false;
     if (filter === "recommended") return isRecommended(facility.specialty);
     if (filter === "nearby") return facility.distanceKm <= 2;
     if (filter === "open") return facility.openToday;
@@ -59,7 +63,8 @@ function Page() {
       setShowAll(false);
       return;
     }
-    window.open(mapsUrl(`${normalizedLocation} ${placeType}`), "_blank", "noopener,noreferrer");
+    const placeQuery = placeType === "全部" ? "醫院 診所" : placeType;
+    window.open(mapsUrl(`${normalizedLocation} ${placeQuery}`), "_blank", "noopener,noreferrer");
   };
 
   const selectFilter = (nextFilter: Filter) => {
@@ -80,7 +85,7 @@ function Page() {
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button asChild className="min-h-11 bg-urgent text-white hover:bg-urgent/90"><a href="tel:119">撥打 119</a></Button>
                 <Button asChild variant="outline" className="min-h-11 border-urgent text-urgent-strong">
-                  <a href={mapsUrl(`${DEFAULT_LOCATION} 急診`)} target="_blank" rel="noreferrer">搜尋附近急診 <ExternalLink className="ml-2 size-4" /></a>
+                  <a href={mapsUrl(`${DEFAULT_LOCATION} 急診`)} target="_blank" rel="noreferrer">搜尋附近急診 <GoogleMapsIcon className="ml-2 size-4" /></a>
                 </Button>
               </div>
             </div>
@@ -115,8 +120,8 @@ function Page() {
           </label>
           <label className="grid gap-1.5 text-sm font-medium">
             搜尋類型
-            <select className="min-h-11 rounded-lg border border-border bg-surface px-3 font-normal" value={placeType} onChange={(event) => setPlaceType(event.target.value)}>
-              <option>醫院或診所</option>
+            <select className="min-h-11 rounded-lg border border-border bg-surface px-3 font-normal" value={placeType} onChange={(event) => { setPlaceType(event.target.value); setShowAll(false); }}>
+              <option>全部</option>
               <option>醫院</option>
               <option>診所</option>
             </select>
@@ -129,8 +134,8 @@ function Page() {
       <section aria-labelledby="connect-results" className="space-y-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 id="connect-results" className="text-xl font-semibold">南京復興周邊院所</h2>
-            <p className="text-sm text-muted-foreground">依目前狀況「{symptom}」整理，符合此條件共 {ranked.length} 筆。</p>
+            <h2 id="connect-results" className="text-xl font-semibold">結果</h2>
+            <p className="text-sm text-muted-foreground">共 {ranked.length} 筆。</p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="flex flex-wrap gap-2" aria-label="院所篩選">
@@ -156,12 +161,15 @@ function Page() {
                   <span className="text-xs text-muted-foreground">#{index + 1}</span>
                   <h3 className="font-semibold">{facility.name}</h3>
                   <span className="rounded-full bg-muted px-2 py-0.5 text-xs">{facility.specialty}</span>
-                  {facility.openToday && <span className="rounded-full border border-primary/30 bg-primary/5 px-2 py-0.5 text-xs text-primary">今日有看診</span>}
+                  <span className={facility.openToday
+                    ? "rounded-full border border-emerald-600 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800"
+                    : "rounded-full border border-slate-500 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700"
+                  }>{facility.openToday ? "今日有看診" : "今日休診"}</span>
                 </div>
-                <p className="mt-2 flex items-center gap-1 text-sm text-muted-foreground"><MapPin className="size-4" /> 約 {facility.distanceKm.toFixed(1)} km・{facility.area}</p>
+                <p className="mt-2 flex items-center gap-1 text-sm text-muted-foreground"><MapPin className="size-4" /> 約 <strong className="font-semibold text-primary">{facility.distanceKm.toFixed(1)} km</strong><span aria-hidden="true">・</span>{facility.area}</p>
               </div>
               <Button asChild variant="outline" className="mt-3 min-h-11 w-full sm:mt-0 sm:w-auto">
-                <a href={mapsUrl(`${DEFAULT_LOCATION} ${facility.specialty}`)} target="_blank" rel="noreferrer">在 Google Maps 搜尋 <ExternalLink className="ml-2 size-4" /></a>
+                <a href={mapsUrl(`${DEFAULT_LOCATION} ${facility.specialty}`)} target="_blank" rel="noreferrer">在 Google Maps 中顯示 <GoogleMapsIcon className="ml-2 size-4" /></a>
               </Button>
             </article>
           ))}
@@ -173,5 +181,16 @@ function Page() {
       </section>
       <p className="text-sm text-muted-foreground">院所資訊可能有所變動，實際資訊請以 Google Maps 顯示內容為準。</p>
     </PageContainer>
+  );
+}
+
+function GoogleMapsIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="#34A853" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Z" />
+      <path fill="#4285F4" d="M5 9a7 7 0 0 1 11.64-5.25L13.2 7.2A2.8 2.8 0 0 0 9.2 11L6.1 14.1A12.7 12.7 0 0 1 5 9Z" />
+      <path fill="#EA4335" d="m16.64 3.75-3.45 3.46A2.8 2.8 0 0 1 14.8 9c0 .77-.31 1.47-.81 1.98l3.1 3.1C18.2 12.17 19 10.34 19 9a6.98 6.98 0 0 0-2.36-5.25Z" />
+      <circle cx="12" cy="9" r="2.25" fill="#FBBC04" />
+    </svg>
   );
 }
