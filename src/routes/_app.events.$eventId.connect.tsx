@@ -163,7 +163,7 @@ function Page() {
                   <span className="rounded-full bg-muted px-2 py-0.5 text-xs">{facility.specialty}</span>
                   <span className={facility.openToday
                     ? "rounded-full border border-emerald-600 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800"
-                    : "rounded-full border border-slate-500 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700"
+                    : "rounded-full border border-amber-500 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:border-amber-400 dark:bg-amber-950/40 dark:text-amber-200"
                   }>{facility.openToday ? "今日有看診" : "今日休診"}</span>
                 </div>
                 <p className="mt-2 flex items-center gap-1 text-sm text-muted-foreground"><MapPin className="size-4" /> 約 <strong className="font-semibold text-primary">{facility.distanceKm.toFixed(1)} km</strong><span aria-hidden="true">・</span>{facility.area}</p>
