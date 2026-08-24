@@ -64,42 +64,33 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
             ) : null}
           </span>
         </MetricCell>
-        <MetricCell label="每日追蹤出現頻率">
-          {stats.hasTracks && (stats.earliestFrequency || stats.latestFrequency) ? (
+        <MetricCell label="出現頻率">
+          {snapshot.initial_record.frequency_level || stats.latestFrequency ? (
             <span className="flex flex-col gap-0.5 sm:block">
               <span className="whitespace-nowrap">
-                最早 {formatFiveLevelText(stats.earliestFrequency)}
+                初始 {formatFiveLevelText(snapshot.initial_record.frequency_level)}
               </span>
-              <span className="hidden sm:inline"> → </span>
-              <span className="whitespace-nowrap">
-                最新 {formatFiveLevelText(stats.latestFrequency)}
-              </span>
+              {stats.hasTracks ? (
+                <>
+                  <span className="hidden sm:inline"> → </span>
+                  <span className="whitespace-nowrap">
+                    最新 {formatFiveLevelText(stats.latestFrequency)}
+                  </span>
+                </>
+              ) : null}
             </span>
           ) : (
-            "尚無每日追蹤紀錄"
+            "未記錄"
           )}
         </MetricCell>
       </dl>
 
-      <div className="rounded-lg bg-muted px-3 py-2">
+      <div className="mt-3 rounded-lg bg-muted px-3 py-2">
         <p className="text-xs text-muted-foreground">最新自覺變化</p>
         <p className="text-sm font-medium text-foreground">
           {stats.latestSubjectiveLabel ?? (stats.hasTracks ? "未填寫" : "尚無每日追蹤紀錄")}
         </p>
       </div>
-
-      {snapshot.initial_record.frequency_level ? (
-        <div className="mt-3 space-y-1 px-3">
-          <p className="text-xs text-muted-foreground">初始紀錄頻率</p>
-          <FrequencyValue
-            level={snapshot.initial_record.frequency_level}
-            wording={
-              snapshot.initial_record.frequency_label ??
-              frequencyLabel(snapshot.initial_record.frequency_level)
-            }
-          />
-        </div>
-      ) : null}
 
       {stats.mismatch ? <MismatchCallout /> : null}
 
