@@ -538,7 +538,7 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
                     placeholder={`問題 ${index + 1}`}
                     value={value}
                     maxLength={QUESTION_MAX_LENGTH}
-                    className="min-h-11 flex-1"
+                    className="min-h-11 min-w-0 flex-1"
                     onChange={(e) => {
                       markDirty();
                       setQuestionError(undefined);
@@ -551,7 +551,7 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
                     <Button
                       type="button"
                       variant="ghost"
-                      className="min-h-11 self-start px-3 text-muted-foreground sm:self-auto"
+                      className="min-h-11 self-start px-3 text-muted-foreground sm:w-14 sm:self-auto"
                       aria-label={`移除問題 ${index + 1}`}
                       onClick={() => {
                         markDirty();
@@ -561,7 +561,9 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
                     >
                       移除
                     </Button>
-                  ) : null}
+                  ) : (
+                    <span aria-hidden="true" className="hidden min-h-11 w-14 shrink-0 sm:block" />
+                  )}
                 </div>
               ))}
               {questions.length < QUESTION_MAX_COUNT ? (
