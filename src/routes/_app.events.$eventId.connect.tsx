@@ -186,11 +186,11 @@ function Page() {
 
 function GoogleMapsIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" aria-hidden="true">
-      <path fill="#34A853" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Z" />
-      <path fill="#4285F4" d="M5 9a7 7 0 0 1 11.64-5.25L13.2 7.2A2.8 2.8 0 0 0 9.2 11L6.1 14.1A12.7 12.7 0 0 1 5 9Z" />
-      <path fill="#EA4335" d="m16.64 3.75-3.45 3.46A2.8 2.8 0 0 1 14.8 9c0 .77-.31 1.47-.81 1.98l3.1 3.1C18.2 12.17 19 10.34 19 9a6.98 6.98 0 0 0-2.36-5.25Z" />
-      <circle cx="12" cy="9" r="2.25" fill="#FBBC04" />
-    </svg>
+    <img
+      className={className}
+      src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico"
+      alt=""
+      aria-hidden="true"
+    />
   );
 }
