@@ -138,7 +138,7 @@ function Page() {
             <p className="text-sm text-muted-foreground">共 {ranked.length} 筆。</p>
           </div>
           <label className="flex shrink-0 items-center gap-2 text-sm sm:hidden">排序
-            <select className="min-h-10 rounded-lg border border-border bg-surface px-3" value={sort} onChange={(event) => setSort(event.target.value as "match" | "distance")}>
+            <select className="h-9 rounded-lg border border-border bg-surface px-2.5 text-sm" value={sort} onChange={(event) => setSort(event.target.value as "match" | "distance")}>
               <option value="match">符合程度</option><option value="distance">距離優先</option>
             </select>
           </label>
@@ -152,7 +152,7 @@ function Page() {
             ))}
           </div>
           <label className="hidden shrink-0 items-center gap-2 text-sm sm:ml-auto sm:flex">排序
-            <select className="min-h-10 rounded-lg border border-border bg-surface px-3" value={sort} onChange={(event) => setSort(event.target.value as "match" | "distance")}>
+            <select className="h-9 rounded-lg border border-border bg-surface px-2.5 text-sm" value={sort} onChange={(event) => setSort(event.target.value as "match" | "distance")}>
               <option value="match">符合程度</option><option value="distance">距離優先</option>
             </select>
           </label>
