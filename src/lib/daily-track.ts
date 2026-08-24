@@ -200,17 +200,24 @@ export function validateDailyTrack(
 ): DailyTrackErrors {
   const errors: DailyTrackErrors = {};
 
-  if (!Number.isInteger(values.severity) || values.severity < 1 || values.severity > 10) {
+  if (
+    values.severity === null ||
+    !Number.isInteger(values.severity) ||
+    values.severity < 1 ||
+    values.severity > 10
+  ) {
     errors.severity = "請選擇困擾程度";
   }
 
   if (
+    values.frequencyLevel === null ||
     !Number.isInteger(values.frequencyLevel) ||
     values.frequencyLevel < 1 ||
     values.frequencyLevel > 5
   ) {
     errors.frequencyLevel = "請選擇發生頻率";
   }
+
 
   if (values.frequencyDescription.trim().length > FREQ_DESC_MAX) {
     errors.frequencyDescription = `補充描述最多${FREQ_DESC_MAX}個字元`;
