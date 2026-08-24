@@ -26,7 +26,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const stats = deriveSummaryStats(snapshot);
   const isProfessional = snapshot.summary_type === "professional_support";
   const tracks = [...(snapshot.daily_tracks ?? [])].sort((a, b) =>
-    a.track_date.localeCompare(b.track_date),
+    b.track_date.localeCompare(a.track_date),
   );
   const notes = [...(snapshot.selected_track_notes ?? [])].sort((a, b) =>
     b.track_date.localeCompare(a.track_date),
@@ -371,9 +371,6 @@ function LifeContextComparison({
   labels: Record<string, string>;
 }) {
   const sources = [
-    ...(hasNumericLifeContext(initialValues)
-      ? [{ key: "initial", label: "初始紀錄", values: initialValues }]
-      : []),
     ...tracks
       .filter((track) => hasNumericLifeContext(track.life_context))
       .map((track) => ({
@@ -381,6 +378,9 @@ function LifeContextComparison({
         label: formatTaipeiDate(track.track_date),
         values: track.life_context,
       })),
+    ...(hasNumericLifeContext(initialValues)
+      ? [{ key: "initial", label: "初始紀錄（基準）", values: initialValues }]
+      : []),
   ];
 
   if (sources.length === 0) return null;
