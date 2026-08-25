@@ -15,7 +15,6 @@ import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppOnboardingRouteImport } from './routes/_app.onboarding'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as PublicIndexRouteImport } from './routes/_public.index'
-import { Route as PublicJourneyPreviewRouteImport } from './routes/_public.journey-preview'
 import { Route as PublicLoginRouteImport } from './routes/_public.login'
 import { Route as PublicRegisterRouteImport } from './routes/_public.register'
 import { Route as AppEventsEventIdRouteImport } from './routes/_app.events.$eventId'
@@ -57,11 +56,6 @@ const AppProfileRoute = AppProfileRouteImport.update({
 const PublicIndexRoute = PublicIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => PublicRoute,
-} as any)
-const PublicJourneyPreviewRoute = PublicJourneyPreviewRouteImport.update({
-  id: '/journey-preview',
-  path: '/journey-preview',
   getParentRoute: () => PublicRoute,
 } as any)
 const PublicLoginRoute = PublicLoginRouteImport.update({
@@ -144,7 +138,6 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AppDashboardRoute
   '/onboarding': typeof AppOnboardingRoute
   '/profile': typeof AppProfileRoute
-  '/journey-preview': typeof PublicJourneyPreviewRoute
   '/login': typeof PublicLoginRoute
   '/register': typeof PublicRegisterRoute
   '/events/$eventId': typeof AppEventsEventIdRouteWithChildren
@@ -165,7 +158,6 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AppDashboardRoute
   '/onboarding': typeof AppOnboardingRoute
   '/profile': typeof AppProfileRoute
-  '/journey-preview': typeof PublicJourneyPreviewRoute
   '/login': typeof PublicLoginRoute
   '/register': typeof PublicRegisterRoute
   '/events/new': typeof AppEventsNewRoute
@@ -187,7 +179,6 @@ export interface FileRoutesById {
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/onboarding': typeof AppOnboardingRoute
   '/_app/profile': typeof AppProfileRoute
-  '/_public/journey-preview': typeof PublicJourneyPreviewRoute
   '/_public/login': typeof PublicLoginRoute
   '/_public/register': typeof PublicRegisterRoute
   '/_public/': typeof PublicIndexRoute
@@ -211,7 +202,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/profile'
-    | '/journey-preview'
     | '/login'
     | '/register'
     | '/events/$eventId'
@@ -232,7 +222,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/profile'
-    | '/journey-preview'
     | '/login'
     | '/register'
     | '/events/new'
@@ -253,7 +242,6 @@ export interface FileRouteTypes {
     | '/_app/dashboard'
     | '/_app/onboarding'
     | '/_app/profile'
-    | '/_public/journey-preview'
     | '/_public/login'
     | '/_public/register'
     | '/_public/'
@@ -318,13 +306,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof PublicIndexRouteImport
-      parentRoute: typeof PublicRoute
-    }
-    '/_public/journey-preview': {
-      id: '/_public/journey-preview'
-      path: '/journey-preview'
-      fullPath: '/journey-preview'
-      preLoaderRoute: typeof PublicJourneyPreviewRouteImport
       parentRoute: typeof PublicRoute
     }
     '/_public/login': {
@@ -476,14 +457,12 @@ const AppRouteChildren: AppRouteChildren = {
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface PublicRouteChildren {
-  PublicJourneyPreviewRoute: typeof PublicJourneyPreviewRoute
   PublicLoginRoute: typeof PublicLoginRoute
   PublicRegisterRoute: typeof PublicRegisterRoute
   PublicIndexRoute: typeof PublicIndexRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
-  PublicJourneyPreviewRoute: PublicJourneyPreviewRoute,
   PublicLoginRoute: PublicLoginRoute,
   PublicRegisterRoute: PublicRegisterRoute,
   PublicIndexRoute: PublicIndexRoute,
