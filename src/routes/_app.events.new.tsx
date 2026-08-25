@@ -337,7 +337,13 @@ function NewEventPage() {
             {submitting ? "建立中，請稍候。" : ""}
           </p>
 
-          <div className="flex flex-row-reverse items-center justify-between gap-3 sm:justify-start">
+          <div
+            className={
+              step === 3
+                ? "flex flex-row-reverse items-center justify-between gap-3 sm:justify-start"
+                : "flex flex-col gap-2 sm:flex-row-reverse sm:justify-start"
+            }
+          >
             {step < 3 ? (
               <Button
                 size="lg"
