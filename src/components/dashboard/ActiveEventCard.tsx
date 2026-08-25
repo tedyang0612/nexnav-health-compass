@@ -101,15 +101,16 @@ export function ActiveEventCard({ event }: { event: ActiveEventItem }) {
                     />
                   ) : null}
                   <span
-                  className={`flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${
-                    done
-                      ? "border-heal bg-heal-muted text-heal"
-                      : active
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-surface-elevated text-muted-foreground"
-                  }`}
-                >
-                  {done ? <Check className="size-4" aria-hidden="true" /> : index + 1}
+                    className={`relative z-10 flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${
+                      done
+                        ? "border-heal bg-heal-muted text-heal"
+                        : active
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-surface-elevated text-muted-foreground"
+                    }`}
+                  >
+                    {done ? <Check className="size-4" aria-hidden="true" /> : index + 1}
+                  </span>
                 </span>
                 <span
                   className={`w-full text-center text-[11px] leading-tight break-keep sm:text-xs ${
