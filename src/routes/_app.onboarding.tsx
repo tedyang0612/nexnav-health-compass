@@ -243,7 +243,7 @@ function OnboardingPage() {
         </SectionCard>
       ) : (
         <SectionCard
-          title="步驟 2／2：健康背景（選填）"
+          title="步驟 2：健康背景（選填）"
           description="這一步全部為選填，您也可以直接略過。"
         >
           <form
