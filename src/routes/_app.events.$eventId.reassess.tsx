@@ -11,7 +11,7 @@ import {
   StatusBanner,
 } from "@/components/shell";
 import { Button } from "@/components/ui/button";
-import { ReassessTimeline } from "@/components/events/ReassessTimeline";
+import { FrequencyDots, ReassessTimeline } from "@/components/events/ReassessTimeline";
 import { SeverityTrendChart } from "@/components/events/SeverityTrendChart";
 import { EventNotFoundError, useReassessData } from "@/hooks/useReassess";
 import { taipeiToday } from "@/lib/event-wizard";
