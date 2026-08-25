@@ -8,19 +8,18 @@ export function GuideSections({ guide, eventId }: { guide: GuideViewModel; event
   const { content, suggestions } = guide;
   const [labelPart, ...restParts] = content.title.split("｜");
   const hasSplit = restParts.length > 0;
-  const displayLabel = hasSplit ? labelPart : "本次改善方向";
-  const displayHeading = hasSplit ? restParts.join("｜") : content.title;
+  const displayHeading = hasSplit ? restParts.join("｜") : (labelPart ?? content.title);
 
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* 摘要：淡 teal 底 + 左側 accent，與一般白卡區隔 */}
       <section className="rounded-xl border border-heal/30 border-l-4 border-l-heal bg-heal-muted/40 p-4 sm:p-5">
         <p className="text-xs font-semibold uppercase tracking-wide text-heal">
-          {displayLabel}
+          改善方向
         </p>
-        <h2 className="mt-1 text-lg font-semibold text-foreground sm:text-xl">
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
           {displayHeading}
-        </h2>
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           {content.summary_disclaimer}
         </p>
@@ -32,7 +31,9 @@ export function GuideSections({ guide, eventId }: { guide: GuideViewModel; event
         <ul className="mt-3 space-y-3">
           {content.factors.map((factor) => (
             <li key={factor} className="flex gap-2.5 text-sm text-foreground/85">
-              <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-heal" />
+              <span aria-hidden="true" className="shrink-0 text-xs leading-6 text-heal">
+                ◆
+              </span>
               <span className="min-w-0 leading-relaxed">{factor}</span>
             </li>
           ))}
@@ -77,34 +78,47 @@ export function GuideSections({ guide, eventId }: { guide: GuideViewModel; event
         <ul className="mt-3 space-y-3">
           {content.observations.map((item) => (
             <li key={item} className="flex gap-2.5 text-sm text-foreground/85">
-              <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-heal" />
+              <span aria-hidden="true" className="shrink-0 text-xs leading-6 text-heal">
+                ◆
+              </span>
               <span className="min-w-0 leading-relaxed">{item}</span>
             </li>
           ))}
         </ul>
-        <div className="mt-5 rounded-lg border border-heal/40 bg-heal-muted/60 p-4">
-          <p className="text-sm font-medium leading-relaxed text-foreground">
+        {/* 尚未判定危急的重新評估提醒：使用黃色 caution，紅色僅保留給已確認的安全警訊。 */}
+        <div className="mt-5 rounded-lg border border-caution/50 border-l-4 border-l-caution bg-caution-muted p-4">
+          <p className="text-sm font-medium leading-relaxed text-caution-strong">
             {content.escalation}
           </p>
         </div>
       </GuideCard>
 
-      <SectionCard
-        title="接下來，持續記錄變化"
-        description="每天花一點時間記錄目前感受與生活狀況，之後可以查看變化趨勢。"
-        footer={
-          <Button asChild className="min-h-11 w-full sm:w-auto">
+      <SectionCard title="接下來，持續記錄變化">
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          建議先嘗試改善調整，並持續每天花一點時間記錄目前感受與生活狀況，
+          <span className="sm:hidden">之後可以查看變化趨勢。</span>
+        </p>
+        <p className="hidden text-sm leading-relaxed text-muted-foreground sm:block">
+          之後可以查看變化趨勢。
+        </p>
+
+        <div className="pt-1">
+          <Button
+            asChild
+            size="lg"
+            className="min-h-13 w-full rounded-xl sm:w-auto sm:min-w-72"
+          >
             <Link to="/events/$eventId/track/today" params={{ eventId }}>
-              開始今日追蹤
+              開始每日追蹤
             </Link>
           </Button>
-        }
-      />
+        </div>
+      </SectionCard>
 
       {content.sources.length > 0 ? (
         <section className="rounded-xl border border-border bg-surface-elevated px-4 py-3 sm:px-5">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            資訊來源
+            內容參考來源
           </h2>
           <ul className="mt-2 space-y-1.5">
             {content.sources.map((source) => (
@@ -127,6 +141,7 @@ export function GuideSections({ guide, eventId }: { guide: GuideViewModel; event
     </div>
   );
 }
+
 
 function GuideCard({ children }: { children: React.ReactNode }) {
   return (

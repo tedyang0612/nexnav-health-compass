@@ -9,7 +9,7 @@ import {
   SectionCard,
 } from "@/components/shell";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { Textarea } from "@/components/ui/textarea";
 import { FieldError } from "@/components/events/FieldError";
 import { SeveritySlider } from "@/components/events/SeveritySlider";
@@ -64,14 +64,54 @@ function TrackHeader({ completed = false }: { completed?: boolean }) {
       description="記錄目前的不適與生活狀況，方便持續觀察變化。"
       actions={
         completed ? (
-          <span className="inline-flex items-center rounded-full border border-heal/40 bg-heal-muted px-3 py-1 text-xs font-medium text-foreground">
+          <span className="inline-flex items-center whitespace-nowrap rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground">
             今日已完成
           </span>
-        ) : null
+        ) : (
+          <span className="inline-flex items-center whitespace-nowrap rounded-full border border-border bg-transparent px-3 py-1.5 text-xs font-medium text-muted-foreground">
+            尚未完成
+          </span>
+        )
       }
     />
   );
 }
+
+/** 補充輸入框：預設兩行，內容增加時自動增高。 */
+function AutoGrowTextarea({
+  textareaRef,
+  value,
+  ...props
+}: React.ComponentProps<typeof Textarea> & {
+  textareaRef?: React.RefObject<HTMLTextAreaElement | null> | undefined;
+}) {
+  const innerRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const resize = (el: HTMLTextAreaElement | null) => {
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  };
+
+  useEffect(() => {
+    resize(innerRef.current);
+  }, [value]);
+
+  return (
+    <Textarea
+      {...props}
+      rows={2}
+      value={value}
+      ref={(node) => {
+        innerRef.current = node;
+        if (textareaRef) textareaRef.current = node;
+      }}
+      className="resize-none overflow-hidden"
+      onInput={(e) => resize(e.currentTarget)}
+    />
+  );
+}
+
 
 function Page() {
   const { eventId } = Route.useParams();
@@ -102,7 +142,7 @@ function Page() {
   const refs = {
     severity: useRef<HTMLDivElement | null>(null),
     frequencyLevel: useRef<HTMLInputElement | null>(null),
-    frequencyDescription: useRef<HTMLInputElement | null>(null),
+    frequencyDescription: useRef<HTMLTextAreaElement | null>(null),
     subjectiveChange: useRef<HTMLInputElement | null>(null),
     sleep: useRef<HTMLInputElement | null>(null),
     diet: useRef<HTMLInputElement | null>(null),
@@ -382,23 +422,23 @@ function Page() {
           </div>
 
           <fieldset className="space-y-2">
-            <legend className="mb-1 text-base font-semibold text-foreground">發生頻率</legend>
-            <div className="space-y-2">
+            <legend className="mb-1 text-sm font-semibold text-foreground">發生頻率</legend>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
               {DAILY_FREQUENCY_OPTIONS.map((option, index) => (
                 <label
                   key={option.value}
-                  className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border border-input px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-accent"
+                  className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-md border border-input px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-accent"
                 >
                   <input
                     type="radio"
                     name="daily-frequency"
                     ref={index === 0 ? refs.frequencyLevel : undefined}
-                    className="h-4 w-4 accent-primary"
+                    className="h-4 w-4 shrink-0 accent-primary"
                     checked={values.frequencyLevel === option.value}
                     onChange={() => set("frequencyLevel", option.value)}
                     aria-describedby={errors.frequencyLevel ? "daily-frequency-error" : undefined}
                   />
-                  <span>{option.label}</span>
+                  <span className="min-w-0">{option.label}</span>
                 </label>
               ))}
             </div>
@@ -407,24 +447,29 @@ function Page() {
         </div>
 
         <div className="space-y-1.5 pt-2">
-          <label htmlFor="daily-frequency-desc" className="text-sm font-medium text-foreground">
-            頻率補充（選填）
-          </label>
-          <Input
+          <div className="flex items-baseline justify-between gap-3">
+            <label htmlFor="daily-frequency-desc" className="text-sm font-medium text-foreground">
+              頻率補充（選填）
+            </label>
+            <span
+              id="daily-frequency-desc-hint"
+              className="shrink-0 text-xs tabular-nums text-muted-foreground"
+            >
+              {values.frequencyDescription.length} / {FREQ_DESC_MAX}
+            </span>
+          </div>
+          <AutoGrowTextarea
             id="daily-frequency-desc"
-            ref={refs.frequencyDescription}
+            textareaRef={refs.frequencyDescription}
             value={values.frequencyDescription}
             maxLength={FREQ_DESC_MAX}
             onChange={(e) => set("frequencyDescription", e.target.value)}
-            className="min-h-11"
             aria-invalid={!!errors.frequencyDescription || undefined}
             aria-describedby="daily-frequency-desc-hint"
           />
-          <p id="daily-frequency-desc-hint" className="text-xs text-muted-foreground">
-            {values.frequencyDescription.length} / {FREQ_DESC_MAX} 個字元
-          </p>
           <FieldError id="daily-frequency-desc-error" message={errors.frequencyDescription} />
         </div>
+
 
         <div className="pt-2">
           <SubjectiveChangeField
@@ -443,48 +488,45 @@ function Page() {
         description="以下四項皆為必填，僅用於整理紀錄，不代表任何健康判斷。"
       >
         {LIFE_CONTEXT_FIELDS.map((field) => (
-          <fieldset key={field.key} className="mt-6 space-y-3 first:mt-0">
-            <legend className="mb-1 flex items-center gap-2 text-base font-semibold text-foreground">
-              <span aria-hidden="true" className="inline-block h-4 w-1 rounded-full bg-primary" />
-              {field.label}
+          <fieldset
+            key={field.key}
+            className="space-y-2 border-t border-border pt-4 first:border-0 first:pt-0"
+          >
+            <legend className="mb-1 flex items-center gap-2 text-sm font-semibold text-foreground">
+              <span aria-hidden="true" className="inline-block h-4 w-1 shrink-0 rounded-full bg-primary" />
+              <span className="min-w-0">{field.label}</span>
             </legend>
-            <div className="space-y-2">
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {field.options.map((option, index) => (
                 <label
                   key={option.value}
-                  className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border border-input px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-accent"
+                  className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-md border border-input px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-accent"
                 >
                   <input
                     type="radio"
                     name={`daily-life-${field.key}`}
                     ref={index === 0 ? refs[field.key] : undefined}
-                    className="h-4 w-4 accent-primary"
+                    className="h-4 w-4 shrink-0 accent-primary"
                     checked={values[field.key] === option.value}
                     onChange={() => set(field.key, option.value)}
                     aria-describedby={
                       errors[field.key] ? `daily-life-${field.key}-error` : undefined
                     }
                   />
-                  <span>{option.label}</span>
+                  <span className="min-w-0">{option.label}</span>
                 </label>
               ))}
             </div>
             <FieldError id={`daily-life-${field.key}-error`} message={errors[field.key]} />
           </fieldset>
         ))}
+
       </SectionCard>
 
       {/* Section 3：改善建議 */}
       {showSuggestions ? (
         <SectionCard
-          title={
-            <span className="inline-flex items-center gap-2">
-              已嘗試的調整
-              <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                選填
-              </span>
-            </span>
-          }
+          title="已嘗試的調整（選填）"
           description="可勾選本次有實際嘗試的項目。"
         >
           <div className="grid gap-2 sm:grid-cols-3">
@@ -496,11 +538,11 @@ function Page() {
                 <input
                   type="checkbox"
                   ref={index === 0 ? refs.suggestionExecution : undefined}
-                  className="mt-0.5 h-4 w-4 accent-primary"
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
                   checked={values.suggestionExecution.includes(suggestion.code)}
                   onChange={() => toggleSuggestion(suggestion.code)}
                 />
-                <span className="min-w-0">{suggestion.title}</span>
+                <span className="min-w-0 leading-relaxed">{suggestion.title}</span>
               </label>
             ))}
           </div>
@@ -509,25 +551,22 @@ function Page() {
       ) : null}
 
       {/* Section 4：補充紀錄 */}
-      <SectionCard
-        title={
-          <span className="inline-flex items-center gap-2">
-            補充紀錄
-            <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-              選填
-            </span>
-          </span>
-        }
-        description="記下其他想補充的狀況。"
-      >
+      <SectionCard description="記下其他想補充的狀況。">
         <div className="space-y-1.5">
-          <label htmlFor="daily-notes" className="text-sm font-medium text-foreground">
-            其他想記錄的內容
-          </label>
-          <Textarea
+          <div className="flex items-baseline justify-between gap-3">
+            <label htmlFor="daily-notes" className="text-sm font-medium text-foreground">
+              補充紀錄（選填）
+            </label>
+            <span
+              id="daily-notes-hint"
+              className="shrink-0 text-xs tabular-nums text-muted-foreground"
+            >
+              {values.notes.length} / {NOTES_MAX}
+            </span>
+          </div>
+          <AutoGrowTextarea
             id="daily-notes"
-            ref={refs.notes}
-            rows={5}
+            textareaRef={refs.notes}
             maxLength={NOTES_MAX}
             value={values.notes}
             placeholder="例如：今天不適較明顯的時間、活動或其他想記錄的變化"
@@ -535,16 +574,18 @@ function Page() {
             aria-invalid={!!errors.notes || undefined}
             aria-describedby="daily-notes-hint"
           />
-          <p id="daily-notes-hint" className="text-xs text-muted-foreground">
-            {values.notes.length} / {NOTES_MAX} 個字元
-          </p>
           <FieldError id="daily-notes-error" message={errors.notes} />
         </div>
 
         <div className="space-y-3 pt-2">
-          <PrimaryCta onClick={handleSave} disabled={saveMutation.isPending}>
+          <PrimaryCta
+            className="min-h-13 rounded-xl sm:min-w-64"
+            onClick={handleSave}
+            disabled={saveMutation.isPending}
+          >
             {ctaLabel}
           </PrimaryCta>
+
           {successMessage ? (
             <section
               role="status"

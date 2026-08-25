@@ -155,16 +155,23 @@ function Page() {
     return (
       <PageContainer width="default" className="space-y-5 sm:space-y-6">
         <GuideHeader />
-        <SectionCard
-          className="border-heal/40 bg-heal-muted"
-          title="目前建議優先尋求專業協助"
-        >
-          <p className="text-sm text-foreground">
+        <section className="overflow-hidden rounded-xl border border-urgent border-l-4 border-l-urgent bg-urgent-muted p-5 sm:p-6">
+          <h2 className="text-lg font-semibold text-urgent-strong sm:text-xl">
+            目前建議優先尋求專業協助
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-foreground">
             你在狀況確認中回報了需要優先注意的情況。NexNav
             不提供醫療診斷，建議優先尋求適當的醫療協助。
           </p>
-          <PrimaryCta onClick={goNavigate}>查看就醫與專業支持</PrimaryCta>
-        </SectionCard>
+          <div className="pt-4">
+            <PrimaryCta
+              className="bg-urgent bg-none text-white shadow-none hover:bg-urgent/90 focus-visible:ring-urgent"
+              onClick={goNavigate}
+            >
+              查看就醫與專業協助
+            </PrimaryCta>
+          </div>
+        </section>
       </PageContainer>
     );
   }
@@ -186,7 +193,6 @@ function Page() {
   if (reusableGuide) {
     return (
       <PageContainer width="default" className="space-y-5 sm:space-y-6">
-        <GuideHeader />
         <GuideSections guide={reusableGuide} eventId={eventId} />
       </PageContainer>
     );
@@ -218,8 +224,8 @@ function Page() {
 
   return (
     <PageContainer width="default" className="space-y-5 sm:space-y-6">
-      <GuideHeader />
       <GuideSections guide={guideQuery.data} eventId={eventId} />
     </PageContainer>
   );
 }
+
