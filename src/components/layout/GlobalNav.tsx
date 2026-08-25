@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import nexnavLogo from "@/assets/nexnav-logo.png.asset.json";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -30,15 +32,20 @@ export function BrandMark({ to }: { to: string }) {
       to={to}
       className="flex min-h-11 items-center gap-2 rounded-md px-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-lg font-bold text-primary-foreground">
-        N
-      </span>
+      <img
+        src={nexnavLogo.url}
+        alt="NexNav"
+        width={48}
+        height={36}
+        className="h-9 w-12 object-contain"
+      />
       <span className="text-lg font-semibold tracking-tight text-foreground">
         NexNav
       </span>
     </Link>
   );
 }
+
 
 export function useSignOut() {
   const navigate = useNavigate();
@@ -79,8 +86,8 @@ export function GlobalNav({
             <Link
               key={item.to}
               to={item.to}
-              activeProps={{ className: "bg-accent text-accent-foreground" }}
-              className="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              activeProps={{ className: "bg-primary text-primary-foreground shadow-sm hover:bg-primary hover:text-primary-foreground" }}
+              className="inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               {item.label}
             </Link>
@@ -142,8 +149,8 @@ export function GlobalNav({
                   key={item.to}
                   to={item.to}
                   onClick={() => setMenuOpen(false)}
-                  activeProps={{ className: "bg-accent text-accent-foreground" }}
-                  className="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  activeProps={{ className: "bg-primary text-primary-foreground shadow-sm hover:bg-primary hover:text-primary-foreground" }}
+                  className="inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {item.label}
                 </Link>
@@ -152,8 +159,8 @@ export function GlobalNav({
               <Link
                 to="/profile"
                 onClick={() => setMenuOpen(false)}
-                activeProps={{ className: "bg-accent text-accent-foreground" }}
-                className="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                activeProps={{ className: "bg-primary text-primary-foreground shadow-sm hover:bg-primary hover:text-primary-foreground" }}
+                className="inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 健康檔案
               </Link>
@@ -164,7 +171,7 @@ export function GlobalNav({
                   setMenuOpen(false);
                   void signOut();
                 }}
-                className="inline-flex min-h-11 items-center rounded-md px-3 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+                className="inline-flex min-h-11 items-center rounded-xl px-4 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
               >
                 {signingOut ? "登出中…" : "登出"}
               </button>

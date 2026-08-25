@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_public/register")({
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const INPUT_CLASS =
-  "w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-[invalid=true]:border-destructive";
+  "w-full rounded-xl border border-input bg-card px-3.5 py-3 text-sm text-foreground shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25 aria-[invalid=true]:border-destructive";
 
 const GENERIC_ERROR = "目前無法建立帳號，請稍後再試一次。";
 
@@ -158,7 +158,7 @@ function RegisterPage() {
 
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-6 rounded-2xl border border-border bg-surface-elevated p-8 shadow-sm">
+      <div className="w-full max-w-md space-y-6 rounded-2xl border border-border bg-card p-8 shadow-card">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             建立 NexNav 帳號
@@ -281,7 +281,7 @@ function RegisterPage() {
             type="submit"
             disabled={loading}
             aria-busy={loading}
-            className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
+            className="bg-gradient-brand shadow-brand flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-primary-foreground transition-all hover:brightness-105 disabled:opacity-60"
           >
             {loading ? (
               <>
