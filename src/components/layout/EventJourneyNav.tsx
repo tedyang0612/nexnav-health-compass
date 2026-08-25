@@ -42,8 +42,16 @@ export const EVENT_JOURNEY = [
   },
 ] as const;
 
-export function EventJourneyNav({ eventId }: { eventId: string }) {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+export function EventJourneyNav({
+  eventId,
+  pathnameOverride,
+}: {
+  eventId: string;
+  /** 僅供視覺驗證用；未提供時使用實際路由 pathname。 */
+  pathnameOverride?: string;
+}) {
+  const routerPathname = useRouterState({ select: (s) => s.location.pathname });
+  const pathname = pathnameOverride ?? routerPathname;
   const base = `/events/${eventId}`;
 
   function isCurrent(item: (typeof EVENT_JOURNEY)[number]) {
