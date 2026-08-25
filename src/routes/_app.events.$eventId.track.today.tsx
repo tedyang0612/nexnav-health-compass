@@ -422,23 +422,23 @@ function Page() {
           </div>
 
           <fieldset className="space-y-2">
-            <legend className="mb-1 text-base font-semibold text-foreground">發生頻率</legend>
-            <div className="space-y-2">
+            <legend className="mb-1 text-sm font-semibold text-foreground">發生頻率</legend>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
               {DAILY_FREQUENCY_OPTIONS.map((option, index) => (
                 <label
                   key={option.value}
-                  className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border border-input px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-accent"
+                  className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-md border border-input px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-accent"
                 >
                   <input
                     type="radio"
                     name="daily-frequency"
                     ref={index === 0 ? refs.frequencyLevel : undefined}
-                    className="h-4 w-4 accent-primary"
+                    className="h-4 w-4 shrink-0 accent-primary"
                     checked={values.frequencyLevel === option.value}
                     onChange={() => set("frequencyLevel", option.value)}
                     aria-describedby={errors.frequencyLevel ? "daily-frequency-error" : undefined}
                   />
-                  <span>{option.label}</span>
+                  <span className="min-w-0">{option.label}</span>
                 </label>
               ))}
             </div>
@@ -447,24 +447,29 @@ function Page() {
         </div>
 
         <div className="space-y-1.5 pt-2">
-          <label htmlFor="daily-frequency-desc" className="text-sm font-medium text-foreground">
-            頻率補充（選填）
-          </label>
-          <Input
+          <div className="flex items-baseline justify-between gap-3">
+            <label htmlFor="daily-frequency-desc" className="text-sm font-medium text-foreground">
+              頻率補充（選填）
+            </label>
+            <span
+              id="daily-frequency-desc-hint"
+              className="shrink-0 text-xs tabular-nums text-muted-foreground"
+            >
+              {values.frequencyDescription.length} / {FREQ_DESC_MAX}
+            </span>
+          </div>
+          <AutoGrowTextarea
             id="daily-frequency-desc"
-            ref={refs.frequencyDescription}
+            textareaRef={refs.frequencyDescription}
             value={values.frequencyDescription}
             maxLength={FREQ_DESC_MAX}
             onChange={(e) => set("frequencyDescription", e.target.value)}
-            className="min-h-11"
             aria-invalid={!!errors.frequencyDescription || undefined}
             aria-describedby="daily-frequency-desc-hint"
           />
-          <p id="daily-frequency-desc-hint" className="text-xs text-muted-foreground">
-            {values.frequencyDescription.length} / {FREQ_DESC_MAX} 個字元
-          </p>
           <FieldError id="daily-frequency-desc-error" message={errors.frequencyDescription} />
         </div>
+
 
         <div className="pt-2">
           <SubjectiveChangeField
