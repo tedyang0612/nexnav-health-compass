@@ -1,11 +1,4 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 /** 固定順序的狀況歷程導覽（不含 workflow gate）。 */
@@ -63,7 +56,6 @@ export function EventJourneyNav({ eventId }: { eventId: string }) {
     0,
     EVENT_JOURNEY.findIndex((item) => isCurrent(item)),
   );
-  const current = EVENT_JOURNEY[currentIndex] ?? EVENT_JOURNEY[0];
 
   // Mobile：固定顯示 4 個相鄰階段（僅視覺，不改流程順序）。
   const MOBILE_WINDOW = 4;
@@ -238,26 +230,6 @@ function CheckIcon() {
       className="shrink-0"
     >
       <path d="M5 12 l5 5 l9 -9" />
-    </svg>
-  );
-}
-
-
-function ChevronIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="m6 9 6 6 6-6" />
     </svg>
   );
 }
