@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/sheet";
 
 const NAV_ITEMS = [
-  { to: "/dashboard", label: "我的狀況" },
+  { to: "/dashboard", label: "狀況總覽" },
   { to: "/events/new", label: "新增狀況追蹤" },
 ] as const;
 
