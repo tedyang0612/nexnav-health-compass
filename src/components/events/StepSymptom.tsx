@@ -204,29 +204,30 @@ export function StepSymptom({
           <legend className="text-sm font-medium text-foreground">
             最近的發生頻率
           </legend>
-          <div className="space-y-2">
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {FREQUENCY_OPTIONS.map((option, index) => (
               <label
                 key={option.value}
-                className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border border-input px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-accent"
+                className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-md border border-input px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-accent"
               >
                 <input
                   type="radio"
                   name="frequency-level"
                   ref={index === 0 ? refs.frequencyLevel : undefined}
-                  className="h-4 w-4 accent-primary"
+                  className="h-4 w-4 shrink-0 accent-primary"
                   checked={values.frequencyLevel === option.value}
                   onChange={() => set("frequencyLevel", option.value)}
                   aria-describedby={
                     errors.frequencyLevel ? "frequency-error" : undefined
                   }
                 />
-                <span>{option.label}</span>
+                <span className="min-w-0">{option.label}</span>
               </label>
             ))}
           </div>
           <FieldError id="frequency-error" message={errors.frequencyLevel} />
         </fieldset>
+
 
         <div className="space-y-1.5">
           <label

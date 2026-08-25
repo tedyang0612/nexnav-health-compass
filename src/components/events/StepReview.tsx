@@ -12,12 +12,21 @@ import {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid gap-1 border-b border-border py-3 last:border-0 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-4">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="text-sm text-foreground">{value}</dd>
+    <div className="grid gap-1 border-b border-border py-3 last:border-0 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4">
+      <dt className="flex min-w-0 items-start gap-2 text-sm text-muted-foreground">
+        <span
+          aria-hidden="true"
+          className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary"
+        />
+        <span className="min-w-0">{label}</span>
+      </dt>
+      <dd className="min-w-0 break-words text-sm font-medium text-foreground sm:pl-0">
+        {value}
+      </dd>
     </div>
   );
 }
+
 
 export function StepReview({
   values,

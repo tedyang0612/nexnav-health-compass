@@ -337,11 +337,11 @@ function NewEventPage() {
             {submitting ? "建立中，請稍候。" : ""}
           </p>
 
-          <div className="flex flex-col gap-2 sm:flex-row-reverse sm:justify-start">
+          <div className="flex flex-row-reverse items-center justify-between gap-3 sm:justify-start">
             {step < 3 ? (
               <Button
                 size="lg"
-                className="min-h-11 w-full sm:w-auto"
+                className="min-h-12 w-full sm:w-auto"
                 disabled={!catalogReady}
                 onClick={handleNext}
               >
@@ -350,7 +350,7 @@ function NewEventPage() {
             ) : (
               <Button
                 size="lg"
-                className="min-h-11 w-full sm:w-auto"
+                className="min-h-12 w-auto shrink-0 whitespace-nowrap px-6"
                 disabled={submitting}
                 onClick={handleCreate}
               >
@@ -369,14 +369,19 @@ function NewEventPage() {
               <Button
                 variant="outline"
                 size="lg"
-                className="min-h-11 w-full sm:w-auto"
+                className={
+                  step === 3
+                    ? "min-h-12 w-auto shrink-0 whitespace-nowrap px-4"
+                    : "min-h-12 w-full sm:w-auto"
+                }
                 disabled={submitting}
                 onClick={() => setStep((s) => (s === 3 ? 2 : 1))}
               >
-                上一步
+                {step === 3 ? "返回上一步" : "上一步"}
               </Button>
             ) : null}
           </div>
+
         </>
       )}
     </PageContainer>
