@@ -130,6 +130,36 @@ type Step2Props = {
   onChange: (field: keyof ProfileFormValues, value: string) => void;
 };
 
+/** 預設兩行高度、隨內容自動增高的 textarea（純視覺行為）。 */
+function AutoGrowTextarea({
+  value,
+  ...props
+}: React.ComponentProps<typeof Textarea>) {
+  const ref = React.useRef<HTMLTextAreaElement | null>(null);
+
+  const resize = React.useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, []);
+
+  React.useLayoutEffect(() => {
+    resize();
+  }, [value, resize]);
+
+  return (
+    <Textarea
+      {...props}
+      ref={ref}
+      rows={2}
+      value={value}
+      className={cn("resize-none overflow-hidden", props.className)}
+      onInput={resize}
+    />
+  );
+}
+
 export function ProfileStep2Fields({
   idPrefix,
   values,
@@ -137,21 +167,10 @@ export function ProfileStep2Fields({
   onChange,
 }: Step2Props) {
   const items = [
-    {
-      key: "chronicConditions" as const,
-      label: "慢性健康狀況（選填）",
-      hint: "每行填寫一項，例如長期追蹤中的狀況名稱。",
-    },
-    {
-      key: "allergies" as const,
-      label: "過敏資訊（選填）",
-      hint: "每行填寫一項。",
-    },
-    {
-      key: "medications" as const,
-      label: "目前用藥（選填）",
-      hint: "每行填寫一項，僅作為個人紀錄。",
-    },
+    { key: "chronicConditions" as const, label: "慢性健康狀況（選填）" },
+    { key: "allergies" as const, label: "過敏資訊（選填）" },
+    { key: "medications" as const, label: "目前用藥（選填）" },
+    { key: "otherNotes" as const, label: "其他健康背景（選填）" },
   ];
 
   return (
@@ -159,33 +178,17 @@ export function ProfileStep2Fields({
       {items.map((item) => {
         const id = `${idPrefix}-${item.key}`;
         return (
-          <FormField key={item.key} id={id} label={item.label} hint={item.hint}>
-            <Textarea
+          <FormField key={item.key} id={id} label={item.label}>
+            <AutoGrowTextarea
               id={id}
-              rows={3}
               value={values[item.key]}
               disabled={disabled}
-              aria-describedby={`${id}-hint`}
               onChange={(e) => onChange(item.key, e.target.value)}
             />
           </FormField>
         );
       })}
-
-      <FormField
-        id={`${idPrefix}-otherNotes`}
-        label="其他健康背景（選填）"
-        hint="想補充的其他背景資訊。"
-      >
-        <Textarea
-          id={`${idPrefix}-otherNotes`}
-          rows={4}
-          value={values.otherNotes}
-          disabled={disabled}
-          aria-describedby={`${idPrefix}-otherNotes-hint`}
-          onChange={(e) => onChange("otherNotes", e.target.value)}
-        />
-      </FormField>
     </div>
   );
 }
+
