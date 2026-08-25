@@ -323,11 +323,27 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   );
 }
 
-function MetricCell({ label, children }: { label: string; children: React.ReactNode }) {
+function MetricCell({
+  label,
+  children,
+  emphasis = false,
+}: {
+  label: string;
+  children: React.ReactNode;
+  emphasis?: boolean;
+}) {
   return (
     <div className="min-w-0 rounded-lg border border-border bg-surface p-3">
       <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="mt-1 break-words text-sm font-semibold text-foreground">{children}</dd>
+      <dd
+        className={
+          emphasis
+            ? "mt-2 break-words text-base font-semibold text-foreground"
+            : "mt-1 break-words text-sm font-semibold text-foreground"
+        }
+      >
+        {children}
+      </dd>
     </div>
   );
 }
