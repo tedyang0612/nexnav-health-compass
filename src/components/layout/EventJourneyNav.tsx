@@ -65,9 +65,13 @@ export function EventJourneyNav({ eventId }: { eventId: string }) {
   );
   const current = EVENT_JOURNEY[currentIndex] ?? EVENT_JOURNEY[0];
 
-  // Mobile：最多顯示 3 個已完成階段 ＋ 目前階段（僅視覺，不改流程順序）。
-  const mobileStart = Math.max(0, currentIndex - 3);
-  const mobileStages = EVENT_JOURNEY.slice(mobileStart, currentIndex + 1);
+  // Mobile：固定顯示 4 個相鄰階段（僅視覺，不改流程順序）。
+  const MOBILE_WINDOW = 4;
+  const mobileStart = Math.min(
+    Math.max(0, currentIndex - 2),
+    Math.max(0, EVENT_JOURNEY.length - MOBILE_WINDOW),
+  );
+  const mobileStages = EVENT_JOURNEY.slice(mobileStart, mobileStart + MOBILE_WINDOW);
 
   return (
     <div className="border-b border-border bg-[color-mix(in_srgb,var(--primary)_5%,var(--muted))]">
