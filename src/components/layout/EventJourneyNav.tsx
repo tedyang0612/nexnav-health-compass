@@ -3,7 +3,14 @@ import { cn } from "@/lib/utils";
 
 /** 固定順序的狀況歷程導覽（不含 workflow gate）。 */
 export const EVENT_JOURNEY = [
-  { to: "/events/$eventId", label: "狀況總覽", en: "Overview", short: "狀況總覽", exact: true },
+  { to: "/events/$eventId", label: "記錄不適", en: "Record", short: "記錄不適", exact: true },
+  {
+    to: "/events/$eventId/safety",
+    label: "安全確認",
+    en: "Safety",
+    short: "安全確認",
+    exact: false,
+  },
   { to: "/events/$eventId/guide", label: "改善方向", en: "Guide", short: "改善方向", exact: false },
   {
     to: "/events/$eventId/track/today",
@@ -12,6 +19,7 @@ export const EVENT_JOURNEY = [
     short: "每日追蹤",
     exact: false,
   },
+
   {
     to: "/events/$eventId/reassess",
     label: "追蹤變化",
@@ -21,38 +29,31 @@ export const EVENT_JOURNEY = [
   },
   {
     to: "/events/$eventId/navigate",
-    label: "就醫與專業協助",
+    label: "專業協助",
     en: "Navigate",
     short: "專業協助",
     exact: false,
   },
   {
     to: "/events/$eventId/summary/new",
-    label: "摘要",
+    label: "建立摘要",
     en: "Prepare",
     short: "建立摘要",
     exact: false,
   },
   {
     to: "/events/$eventId/connect",
-    label: "尋找醫療資源",
+    label: "醫療資源",
     en: "Connect",
     short: "醫療資源",
     exact: false,
   },
 ] as const;
 
-export function EventJourneyNav({
-  eventId,
-  pathnameOverride,
-}: {
-  eventId: string;
-  /** 僅供視覺驗證用；未提供時使用實際路由 pathname。 */
-  pathnameOverride?: string;
-}) {
-  const routerPathname = useRouterState({ select: (s) => s.location.pathname });
-  const pathname = pathnameOverride ?? routerPathname;
+export function EventJourneyNav({ eventId }: { eventId: string }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   const base = `/events/${eventId}`;
+
 
   function isCurrent(item: (typeof EVENT_JOURNEY)[number]) {
     return item.exact
