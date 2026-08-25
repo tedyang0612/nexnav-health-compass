@@ -95,10 +95,13 @@ export function GuideSections({ guide, eventId }: { guide: GuideViewModel; event
 
       <SectionCard title="接下來，持續記錄變化">
         <p className="text-sm leading-relaxed text-muted-foreground">
-          <span>建議先嘗試改善調整，並持續每天花一點時間記錄目前感受與生活狀況，</span>
-          <span className="hidden sm:block sm:h-4" aria-hidden="true" />
-          <span>之後可以查看變化趨勢。</span>
+          建議先嘗試改善調整，並持續每天花一點時間記錄目前感受與生活狀況，
+          <span className="sm:hidden">之後可以查看變化趨勢。</span>
         </p>
+        <p className="hidden text-sm leading-relaxed text-muted-foreground sm:block">
+          之後可以查看變化趨勢。
+        </p>
+
         <div className="pt-1">
           <Button
             asChild
