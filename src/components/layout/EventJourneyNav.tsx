@@ -29,38 +29,114 @@ export function EventJourneyNav({ eventId }: { eventId: string }) {
       : pathname.startsWith(item.to.replace("$eventId", eventId));
   }
 
-  const current = EVENT_JOURNEY.find((item) => isCurrent(item)) ?? EVENT_JOURNEY[0];
+  const currentIndex = Math.max(
+    0,
+    EVENT_JOURNEY.findIndex((item) => isCurrent(item)),
+  );
+  const current = EVENT_JOURNEY[currentIndex] ?? EVENT_JOURNEY[0];
+
+  // Mobile：最多顯示 3 個已完成階段 ＋ 目前階段（僅視覺，不改流程順序）。
+  const mobileStart = Math.max(0, currentIndex - 3);
+  const mobileStages = EVENT_JOURNEY.slice(mobileStart, currentIndex + 1);
 
   return (
-    <div className="border-b border-border/60 bg-surface">
+    <div className="border-b border-border bg-[color-mix(in_srgb,var(--primary)_5%,var(--muted))]">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        {/* Desktop：輕量區塊感水平選單 */}
-        <div className="hidden py-3 md:block">
-          <nav aria-label="狀況歷程導覽" className="flex flex-wrap gap-1 rounded-xl bg-muted p-1.5">
-            {EVENT_JOURNEY.map((item) => {
-              const active = isCurrent(item);
-              return (
-                <Link
-                  key={item.label}
-                  to={item.to}
-                  params={{ eventId }}
-                  aria-current={active ? "page" : undefined}
-                  className={cn(
-                    "inline-flex min-h-11 shrink-0 items-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                    active
-                      ? "bg-primary/10 font-semibold text-primary"
-                      : "text-muted-foreground hover:bg-primary/5 hover:text-foreground",
-                  )}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
+        {/* Desktop：完整階段與連接線 */}
+        <div className="hidden py-5 md:block">
+          <nav aria-label="狀況歷程導覽">
+            <ol className="flex w-full items-start">
+              {EVENT_JOURNEY.map((item, index) => {
+                const active = index === currentIndex;
+                const completed = index < currentIndex;
+                return (
+                  <li
+                    key={item.label}
+                    className={cn(
+                      "flex min-w-0 items-start",
+                      index === EVENT_JOURNEY.length - 1 ? "shrink-0" : "flex-1",
+                    )}
+                  >
+                    <Link
+                      to={item.to}
+                      params={{ eventId }}
+                      aria-current={active ? "page" : undefined}
+                      className="flex w-20 shrink-0 flex-col items-center gap-2 rounded-lg text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    >
+                      <span
+                        className={cn(
+                          "grid h-9 w-9 place-items-center rounded-full border-2 text-sm font-semibold transition-colors",
+                          active &&
+                            "border-primary bg-primary text-primary-foreground shadow-[0_0_0_4px_color-mix(in_srgb,var(--primary)_16%,transparent)]",
+                          completed && "border-success bg-card text-success",
+                          !active &&
+                            !completed &&
+                            "border-transparent bg-muted text-muted-foreground",
+                        )}
+                      >
+                        {completed ? <CheckIcon /> : index + 1}
+                      </span>
+                      <span
+                        className={cn(
+                          "line-clamp-2 text-xs leading-snug",
+                          active
+                            ? "font-semibold text-primary"
+                            : completed
+                              ? "text-foreground"
+                              : "text-muted-foreground",
+                        )}
+                      >
+                        {item.label}
+                      </span>
+                    </Link>
+                    {index < EVENT_JOURNEY.length - 1 ? (
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "mt-[18px] h-0.5 min-w-2 flex-1 rounded-full",
+                          index < currentIndex ? "bg-success" : "bg-border",
+                        )}
+                      />
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ol>
           </nav>
         </div>
 
-        {/* Mobile：Dropdown */}
-        <div className="py-2 md:hidden">
+        {/* Mobile：已完成 ＋ 目前階段，另提供完整清單 */}
+        <div className="space-y-2 py-3 md:hidden">
+          <nav aria-label="狀況歷程導覽">
+            <ol className="flex items-center gap-1.5 overflow-hidden">
+              {mobileStages.map((item, index) => {
+                const stageIndex = mobileStart + index;
+                const active = stageIndex === currentIndex;
+                return (
+                  <li key={item.label} className="flex min-w-0 items-center gap-1.5">
+                    {index > 0 ? (
+                      <span
+                        aria-hidden="true"
+                        className="h-0.5 w-3 shrink-0 rounded-full bg-success"
+                      />
+                    ) : null}
+                    <span
+                      className={cn(
+                        "inline-flex min-w-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs",
+                        active
+                          ? "bg-primary font-semibold text-primary-foreground"
+                          : "bg-card text-success",
+                      )}
+                    >
+                      {active ? null : <CheckIcon />}
+                      <span className="truncate">{item.label}</span>
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </nav>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -87,6 +163,27 @@ export function EventJourneyNav({ eventId }: { eventId: string }) {
     </div>
   );
 }
+
+function CheckIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="shrink-0"
+    >
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+
 
 function ChevronIcon() {
   return (
