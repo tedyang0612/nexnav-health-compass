@@ -326,7 +326,7 @@ function SymptomRadio({
   inputRef?: React.RefObject<HTMLInputElement | null> | undefined;
 }) {
   return (
-    <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border border-input px-3 py-3 text-sm transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+    <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border border-input px-3 py-3 text-sm transition-colors focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 has-[:checked]:border-primary has-[:checked]:bg-primary/5">
       <input
         type="radio"
         name={name}
