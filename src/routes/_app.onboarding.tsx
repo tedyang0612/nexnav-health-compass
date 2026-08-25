@@ -169,40 +169,32 @@ function OnboardingPage() {
       <UnsavedChangesGuard enabled={dirty && !saving} />
 
       <PageHeader
-        title="初次設定"
-        description="完成兩個步驟，建立您的基本健康檔案。"
+        title="個人資料"
+        description="只要兩個步驟，建立您的基本健康檔案。"
       />
 
-      <ol
-        className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4"
-        aria-label="設定步驟"
+      <div
+        className="grid w-full max-w-[250px] grid-cols-2 gap-2"
+        role="group"
+        aria-label="設定步驟進度"
       >
-        {[
-          { index: 1 as const, label: "基本健康檔案" },
-          { index: 2 as const, label: "健康背景（選填）" },
-        ].map((item) => {
-          const state =
-            item.index === step
-              ? "進行中"
-              : item.index < step
-                ? "已完成"
-                : "尚未開始";
-          return (
-            <li
-              key={item.index}
-              aria-current={item.index === step ? "step" : undefined}
-              className={
-                item.index === step
-                  ? "rounded-lg border border-primary/40 bg-accent px-3 py-2 text-sm font-medium text-foreground"
-                  : "rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground"
-              }
-            >
-              步驟 {item.index}／2：{item.label}
-              <span className="ml-2 text-xs">（{state}）</span>
-            </li>
-          );
-        })}
-      </ol>
+        <span
+          className={
+            step === 1
+              ? "h-1.5 rounded-full bg-gradient-to-r from-heal to-primary"
+              : "h-1.5 rounded-full bg-heal"
+          }
+        />
+        <span
+          className={
+            step === 2
+              ? "h-1.5 rounded-full bg-gradient-to-r from-heal to-primary"
+              : "h-1.5 rounded-full bg-muted"
+          }
+        />
+        <span className="sr-only">目前為步驟 {step}／2</span>
+      </div>
+
 
       {saveError ? (
         <StatusBanner
@@ -225,8 +217,8 @@ function OnboardingPage() {
 
       {step === 1 ? (
         <SectionCard
-          title="步驟 1／2：基本健康檔案"
-          description="這些資訊用於整理您的個人紀錄。"
+          title="步驟 1：基本健康檔案"
+          description="這些資訊將用於建立您的個人檔案。"
         >
           <form
             noValidate
@@ -251,7 +243,7 @@ function OnboardingPage() {
         </SectionCard>
       ) : (
         <SectionCard
-          title="步驟 2／2：健康背景（選填）"
+          title="步驟 2：健康背景（選填）"
           description="這一步全部為選填，您也可以直接略過。"
         >
           <form
