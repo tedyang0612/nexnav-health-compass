@@ -244,7 +244,13 @@ function Page() {
   if (shownResult) {
     return (
       <PageContainer width="narrow" className="space-y-6">
-        <PageHeader title="先確認目前狀況" description={eventSummary} />
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+            安全確認
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{eventSummary}</p>
+        </div>
+
         <ResultView
           result={shownResult}
           onGuide={() =>
