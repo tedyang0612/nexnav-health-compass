@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveEvents } from "@/hooks/useActiveEvents";
+import { useProfileGate } from "@/hooks/useProfileGate";
 import { ActiveEventCard } from "@/components/dashboard/ActiveEventCard";
 
 export const Route = createFileRoute("/_app/dashboard")({
@@ -28,12 +29,17 @@ export const Route = createFileRoute("/_app/dashboard")({
 function DashboardPage() {
   const { user } = useAuth();
   const query = useActiveEvents(user?.id);
+  const profile = useProfileGate(user?.id);
+  const displayName =
+    profile.data?.display_name?.trim() ||
+    user?.email?.split("@")[0]?.trim() ||
+    "您";
   const events = query.data ?? [];
 
   return (
     <PageContainer className="space-y-6">
       <PageHeader
-        title="狀況總覽"
+        title={`Hi ${displayName}`}
         description="以下是目前正在追蹤的狀況。"
 
         actions={
@@ -62,7 +68,7 @@ function DashboardPage() {
           }
         />
       ) : (
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-4">
           {events.map((event) => (
             <ActiveEventCard key={event.id} event={event} />
           ))}

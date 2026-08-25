@@ -10,6 +10,7 @@ export type ActiveEventItem = {
   id: string;
   startedOn: string;
   primarySymptomLabel: string;
+  symptomCode: string | null;
   trackedDays: number;
   trackCount: number;
   latestSeverity: number | null;
@@ -20,7 +21,7 @@ type EventRow = {
   id: string;
   started_on: string;
   custom_primary_symptom: string | null;
-  symptom_catalog: { display_name: string } | null;
+  symptom_catalog: { display_name: string; code: string } | null;
 };
 
 type SafetyResult = "normal" | "attention" | "priority_care";
@@ -44,7 +45,7 @@ export function useActiveEvents(userId: string | undefined) {
       const { data, error } = await supabase
         .from("health_events")
         .select(
-          "id, started_on, custom_primary_symptom, symptom_catalog(display_name)",
+          "id, started_on, custom_primary_symptom, symptom_catalog(display_name, code)",
         )
         .eq("user_id", userId!)
         .eq("status", "active")
@@ -139,6 +140,7 @@ export function useActiveEvents(userId: string | undefined) {
             event.custom_primary_symptom?.trim() ||
             event.symptom_catalog?.display_name ||
             "未指定不適",
+          symptomCode: event.symptom_catalog?.code ?? null,
           trackedDays: trackedDays(event.started_on, today),
           trackCount: trackCountByEvent.get(event.id) ?? 0,
           latestSeverity: latestSeverityByEvent.get(event.id) ?? null,
