@@ -273,10 +273,8 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
 
   return (
     <div className="space-y-4">
-      <p className="text-sm font-medium text-muted-foreground">
-        {SUMMARY_TYPE_LABEL[snapshot.summary_type]}
-      </p>
       {isProfessional ? (
+
         <>
           {targetCard}
           {overview}

@@ -598,18 +598,21 @@ function BuilderPage({ eventId, summaryType }: { eventId: string; summaryType: S
             </div>
           </SectionCard>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <PrimaryCta onClick={goPreview}>預覽摘要</PrimaryCta>
+          <div className="flex flex-row items-center justify-between gap-3 sm:justify-end">
             <Button
               variant="outline"
-              className="min-h-11 w-full sm:w-auto"
+              className="min-h-11 flex-1 sm:flex-none"
               onClick={() =>
                 void navigate({ to: "/events/$eventId/navigate", params: { eventId } })
               }
             >
               返回
             </Button>
+            <PrimaryCta className="w-auto flex-1 justify-center text-center sm:flex-none" onClick={goPreview}>
+              預覽摘要
+            </PrimaryCta>
           </div>
+
 
           <ExistingSummaries query={summaries} />
         </>
