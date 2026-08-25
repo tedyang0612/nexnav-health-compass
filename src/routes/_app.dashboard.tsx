@@ -14,9 +14,9 @@ import { ActiveEventCard } from "@/components/dashboard/ActiveEventCard";
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({
     meta: [
-      { title: "我的狀況 — NexNav" },
+      { title: "狀況總覽 — NexNav" },
       { name: "description", content: "NexNav 個人狀況追蹤總覽。" },
-      { property: "og:title", content: "我的狀況 — NexNav" },
+      { property: "og:title", content: "狀況總覽 — NexNav" },
       { property: "og:description", content: "NexNav 個人狀況追蹤總覽。" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -33,8 +33,9 @@ function DashboardPage() {
   return (
     <PageContainer className="space-y-6">
       <PageHeader
-        title="我的狀況"
+        title="狀況總覽"
         description="以下是目前正在追蹤的狀況。"
+
         actions={
           <Button asChild className="min-h-11">
             <Link to="/events/new">新增狀況追蹤</Link>
