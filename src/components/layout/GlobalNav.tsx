@@ -30,15 +30,20 @@ export function BrandMark({ to }: { to: string }) {
       to={to}
       className="flex min-h-11 items-center gap-2 rounded-md px-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-lg font-bold text-primary-foreground">
-        N
-      </span>
+      <img
+        src={nexnavLogo.url}
+        alt="NexNav"
+        width={48}
+        height={36}
+        className="h-9 w-12 object-contain"
+      />
       <span className="text-lg font-semibold tracking-tight text-foreground">
         NexNav
       </span>
     </Link>
   );
 }
+
 
 export function useSignOut() {
   const navigate = useNavigate();
