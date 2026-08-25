@@ -24,29 +24,42 @@ export const Route = createFileRoute("/_public/")({
 
 function Index() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-4 py-24 text-center sm:py-32">
-      <div className="mx-auto max-w-3xl space-y-8">
-        <div className="inline-flex items-center rounded-full border border-border bg-surface-elevated px-3 py-1 text-sm text-muted-foreground">
+    <div className="flex flex-1 flex-col items-center justify-center px-4 py-16 text-center sm:py-24">
+      <div className="mx-auto flex w-full max-w-4xl flex-col items-center">
+        <p className="mb-8 inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3.5 py-1.5 text-sm text-primary">
           健康導航平台
-        </div>
-        <h1 className="text-4xl font-bold leading-snug tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-          整理健康困擾，
-          <br className="hidden sm:block" />
-          準備好就醫資訊
-        </h1>
-        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-          NexNav 協助您記錄症狀、追蹤生活因素，讓您在尋求專業協助時更有條理。
         </p>
-        <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+
+        {/* Desktop：兩行置中 */}
+        <h1 className="hidden max-w-3xl text-[38px] font-semibold leading-[1.35] tracking-tight text-foreground sm:block">
+          <span className="block whitespace-nowrap">
+            NexNav 協助您記錄症狀 &amp; 追蹤生活因素
+          </span>
+          <span className="mt-4 block whitespace-nowrap">
+            讓您在尋求專業協助時更有條理
+          </span>
+        </h1>
+
+        {/* Mobile：兩行置中、字級縮小 */}
+        <h1 className="block max-w-[354px] text-[19px] font-semibold leading-[1.5] tracking-tight text-foreground sm:hidden">
+          <span className="block whitespace-nowrap">
+            NexNav 協助您記錄症狀 &amp; 追蹤生活因素
+          </span>
+          <span className="mt-4 block whitespace-nowrap">
+            讓您在尋求專業協助時更有條理
+          </span>
+        </h1>
+
+        <div className="mt-9 flex w-full max-w-[190px] flex-col items-stretch gap-3 sm:max-w-none sm:flex-row sm:justify-center">
           <Link
             to="/register"
-            className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-base font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+            className="bg-gradient-brand shadow-brand inline-flex min-h-[50px] items-center justify-center rounded-xl px-6 text-base font-medium text-primary-foreground transition-all hover:brightness-105"
           >
             開始使用
           </Link>
           <Link
             to="/login"
-            className="inline-flex items-center justify-center rounded-lg border border-input bg-surface-elevated px-6 py-3 text-base font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+            className="inline-flex min-h-[50px] items-center justify-center rounded-xl border border-border bg-card px-6 text-base font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-secondary"
           >
             已有帳號？登入
           </Link>
@@ -55,3 +68,4 @@ function Index() {
     </div>
   );
 }
+
