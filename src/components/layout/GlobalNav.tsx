@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import nexnavLogo from "@/assets/nexnav-logo.png.asset.json";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
