@@ -95,7 +95,7 @@ export function ActiveEventCard({ event }: { event: ActiveEventItem }) {
                   {!isLast ? (
                     <span
                       aria-hidden="true"
-                      className={`pointer-events-none absolute top-1/2 left-[calc(50%+1.125rem)] -z-0 h-0.5 w-[calc(100%-2.25rem+0.5rem)] -translate-y-1/2 rounded-full ${
+                      className={`pointer-events-none absolute top-1/2 left-[calc(50%+1.125rem)] z-0 h-0.5 w-[calc(100%-1.5rem)] -translate-y-1/2 rounded-full ${
                         done ? "bg-heal" : "bg-border"
                       }`}
                     />
