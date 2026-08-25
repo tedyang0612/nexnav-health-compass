@@ -9,24 +9,23 @@ const STATUS_CLASSES: Record<EventNextStepState, string> = {
   safety_incomplete: "border-caution/60 bg-caution-muted text-caution-strong",
   priority_care: "border-urgent bg-urgent-muted text-urgent-strong",
   attention: "border-caution bg-caution-muted text-caution-strong",
-  guide_pending: "border-chart-3/35 bg-chart-3/10 text-chart-3",
-  track_pending: "border-primary/35 bg-secondary text-secondary-foreground",
-  track_complete: "border-chart-3/30 bg-chart-3/10 text-chart-3",
+  guide_pending: "border-heal/40 bg-heal-muted text-heal",
+  track_pending: "border-primary/40 bg-primary/10 text-primary",
+  track_complete: "border-heal/40 bg-heal-muted text-heal",
 };
 
 const CTA_CLASSES: Record<EventNextStepState, string> = {
-  safety_incomplete:
-    "bg-caution text-foreground hover:bg-caution/90 focus-visible:ring-caution",
+  safety_incomplete: "",
   priority_care:
-    "bg-urgent text-white hover:bg-urgent/90 focus-visible:ring-urgent",
+    "bg-urgent bg-none text-white shadow-none hover:bg-urgent/90 focus-visible:ring-urgent",
   attention:
-    "bg-caution text-foreground hover:bg-caution/90 focus-visible:ring-caution",
-  guide_pending:
-    "bg-chart-3 text-white hover:bg-chart-3/90 focus-visible:ring-chart-3",
+    "bg-caution bg-none text-foreground shadow-none hover:bg-caution/90 focus-visible:ring-caution",
+  guide_pending: "",
   track_pending: "",
   track_complete:
-    "border-2 border-chart-3 bg-transparent text-chart-3 hover:bg-chart-3/10",
+    "border-2 border-heal bg-transparent text-heal hover:bg-heal-muted",
 };
+
 
 /** Dashboard active event card：依 Safety、Guide 與今日 Track 狀態顯示真正的下一步。 */
 export function ActiveEventCard({ event }: { event: ActiveEventItem }) {
