@@ -9,7 +9,7 @@ import {
   SectionCard,
 } from "@/components/shell";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { Textarea } from "@/components/ui/textarea";
 import { FieldError } from "@/components/events/FieldError";
 import { SeveritySlider } from "@/components/events/SeveritySlider";
