@@ -6,6 +6,7 @@ import { SectionCard } from "@/components/shell";
 import { FieldError } from "./FieldError";
 import { SeveritySlider } from "./SeveritySlider";
 import { deriveCategories } from "@/hooks/useSymptomCatalog";
+import { SymptomIcon } from "@/lib/symptom-icons";
 import {
   DURATION_UNITS,
   FREQUENCY_OPTIONS,
