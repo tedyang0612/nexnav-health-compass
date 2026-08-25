@@ -325,19 +325,22 @@ function SymptomRadio({
   inputRef?: React.RefObject<HTMLInputElement | null> | undefined;
 }) {
   return (
-    <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border border-input px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-accent">
+    <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border border-input px-3 py-3 text-sm transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
       <input
         type="radio"
         name={name}
         ref={inputRef}
-        className="h-4 w-4 accent-primary"
+        className="sr-only"
         checked={checked}
         onChange={onSelect}
       />
+      <SymptomIcon code={option.code} className="size-10" />
       <span className="min-w-0">
-        <span className="block truncate">{option.display_name}</span>
+        <span className="block break-words font-medium text-foreground">
+          {option.display_name}
+        </span>
         {!option.is_other ? (
-          <span className="block text-xs text-muted-foreground">
+          <span className="block text-xs break-words text-muted-foreground">
             {option.category_name}
           </span>
         ) : null}
