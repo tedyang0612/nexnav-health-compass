@@ -345,7 +345,12 @@ function ReassessView({
       {!isClosed && currentSafety?.result === "normal" ? (
         <SectionCard
           title="需要進一步確認嗎？"
-          description="你可以依目前的追蹤變化，查看適合的就醫方向或其他專業協助。"
+          description={
+            <>
+              <span className="block sm:inline">你可以依目前的追蹤變化，</span>
+              <span className="block sm:inline">查看適合的就醫方向或其他專業協助。</span>
+            </>
+          }
           footer={
             <PrimaryCta asChild>
               <Link to="/events/$eventId/navigate" params={{ eventId }}>
@@ -379,20 +384,22 @@ function FrequencyEnd({
   return (
     <div className="min-w-0 flex-1 rounded-xl border border-border bg-surface px-3.5 py-2.5 sm:p-4">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-0.5 break-words text-base font-semibold text-foreground">
-        {text}（{level}／5）
+      <p className="mt-0.5 break-words text-base font-semibold text-foreground">{text}</p>
+      <p className="mt-1">
+        <FrequencyDots level={level} label={label} />
       </p>
-      <p className="mt-0.5 text-xs text-muted-foreground">{formatDisplayDate(date)}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{formatDisplayDate(date)}</p>
     </div>
   );
 }
 
 function DirectionIcon({ direction }: { direction: SeverityDirection }) {
   if (direction === "down") {
-    return <TrendingDown aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" />;
+    return <TrendingDown aria-hidden="true" className="size-4 shrink-0 text-primary" />;
   }
   if (direction === "up") {
-    return <TrendingUp aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" />;
+    return <TrendingUp aria-hidden="true" className="size-4 shrink-0 text-caution-strong" />;
   }
   return <Minus aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" />;
 }
+
