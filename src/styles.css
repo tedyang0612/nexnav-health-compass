@@ -43,6 +43,12 @@
 
   --color-surface: var(--surface);
   --color-surface-elevated: var(--surface-elevated);
+  --color-brand: var(--brand);
+  --color-brand-teal: var(--brand-teal);
+  --color-viz-series-1: var(--viz-series-1);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-muted: var(--success-muted);
   --color-heal: var(--heal);
   --color-heal-foreground: var(--heal-foreground);
   --color-heal-muted: var(--heal-muted);
@@ -52,6 +58,7 @@
   --color-caution: var(--caution);
   --color-caution-strong: var(--caution-strong);
   --color-caution-muted: var(--caution-muted);
+
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
