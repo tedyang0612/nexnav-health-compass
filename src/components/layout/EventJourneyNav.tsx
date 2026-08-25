@@ -113,11 +113,23 @@ export function EventJourneyNav({ eventId }: { eventId: string }) {
                       </span>
                       <span
                         className={cn(
-                          "line-clamp-2 text-xs leading-snug",
+                          "text-[10px] leading-tight whitespace-nowrap",
+                          active
+                            ? "text-primary"
+                            : completed
+                              ? "text-foreground"
+                              : "text-muted-foreground",
+                        )}
+                      >
+                        {item.en}
+                      </span>
+                      <span
+                        className={cn(
+                          "text-xs leading-snug whitespace-nowrap",
                           active
                             ? "font-semibold text-primary"
                             : completed
-                              ? "text-foreground"
+                              ? "font-medium text-foreground"
                               : "text-muted-foreground",
                         )}
                       >
