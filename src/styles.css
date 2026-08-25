@@ -245,3 +245,16 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+/* 品牌漸層主要 CTA（青綠 → 品牌藍） */
+@utility bg-gradient-brand {
+  background-image: var(--gradient-brand);
+}
+
+@utility shadow-brand {
+  box-shadow: var(--shadow-brand);
+}
+
+@utility shadow-card {
+  box-shadow: var(--shadow-card);
+}
