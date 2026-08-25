@@ -488,35 +488,39 @@ function Page() {
         description="以下四項皆為必填，僅用於整理紀錄，不代表任何健康判斷。"
       >
         {LIFE_CONTEXT_FIELDS.map((field) => (
-          <fieldset key={field.key} className="mt-6 space-y-3 first:mt-0">
-            <legend className="mb-1 flex items-center gap-2 text-base font-semibold text-foreground">
-              <span aria-hidden="true" className="inline-block h-4 w-1 rounded-full bg-primary" />
-              {field.label}
+          <fieldset
+            key={field.key}
+            className="space-y-2 border-t border-border pt-4 first:border-0 first:pt-0"
+          >
+            <legend className="mb-1 flex items-center gap-2 text-sm font-semibold text-foreground">
+              <span aria-hidden="true" className="inline-block h-4 w-1 shrink-0 rounded-full bg-primary" />
+              <span className="min-w-0">{field.label}</span>
             </legend>
-            <div className="space-y-2">
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {field.options.map((option, index) => (
                 <label
                   key={option.value}
-                  className="flex min-h-11 cursor-pointer items-center gap-3 rounded-md border border-input px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-accent"
+                  className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-md border border-input px-3 py-2 text-sm has-[:checked]:border-primary has-[:checked]:bg-accent"
                 >
                   <input
                     type="radio"
                     name={`daily-life-${field.key}`}
                     ref={index === 0 ? refs[field.key] : undefined}
-                    className="h-4 w-4 accent-primary"
+                    className="h-4 w-4 shrink-0 accent-primary"
                     checked={values[field.key] === option.value}
                     onChange={() => set(field.key, option.value)}
                     aria-describedby={
                       errors[field.key] ? `daily-life-${field.key}-error` : undefined
                     }
                   />
-                  <span>{option.label}</span>
+                  <span className="min-w-0">{option.label}</span>
                 </label>
               ))}
             </div>
             <FieldError id={`daily-life-${field.key}-error`} message={errors[field.key]} />
           </fieldset>
         ))}
+
       </SectionCard>
 
       {/* Section 3：改善建議 */}
