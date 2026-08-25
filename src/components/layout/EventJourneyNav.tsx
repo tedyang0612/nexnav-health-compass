@@ -139,59 +139,83 @@ export function EventJourneyNav({ eventId }: { eventId: string }) {
           </nav>
         </div>
 
-        {/* Mobile：已完成 ＋ 目前階段，另提供完整清單 */}
-        <div className="space-y-2 py-3 md:hidden">
+        {/* Mobile：固定四個相鄰階段的圓形節點 */}
+        <div className="py-4 md:hidden">
           <nav aria-label="狀況歷程導覽">
-            <ol className="flex items-center gap-1.5 overflow-hidden">
+            <ol className="grid grid-cols-[minmax(0,1fr)_18px_minmax(0,1fr)_18px_minmax(0,1fr)_18px_minmax(0,1fr)] items-start">
               {mobileStages.map((item, index) => {
                 const stageIndex = mobileStart + index;
                 const active = stageIndex === currentIndex;
+                const completed = stageIndex < currentIndex;
                 return (
-                  <li key={item.label} className="flex min-w-0 items-center gap-1.5">
+                  <li key={item.label} className="contents">
                     {index > 0 ? (
                       <span
                         aria-hidden="true"
-                        className="h-0.5 w-3 shrink-0 rounded-full bg-success"
-                      />
+                        className="relative mt-[21px] flex h-2 items-center justify-end"
+                      >
+                        <span
+                          className={cn(
+                            "absolute inset-x-0 h-0.5 rounded-full",
+                            stageIndex <= currentIndex ? "bg-success" : "bg-border",
+                          )}
+                        />
+                        {stageIndex === currentIndex ? (
+                          <span className="relative h-0 w-0 border-y-[4px] border-l-[6px] border-y-transparent border-l-primary" />
+                        ) : null}
+                      </span>
                     ) : null}
-                    <span
-                      className={cn(
-                        "inline-flex min-w-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs",
-                        active
-                          ? "bg-primary font-semibold text-primary-foreground"
-                          : "bg-card text-success",
-                      )}
+                    <Link
+                      to={item.to}
+                      params={{ eventId }}
+                      aria-current={active ? "page" : undefined}
+                      className="flex min-w-0 flex-col items-center gap-1.5 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
-                      {active ? null : <CheckIcon />}
-                      <span className="truncate">{item.label}</span>
-                    </span>
+                      <span
+                        className={cn(
+                          "grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 transition-colors",
+                          active &&
+                            "border-primary bg-primary text-primary-foreground shadow-[0_0_0_5px_color-mix(in_srgb,var(--primary)_18%,transparent)]",
+                          completed && "border-success bg-card text-success",
+                          !active && !completed && "border-transparent bg-muted",
+                        )}
+                      >
+                        {completed ? (
+                          <CheckIcon />
+                        ) : active ? (
+                          <span className="h-2.5 w-2.5 rounded-full bg-primary-foreground" />
+                        ) : null}
+                      </span>
+                      <span
+                        className={cn(
+                          "text-[11px] leading-tight whitespace-nowrap",
+                          active
+                            ? "text-primary"
+                            : completed
+                              ? "text-foreground"
+                              : "text-muted-foreground",
+                        )}
+                      >
+                        {item.en}
+                      </span>
+                      <span
+                        className={cn(
+                          "text-[12px] leading-tight font-semibold whitespace-nowrap",
+                          active
+                            ? "text-primary"
+                            : completed
+                              ? "text-foreground"
+                              : "text-muted-foreground",
+                        )}
+                      >
+                        {item.short}
+                      </span>
+                    </Link>
                   </li>
                 );
               })}
             </ol>
           </nav>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="min-h-11 w-full justify-between"
-                aria-label="切換狀況歷程頁面"
-              >
-                <span className="truncate">{current.label}</span>
-                <ChevronIcon />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[calc(100vw-2rem)] max-w-sm">
-              {EVENT_JOURNEY.map((item) => (
-                <DropdownMenuItem key={item.label} asChild className="min-h-11">
-                  <Link to={item.to} params={{ eventId }}>
-                    {item.label}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
     </div>
