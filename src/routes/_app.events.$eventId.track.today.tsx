@@ -64,14 +64,54 @@ function TrackHeader({ completed = false }: { completed?: boolean }) {
       description="記錄目前的不適與生活狀況，方便持續觀察變化。"
       actions={
         completed ? (
-          <span className="inline-flex items-center rounded-full border border-heal/40 bg-heal-muted px-3 py-1 text-xs font-medium text-foreground">
+          <span className="inline-flex items-center whitespace-nowrap rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground">
             今日已完成
           </span>
-        ) : null
+        ) : (
+          <span className="inline-flex items-center whitespace-nowrap rounded-full border border-border bg-transparent px-3 py-1.5 text-xs font-medium text-muted-foreground">
+            尚未完成
+          </span>
+        )
       }
     />
   );
 }
+
+/** 補充輸入框：預設兩行，內容增加時自動增高。 */
+function AutoGrowTextarea({
+  textareaRef,
+  value,
+  ...props
+}: React.ComponentProps<typeof Textarea> & {
+  textareaRef?: React.RefObject<HTMLTextAreaElement | null> | undefined;
+}) {
+  const innerRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const resize = (el: HTMLTextAreaElement | null) => {
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  };
+
+  useEffect(() => {
+    resize(innerRef.current);
+  }, [value]);
+
+  return (
+    <Textarea
+      {...props}
+      rows={2}
+      value={value}
+      ref={(node) => {
+        innerRef.current = node;
+        if (textareaRef) textareaRef.current = node;
+      }}
+      className="resize-none overflow-hidden"
+      onInput={(e) => resize(e.currentTarget)}
+    />
+  );
+}
+
 
 function Page() {
   const { eventId } = Route.useParams();
