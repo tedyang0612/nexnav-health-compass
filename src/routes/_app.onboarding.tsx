@@ -217,8 +217,8 @@ function OnboardingPage() {
 
       {step === 1 ? (
         <SectionCard
-          title="步驟 1／2：基本健康檔案"
-          description="這些資訊用於整理您的個人紀錄。"
+          title="步驟 1：基本健康檔案"
+          description="這些資訊將用於建立您的個人檔案。"
         >
           <form
             noValidate
