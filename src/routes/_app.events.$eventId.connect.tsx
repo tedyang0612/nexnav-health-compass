@@ -112,7 +112,7 @@ function Page() {
           <label className="grid gap-1.5 text-sm font-medium">
             位置
             <input
-              className="min-h-11 rounded-lg border border-border bg-surface px-3 font-normal"
+              className="min-h-11 w-full rounded-lg border border-border bg-surface px-3 font-normal"
               value={location}
               onChange={(event) => setLocation(event.target.value)}
               placeholder="輸入地點或捷運站"
@@ -120,25 +120,25 @@ function Page() {
           </label>
           <label className="grid gap-1.5 text-sm font-medium">
             搜尋類型
-            <select className="min-h-11 rounded-lg border border-border bg-surface px-3 font-normal" value={placeType} onChange={(event) => { setPlaceType(event.target.value); setShowAll(false); }}>
+            <select className="min-h-11 w-full rounded-lg border border-border bg-surface px-3 font-normal" value={placeType} onChange={(event) => { setPlaceType(event.target.value); setShowAll(false); }}>
               <option>全部</option>
               <option>醫院</option>
               <option>診所</option>
             </select>
           </label>
-          <Button type="submit" className="min-h-11"><Search className="mr-2 size-4" />搜尋</Button>
+          <Button type="submit" className="min-h-11 w-full sm:w-auto"><Search className="mr-2 size-4" />搜尋</Button>
         </form>
         <p className="mt-3 text-sm text-muted-foreground">更換位置後，將前往 Google Maps 查看該地點的即時搜尋結果。</p>
       </section>
 
       <section aria-labelledby="connect-results" className="space-y-4">
-        <div className="flex items-end justify-between gap-3">
-          <div>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className="min-w-0">
             <h2 id="connect-results" className="text-xl font-semibold">結果</h2>
             <p className="text-sm text-muted-foreground">共 {ranked.length} 筆。</p>
           </div>
           <label className="flex shrink-0 items-center gap-2 text-sm sm:hidden">排序
-            <select className="h-9 rounded-lg border border-border bg-surface px-2.5 text-sm" value={sort} onChange={(event) => setSort(event.target.value as "match" | "distance")}>
+            <select className="h-9 max-w-[9rem] rounded-lg border border-border bg-surface px-2.5 text-sm" value={sort} onChange={(event) => setSort(event.target.value as "match" | "distance")}>
               <option value="match">符合程度</option><option value="distance">距離優先</option>
             </select>
           </label>
@@ -160,24 +160,24 @@ function Page() {
 
         <div className="space-y-3">
           {visible.map((facility, index) => (
-            <article key={facility.id} className="rounded-xl border border-border bg-card p-4 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-5">
+            <article key={facility.id} className="overflow-hidden rounded-xl border border-border bg-card p-4 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-5">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs text-muted-foreground">#{index + 1}</span>
-                  <h3 className="font-semibold">{facility.name}</h3>
+                  <h3 className="min-w-0 break-words font-semibold">{facility.name}</h3>
                   <span className="rounded-full bg-muted px-2 py-0.5 text-xs">{facility.specialty}</span>
                   <span className={`${facility.openToday
-                    ? "rounded-full border border-emerald-600 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800"
-                    : "rounded-full border border-amber-500 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:border-amber-400 dark:bg-amber-950/40 dark:text-amber-200"
+                    ? "rounded-full border border-emerald-600 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800 dark:border-emerald-400 dark:bg-emerald-950/40 dark:text-emerald-200"
+                    : "rounded-full border border-caution bg-caution-muted px-2.5 py-1 text-xs font-semibold text-caution-strong"
                   } hidden sm:inline-flex`}>{facility.openToday ? "今日有看診" : "今日休診"}</span>
                 </div>
-                <p className="mt-2 flex flex-wrap items-center gap-1 text-sm text-muted-foreground"><MapPin className="size-4" /> 約 <strong className="font-semibold text-primary">{facility.distanceKm.toFixed(1)} km</strong><span aria-hidden="true">・</span>{facility.area}<span className={`${facility.openToday
-                    ? "rounded-full border border-emerald-600 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800"
-                    : "rounded-full border border-amber-500 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:border-amber-400 dark:bg-amber-950/40 dark:text-amber-200"
+                <p className="mt-2 flex flex-wrap items-center gap-1 text-sm text-muted-foreground"><MapPin className="size-4 shrink-0" /> 約 <strong className="font-semibold text-primary">{facility.distanceKm.toFixed(1)} km</strong><span aria-hidden="true">・</span>{facility.area}<span className={`${facility.openToday
+                    ? "rounded-full border border-emerald-600 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800 dark:border-emerald-400 dark:bg-emerald-950/40 dark:text-emerald-200"
+                    : "rounded-full border border-caution bg-caution-muted px-2.5 py-1 text-xs font-semibold text-caution-strong"
                   } ml-1 inline-flex sm:hidden`}>{facility.openToday ? "今日有看診" : "今日休診"}</span></p>
               </div>
-              <Button asChild variant="outline" className="mt-3 min-h-11 w-full sm:mt-0 sm:w-auto">
-                <a href={mapsUrl(`${DEFAULT_LOCATION} ${facility.specialty}`)} target="_blank" rel="noreferrer">在 Google Maps 中顯示 <GoogleMapsIcon className="ml-2 size-4" /></a>
+              <Button asChild variant="outline" className="mt-3 min-h-11 w-full shrink-0 sm:mt-0 sm:w-auto">
+                <a href={mapsUrl(`${DEFAULT_LOCATION} ${facility.specialty}`)} target="_blank" rel="noreferrer">在 Google Maps 中顯示 <GoogleMapsIcon className="ml-2 h-4 w-auto" /></a>
               </Button>
             </article>
           ))}
@@ -193,12 +193,6 @@ function Page() {
 }
 
 function GoogleMapsIcon({ className }: { className?: string }) {
-  return (
-    <img
-      className={className}
-      src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico"
-      alt=""
-      aria-hidden="true"
-    />
-  );
+  return <img className={className} src="/google-maps.svg" alt="" aria-hidden="true" />;
 }
+

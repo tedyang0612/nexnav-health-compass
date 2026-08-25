@@ -42,6 +42,10 @@ export const Route = createFileRoute("/_app/events/$eventId/navigate")({
 const PAGE_TITLE = "就醫與專業協助";
 const PAGE_DESCRIPTION = "依目前紀錄，提供一般性的就醫與專業協助方向。";
 
+function GoogleMapsIcon({ className }: { className?: string }) {
+  return <img className={className} src="/google-maps.svg" alt="" aria-hidden="true" />;
+}
+
 function BackToEvents() {
   return (
     <Button asChild variant="outline" className="min-h-11">
@@ -156,17 +160,16 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
       {result !== "priority_care" ? (
         <>
           <SectionCard title="可以從哪裡開始" description="以下為一般性方向，不是個人化醫療建議。">
-            <ul>
+            <ul className="grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
               {START_POINTS.map((item) => (
                 <li
                   key={item}
-                  className="flex gap-2 py-1.5 text-sm font-medium text-foreground first:pt-0 last:pb-0"
+                  className="flex min-w-0 gap-2 text-sm font-medium text-foreground"
                 >
-                  <span
-                    aria-hidden="true"
-                    className="mt-2 size-1.5 shrink-0 rounded-full bg-primary"
-                  />
-                  <span>{item}</span>
+                  <span aria-hidden="true" className="shrink-0 text-primary">
+                    ◆
+                  </span>
+                  <span className="min-w-0 break-words">{item}</span>
                 </li>
               ))}
             </ul>
@@ -174,9 +177,13 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
 
           <SectionCard
             title="哪些情況可考慮尋求專業協助"
-            description="以下提供常見的諮詢方向參考，系統並未判定你需要其中任何一項服務。"
+            description={
+              <span className="mt-2 block">
+                以下提供常見的諮詢方向參考，系統並未判定你需要其中任何一項服務。
+              </span>
+            }
           >
-            <ul className="divide-y divide-border">
+            <ul className="mt-2 divide-y divide-border">
               {SUPPORT_OPTIONS.map((option) => (
                 <li key={option.topic} className="py-3 first:pt-0 last:pb-0">
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
@@ -196,6 +203,7 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
           </SectionCard>
         </>
       ) : null}
+
 
       <SectionCard title="目前紀錄摘要">
         <dl className="grid gap-4 sm:grid-cols-2">
@@ -237,9 +245,13 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
         </div>
       </SectionCard>
 
-      <SectionCard title="建立摘要" description="整理目前紀錄，方便與專業人員溝通。">
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Button asChild className="min-h-11 w-full sm:w-auto">
+      <SectionCard
+        title="建立摘要"
+        description="整理目前紀錄，方便與專業人員溝通。"
+        className="gap-3"
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Button asChild className="min-h-11 w-full">
             <Link
               to="/events/$eventId/summary/new"
               params={{ eventId }}
@@ -249,7 +261,7 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
             </Link>
           </Button>
           {result !== "priority_care" ? (
-            <Button asChild variant="outline" className="min-h-11 w-full sm:w-auto">
+            <Button asChild variant="outline" className="min-h-11 w-full">
               <Link
                 to="/events/$eventId/summary/new"
                 params={{ eventId }}
@@ -262,16 +274,15 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
         </div>
       </SectionCard>
 
-      <SectionCard
-        title="尋找附近醫療院所"
-        description="以南京復興捷運站為中心，查看 5 公里內的醫療院所清單。"
-      >
+      <SectionCard title="尋找附近醫療資源" className="gap-3">
         <Button asChild className="min-h-11 w-full sm:w-auto">
           <Link to="/events/$eventId/connect" params={{ eventId }}>
-            查看附近院所
+            查看地圖
+            <GoogleMapsIcon className="ml-2 size-4" />
           </Link>
         </Button>
       </SectionCard>
+
 
       <p className="text-sm text-muted-foreground">{NAVIGATE_DISCLAIMER}</p>
     </PageContainer>

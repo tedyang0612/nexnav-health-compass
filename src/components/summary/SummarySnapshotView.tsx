@@ -10,7 +10,7 @@ import {
   MISMATCH_NOTICE,
   safetyLines,
   subjectiveLabel,
-  SUMMARY_TYPE_LABEL,
+  
   type SnapshotTrack,
   type SummarySnapshot,
 } from "@/lib/summary";
@@ -49,9 +49,10 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const overview = (
     <SectionCard title="狀況重點" className="gap-5">
       <dl className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <MetricCell label="主要不適">
+        <MetricCell label="主要不適" emphasis>
           {snapshot.event.primary_symptom_label ?? "未記錄"}
         </MetricCell>
+
         <MetricCell label="追蹤期間">
           {stats.hasTracks
             ? `${formatTaipeiDate(stats.firstTrackDate)}－${formatTaipeiDate(stats.latestTrackDate)}`
@@ -168,42 +169,45 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
           {visibleTrackDetails.map((track) => (
             <li
               key={track.track_id}
-              className="space-y-2 rounded-lg border border-border bg-surface p-3"
+              className="space-y-2 overflow-hidden rounded-lg border border-border bg-surface p-3"
             >
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
-                <p className="text-sm font-semibold text-foreground">
-                  {formatTaipeiDate(track.track_date)}
-                </p>
-                <p className="text-sm text-foreground">
-                  <span className="text-muted-foreground">困擾程度</span>{" "}
-                  <span className="font-medium">{track.severity}/10</span>
-                </p>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.3fr)_minmax(0,1fr)] sm:items-start sm:gap-4">
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground">日期</p>
+                  <p className="text-sm font-semibold text-foreground">
+                    {formatTaipeiDate(track.track_date)}
+                  </p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground">困擾程度</p>
+                  <p className="text-sm font-medium text-foreground">{track.severity}/10</p>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground">出現頻率</p>
+                  <FrequencyValue
+                    level={track.frequency_level}
+                    wording={
+                      track.frequency_label ?? frequencyLabel(track.frequency_level) ?? "未填寫"
+                    }
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground">自覺變化</p>
+                  <p className="break-words text-sm text-foreground">
+                    {track.subjective_change_label ??
+                      subjectiveLabel(track.subjective_change) ??
+                      "未填寫"}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">出現頻率</p>
-                <FrequencyValue
-                  level={track.frequency_level}
-                  wording={
-                    track.frequency_label ??
-                    frequencyLabel(track.frequency_level) ??
-                    "未填寫"
-                  }
-                />
-              </div>
-              <p className="text-sm text-foreground">
-                <span className="text-muted-foreground">自覺變化：</span>
-                {track.subjective_change_label ??
-                  subjectiveLabel(track.subjective_change) ??
-                  "未填寫"}
-              </p>
               {track.frequency_description?.trim() ? (
-                <p className="text-sm text-foreground">
+                <p className="break-words text-sm text-foreground">
                   <span className="text-muted-foreground">頻率補充：</span>
                   {track.frequency_description.trim()}
                 </p>
               ) : null}
               {(track.actions_tried?.length ?? 0) > 0 ? (
-                <p className="text-sm text-foreground">
+                <p className="break-words text-sm text-foreground">
                   <span className="font-medium">已嘗試的調整：</span>
                   {track.actions_tried?.map((action) => action.title).join("、")}
                 </p>
@@ -224,6 +228,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
       ) : null}
     </SectionCard>
   );
+
 
   const backgroundCard =
     background.length > 0 ? (
@@ -273,10 +278,8 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
 
   return (
     <div className="space-y-4">
-      <p className="text-sm font-medium text-muted-foreground">
-        {SUMMARY_TYPE_LABEL[snapshot.summary_type]}
-      </p>
       {isProfessional ? (
+
         <>
           {targetCard}
           {overview}
@@ -320,11 +323,27 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   );
 }
 
-function MetricCell({ label, children }: { label: string; children: React.ReactNode }) {
+function MetricCell({
+  label,
+  children,
+  emphasis = false,
+}: {
+  label: string;
+  children: React.ReactNode;
+  emphasis?: boolean;
+}) {
   return (
     <div className="min-w-0 rounded-lg border border-border bg-surface p-3">
       <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="mt-1 break-words text-sm font-semibold text-foreground">{children}</dd>
+      <dd
+        className={
+          emphasis
+            ? "mt-2 break-words text-base font-semibold text-foreground"
+            : "mt-1 break-words text-sm font-semibold text-foreground"
+        }
+      >
+        {children}
+      </dd>
     </div>
   );
 }
