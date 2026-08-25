@@ -88,9 +88,19 @@ export function ActiveEventCard({ event }: { event: ActiveEventItem }) {
           {STAGES.map((stage, index) => {
             const done = index < current;
             const active = index === current;
+            const isLast = index === STAGES.length - 1;
             return (
               <li key={stage} className="flex min-w-0 flex-col items-center gap-1.5">
-                <span
+                <span className="relative flex w-full items-center justify-center">
+                  {!isLast ? (
+                    <span
+                      aria-hidden="true"
+                      className={`pointer-events-none absolute top-1/2 left-[calc(50%+1.125rem)] -z-0 h-0.5 w-[calc(100%-2.25rem+0.5rem)] -translate-y-1/2 rounded-full ${
+                        done ? "bg-heal" : "bg-border"
+                      }`}
+                    />
+                  ) : null}
+                  <span
                   className={`flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${
                     done
                       ? "border-heal bg-heal-muted text-heal"
