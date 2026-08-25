@@ -241,9 +241,13 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
         </div>
       </SectionCard>
 
-      <SectionCard title="建立摘要" description="整理目前紀錄，方便與專業人員溝通。">
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Button asChild className="min-h-11 w-full sm:w-auto">
+      <SectionCard
+        title="建立摘要"
+        description="整理目前紀錄，方便與專業人員溝通。"
+        className="gap-3"
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Button asChild className="min-h-11 w-full">
             <Link
               to="/events/$eventId/summary/new"
               params={{ eventId }}
@@ -253,7 +257,7 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
             </Link>
           </Button>
           {result !== "priority_care" ? (
-            <Button asChild variant="outline" className="min-h-11 w-full sm:w-auto">
+            <Button asChild variant="outline" className="min-h-11 w-full">
               <Link
                 to="/events/$eventId/summary/new"
                 params={{ eventId }}
@@ -266,16 +270,15 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
         </div>
       </SectionCard>
 
-      <SectionCard
-        title="尋找附近醫療院所"
-        description="以南京復興捷運站為中心，查看 5 公里內的醫療院所清單。"
-      >
+      <SectionCard title="尋找附近醫療資源" className="gap-3">
         <Button asChild className="min-h-11 w-full sm:w-auto">
           <Link to="/events/$eventId/connect" params={{ eventId }}>
-            查看附近院所
+            查看地圖
+            <GoogleMapsIcon className="ml-2 size-4" />
           </Link>
         </Button>
       </SectionCard>
+
 
       <p className="text-sm text-muted-foreground">{NAVIGATE_DISCLAIMER}</p>
     </PageContainer>
