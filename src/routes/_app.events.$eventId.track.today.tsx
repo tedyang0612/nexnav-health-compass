@@ -142,7 +142,7 @@ function Page() {
   const refs = {
     severity: useRef<HTMLDivElement | null>(null),
     frequencyLevel: useRef<HTMLInputElement | null>(null),
-    frequencyDescription: useRef<HTMLInputElement | null>(null),
+    frequencyDescription: useRef<HTMLTextAreaElement | null>(null),
     subjectiveChange: useRef<HTMLInputElement | null>(null),
     sleep: useRef<HTMLInputElement | null>(null),
     diet: useRef<HTMLInputElement | null>(null),
