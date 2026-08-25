@@ -522,14 +522,7 @@ function Page() {
       {/* Section 3：改善建議 */}
       {showSuggestions ? (
         <SectionCard
-          title={
-            <span className="inline-flex items-center gap-2">
-              已嘗試的調整
-              <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                選填
-              </span>
-            </span>
-          }
+          title="已嘗試的調整（選填）"
           description="可勾選本次有實際嘗試的項目。"
         >
           <div className="grid gap-2 sm:grid-cols-3">
@@ -541,11 +534,11 @@ function Page() {
                 <input
                   type="checkbox"
                   ref={index === 0 ? refs.suggestionExecution : undefined}
-                  className="mt-0.5 h-4 w-4 accent-primary"
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
                   checked={values.suggestionExecution.includes(suggestion.code)}
                   onChange={() => toggleSuggestion(suggestion.code)}
                 />
-                <span className="min-w-0">{suggestion.title}</span>
+                <span className="min-w-0 leading-relaxed">{suggestion.title}</span>
               </label>
             ))}
           </div>
@@ -554,25 +547,22 @@ function Page() {
       ) : null}
 
       {/* Section 4：補充紀錄 */}
-      <SectionCard
-        title={
-          <span className="inline-flex items-center gap-2">
-            補充紀錄
-            <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-              選填
-            </span>
-          </span>
-        }
-        description="記下其他想補充的狀況。"
-      >
+      <SectionCard description="記下其他想補充的狀況。">
         <div className="space-y-1.5">
-          <label htmlFor="daily-notes" className="text-sm font-medium text-foreground">
-            其他想記錄的內容
-          </label>
-          <Textarea
+          <div className="flex items-baseline justify-between gap-3">
+            <label htmlFor="daily-notes" className="text-sm font-medium text-foreground">
+              補充紀錄（選填）
+            </label>
+            <span
+              id="daily-notes-hint"
+              className="shrink-0 text-xs tabular-nums text-muted-foreground"
+            >
+              {values.notes.length} / {NOTES_MAX}
+            </span>
+          </div>
+          <AutoGrowTextarea
             id="daily-notes"
-            ref={refs.notes}
-            rows={5}
+            textareaRef={refs.notes}
             maxLength={NOTES_MAX}
             value={values.notes}
             placeholder="例如：今天不適較明顯的時間、活動或其他想記錄的變化"
@@ -580,16 +570,18 @@ function Page() {
             aria-invalid={!!errors.notes || undefined}
             aria-describedby="daily-notes-hint"
           />
-          <p id="daily-notes-hint" className="text-xs text-muted-foreground">
-            {values.notes.length} / {NOTES_MAX} 個字元
-          </p>
           <FieldError id="daily-notes-error" message={errors.notes} />
         </div>
 
         <div className="space-y-3 pt-2">
-          <PrimaryCta onClick={handleSave} disabled={saveMutation.isPending}>
+          <PrimaryCta
+            className="min-h-13 rounded-xl sm:min-w-64"
+            onClick={handleSave}
+            disabled={saveMutation.isPending}
+          >
             {ctaLabel}
           </PrimaryCta>
+
           {successMessage ? (
             <section
               role="status"
