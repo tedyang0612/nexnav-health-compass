@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
+import { ArrowRight, Check, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { SymptomIcon } from "@/lib/symptom-icons";
 import { formatDisplayDate } from "@/lib/event-wizard";
 import type { ActiveEventItem } from "@/hooks/useActiveEvents";
 import type { EventNextStepState } from "@/lib/event-next-step";
@@ -26,55 +28,123 @@ const CTA_CLASSES: Record<EventNextStepState, string> = {
     "border-2 border-heal bg-transparent text-heal hover:bg-heal-muted",
 };
 
+const STAGES = ["狀況確認", "改善方向", "每日追蹤", "追蹤變化"] as const;
 
-/** Dashboard active event card：依 Safety、Guide 與今日 Track 狀態顯示真正的下一步。 */
+/** 依下一步狀態推導健康導航進度（不改動既有狀態判斷邏輯）。 */
+function stageIndex(state: EventNextStepState): number {
+  switch (state) {
+    case "safety_incomplete":
+      return 0;
+    case "priority_care":
+    case "attention":
+    case "guide_pending":
+      return 1;
+    case "track_pending":
+      return 2;
+    case "track_complete":
+      return 3;
+  }
+}
+
+/** Dashboard active event card：症狀資訊、健康導航進度與建議下一步。 */
 export function ActiveEventCard({ event }: { event: ActiveEventItem }) {
   const { nextStep } = event;
   const displayStartedOn = formatDisplayDate(event.startedOn);
-  const mobileStartedOn = displayStartedOn.replace(/^\d{4}\//, "");
-  const latestDesktopLabel =
-    event.latestSeverity === null ? null : `最新困擾程度 ${event.latestSeverity}/10`;
-  const latestMobileLabel =
-    event.latestSeverity === null ? null : `困擾 ${event.latestSeverity}/10`;
-  const mobileCtaLabel =
-    nextStep.state === "priority_care" || nextStep.state === "attention"
-      ? "查看專業協助"
-      : nextStep.ctaLabel;
+  const current = stageIndex(nextStep.state);
+  const isUrgent = nextStep.state === "priority_care";
 
   return (
-    <Card className="gap-3 border-border bg-surface-elevated p-5 sm:grid sm:grid-cols-[minmax(0,1.35fr)_minmax(10rem,0.8fr)_auto] sm:items-center sm:gap-6 sm:p-6">
-      <div className="min-w-0 sm:space-y-1">
-        <div className="flex items-center justify-between gap-3 sm:block">
-          <h3 className="min-w-0 break-words text-lg font-semibold text-foreground">
+    <Card className="w-full gap-0 overflow-hidden border-border bg-surface-elevated p-5 sm:p-6">
+      {/* 頂部資訊列 */}
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:gap-4">
+        <SymptomIcon code={event.symptomCode} />
+        <div className="min-w-0">
+          <h3 className="text-base font-semibold break-words text-foreground sm:text-lg">
             {event.primarySymptomLabel}
           </h3>
-          <p className="shrink-0 whitespace-nowrap text-sm text-muted-foreground sm:hidden">
-            {mobileStartedOn} · {event.trackCount}筆
-            {latestMobileLabel ? ` · ${latestMobileLabel}` : ""}
+          <p className="mt-0.5 text-sm break-words text-muted-foreground">
+            開始日期 {displayStartedOn}．累計追蹤 {event.trackCount} 筆
+            {event.latestSeverity === null
+              ? ""
+              : `．最新困擾程度 ${event.latestSeverity}/10`}
           </p>
         </div>
-        <p className="hidden text-sm text-muted-foreground sm:block">
-          開始日期 {displayStartedOn}．累計追蹤 {event.trackCount} 筆
-          {latestDesktopLabel ? `．${latestDesktopLabel}` : ""}
-        </p>
-      </div>
-
-      <div className="flex items-center justify-between gap-2 sm:contents">
         <p
-          className={`inline-flex w-fit min-w-0 items-center rounded-full border px-3 py-1 text-xs font-medium ${STATUS_CLASSES[nextStep.state]}`}
+          className={`col-span-2 inline-flex w-fit items-center rounded-full border px-3 py-1 text-xs font-medium sm:col-span-1 ${STATUS_CLASSES[nextStep.state]}`}
         >
           {nextStep.statusLabel}
         </p>
+      </div>
+
+      {/* 健康導航進度 */}
+      <div className="mt-5 rounded-xl border border-border/70 bg-surface p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm font-semibold text-foreground">健康導航進度</p>
+          <p className="text-xs text-muted-foreground">
+            目前：{STAGES[current]}
+          </p>
+        </div>
+        <ol className="mt-3 grid grid-cols-4 gap-2">
+          {STAGES.map((stage, index) => {
+            const done = index < current;
+            const active = index === current;
+            return (
+              <li key={stage} className="flex min-w-0 flex-col items-center gap-1.5">
+                <span
+                  className={`flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold ${
+                    done
+                      ? "border-heal bg-heal-muted text-heal"
+                      : active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-surface-elevated text-muted-foreground"
+                  }`}
+                >
+                  {done ? <Check className="size-4" aria-hidden="true" /> : index + 1}
+                </span>
+                <span
+                  className={`w-full text-center text-[11px] leading-tight break-keep sm:text-xs ${
+                    active
+                      ? "font-semibold text-primary"
+                      : done
+                        ? "text-heal"
+                        : "text-muted-foreground"
+                  }`}
+                >
+                  {stage}
+                </span>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+
+      {/* 建議下一步 */}
+      <div className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        <div className="flex min-w-0 items-start gap-3">
+          <span
+            className={`mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full ${
+              isUrgent ? "bg-urgent-muted text-urgent-strong" : "bg-primary/10 text-primary"
+            }`}
+          >
+            <Compass className="size-4" aria-hidden="true" />
+          </span>
+          <div className="min-w-0">
+            <p className="text-xs font-medium text-muted-foreground">建議下一步</p>
+            <p className="text-sm font-medium break-words text-foreground">
+              {nextStep.ctaLabel}
+            </p>
+          </div>
+        </div>
 
         <Button
           asChild
           size="lg"
           variant={nextStep.state === "track_complete" ? "outline" : "default"}
-          className={`min-h-11 shrink-0 ${CTA_CLASSES[nextStep.state]}`}
+          className={`min-h-11 w-full sm:w-auto ${CTA_CLASSES[nextStep.state]}`}
         >
           <Link to={nextStep.to} params={{ eventId: event.id }}>
-            <span className="sm:hidden">{mobileCtaLabel}</span>
-            <span className="hidden sm:inline">{nextStep.ctaLabel}</span>
+            <span className="truncate">{nextStep.ctaLabel}</span>
+            <ArrowRight className="size-4 shrink-0" aria-hidden="true" />
           </Link>
         </Button>
       </div>
