@@ -3,7 +3,14 @@ import { cn } from "@/lib/utils";
 
 /** 固定順序的狀況歷程導覽（不含 workflow gate）。 */
 export const EVENT_JOURNEY = [
-  { to: "/events/$eventId", label: "狀況總覽", en: "Overview", short: "狀況總覽", exact: true },
+  { to: "/events/$eventId", label: "記錄不適", en: "Record", short: "記錄不適", exact: true },
+  {
+    to: "/events/$eventId/safety",
+    label: "安全確認",
+    en: "Safety",
+    short: "安全確認",
+    exact: false,
+  },
   { to: "/events/$eventId/guide", label: "改善方向", en: "Guide", short: "改善方向", exact: false },
   {
     to: "/events/$eventId/track/today",
@@ -12,6 +19,7 @@ export const EVENT_JOURNEY = [
     short: "每日追蹤",
     exact: false,
   },
+
   {
     to: "/events/$eventId/reassess",
     label: "追蹤變化",
