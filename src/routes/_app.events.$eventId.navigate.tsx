@@ -42,6 +42,10 @@ export const Route = createFileRoute("/_app/events/$eventId/navigate")({
 const PAGE_TITLE = "就醫與專業協助";
 const PAGE_DESCRIPTION = "依目前紀錄，提供一般性的就醫與專業協助方向。";
 
+function GoogleMapsIcon({ className }: { className?: string }) {
+  return <img className={className} src="/google-maps.svg" alt="" aria-hidden="true" />;
+}
+
 function BackToEvents() {
   return (
     <Button asChild variant="outline" className="min-h-11">
