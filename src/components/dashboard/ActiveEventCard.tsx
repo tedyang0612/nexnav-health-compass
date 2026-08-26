@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Compass } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SymptomIcon } from "@/lib/symptom-icons";
@@ -61,7 +61,6 @@ export function ActiveEventCard({ event }: { event: ActiveEventItem }) {
   const { nextStep } = event;
   const displayStartedOn = formatDisplayDate(event.startedOn);
   const current = stageIndex(nextStep.state);
-  const isUrgent = nextStep.state === "priority_care";
 
   return (
     <Card className="w-full gap-0 overflow-hidden border-border bg-surface-elevated p-5 sm:p-6">
