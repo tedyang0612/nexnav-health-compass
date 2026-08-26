@@ -30,6 +30,16 @@ const CTA_CLASSES: Record<EventNextStepState, string> = {
 
 const STAGES = ["狀況確認", "改善方向", "每日追蹤", "追蹤變化"] as const;
 
+/** next-step 狀態 → 建議下一步官方 SVG（含淡色圓底，外層不再加底色）。 */
+const NEXT_STEP_ICON_SRC: Record<EventNextStepState, string> = {
+  safety_incomplete: "/icons/next-step/complete_status_check.svg",
+  priority_care: "/icons/next-step/view_professional_support.svg",
+  attention: "/icons/next-step/view_professional_support.svg",
+  guide_pending: "/icons/next-step/view_improvement_guide.svg",
+  track_pending: "/icons/next-step/start_daily_tracking.svg",
+  track_complete: "/icons/next-step/view_tracking_changes.svg",
+};
+
 /** 依下一步狀態推導健康導航進度（不改動既有狀態判斷邏輯）。 */
 function stageIndex(state: EventNextStepState): number {
   switch (state) {
