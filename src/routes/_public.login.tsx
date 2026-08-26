@@ -125,15 +125,16 @@ function LoginPage() {
 
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-6 rounded-2xl border border-border bg-card p-8 shadow-card">
+      <div className="nexnav-auth-card w-full max-w-md space-y-6 rounded-2xl p-8">
         <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          <h1 className="text-2xl font-semibold tracking-tight">
             登入 NexNav
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="nexnav-auth-muted text-sm">
             使用您的 Email 與密碼登入。
           </p>
         </div>
+
 
         {formError && (
           <div
@@ -225,7 +226,7 @@ function LoginPage() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="nexnav-auth-muted text-center text-sm">
           還沒有帳號？{" "}
           <Link
             to="/register"
