@@ -335,7 +335,7 @@ function SafetySection({ eventId, result }: { eventId: string; result: SafetyRes
                 variant="outline"
                 className="min-h-11 border-urgent text-urgent-strong hover:bg-urgent-muted"
               >
-                <Link to="/events/$eventId/safety" params={{ eventId }}>
+                <Link to="/events/$eventId/safety/edit" params={{ eventId }}>
                   重新確認目前狀況
                 </Link>
               </Button>
@@ -374,7 +374,7 @@ function SafetySection({ eventId, result }: { eventId: string; result: SafetyRes
                 variant="outline"
                 className="min-h-11 border-caution text-caution-strong hover:bg-caution-muted"
               >
-                <Link to="/events/$eventId/safety" params={{ eventId }}>
+                <Link to="/events/$eventId/safety/edit" params={{ eventId }}>
                   重新確認目前狀況
                 </Link>
               </Button>
