@@ -27,6 +27,7 @@ import { Route as AppEventsEventIdGuideRouteImport } from './routes/_app.events.
 import { Route as AppEventsEventIdNavigateRouteImport } from './routes/_app.events.$eventId.navigate'
 import { Route as AppEventsEventIdReassessRouteImport } from './routes/_app.events.$eventId.reassess'
 import { Route as AppEventsEventIdSafetyRouteImport } from './routes/_app.events.$eventId.safety'
+import { Route as AppEventsEventIdSafetyEditRouteImport } from './routes/_app.events.$eventId.safety_.edit'
 import { Route as AppEventsEventIdSummaryNewRouteImport } from './routes/_app.events.$eventId.summary.new'
 import { Route as AppEventsEventIdTrackTodayRouteImport } from './routes/_app.events.$eventId.track.today'
 
@@ -120,6 +121,12 @@ const AppEventsEventIdSafetyRoute = AppEventsEventIdSafetyRouteImport.update({
   path: '/safety',
   getParentRoute: () => AppEventsEventIdRoute,
 } as any)
+const AppEventsEventIdSafetyEditRoute =
+  AppEventsEventIdSafetyEditRouteImport.update({
+    id: '/safety_/edit',
+    path: '/safety/edit',
+    getParentRoute: () => AppEventsEventIdRoute,
+  } as any)
 const AppEventsEventIdSummaryNewRoute =
   AppEventsEventIdSummaryNewRouteImport.update({
     id: '/summary/new',
@@ -150,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/events/$eventId/reassess': typeof AppEventsEventIdReassessRoute
   '/events/$eventId/safety': typeof AppEventsEventIdSafetyRoute
   '/events/$eventId/': typeof AppEventsEventIdIndexRoute
+  '/events/$eventId/safety/edit': typeof AppEventsEventIdSafetyEditRoute
   '/events/$eventId/summary/new': typeof AppEventsEventIdSummaryNewRoute
   '/events/$eventId/track/today': typeof AppEventsEventIdTrackTodayRoute
 }
@@ -169,6 +177,7 @@ export interface FileRoutesByTo {
   '/events/$eventId/reassess': typeof AppEventsEventIdReassessRoute
   '/events/$eventId/safety': typeof AppEventsEventIdSafetyRoute
   '/events/$eventId': typeof AppEventsEventIdIndexRoute
+  '/events/$eventId/safety/edit': typeof AppEventsEventIdSafetyEditRoute
   '/events/$eventId/summary/new': typeof AppEventsEventIdSummaryNewRoute
   '/events/$eventId/track/today': typeof AppEventsEventIdTrackTodayRoute
 }
@@ -192,6 +201,7 @@ export interface FileRoutesById {
   '/_app/events/$eventId/reassess': typeof AppEventsEventIdReassessRoute
   '/_app/events/$eventId/safety': typeof AppEventsEventIdSafetyRoute
   '/_app/events/$eventId/': typeof AppEventsEventIdIndexRoute
+  '/_app/events/$eventId/safety_/edit': typeof AppEventsEventIdSafetyEditRoute
   '/_app/events/$eventId/summary/new': typeof AppEventsEventIdSummaryNewRoute
   '/_app/events/$eventId/track/today': typeof AppEventsEventIdTrackTodayRoute
 }
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/events/$eventId/reassess'
     | '/events/$eventId/safety'
     | '/events/$eventId/'
+    | '/events/$eventId/safety/edit'
     | '/events/$eventId/summary/new'
     | '/events/$eventId/track/today'
   fileRoutesByTo: FileRoutesByTo
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/events/$eventId/reassess'
     | '/events/$eventId/safety'
     | '/events/$eventId'
+    | '/events/$eventId/safety/edit'
     | '/events/$eventId/summary/new'
     | '/events/$eventId/track/today'
   id:
@@ -255,6 +267,7 @@ export interface FileRouteTypes {
     | '/_app/events/$eventId/reassess'
     | '/_app/events/$eventId/safety'
     | '/_app/events/$eventId/'
+    | '/_app/events/$eventId/safety_/edit'
     | '/_app/events/$eventId/summary/new'
     | '/_app/events/$eventId/track/today'
   fileRoutesById: FileRoutesById
@@ -392,6 +405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEventsEventIdSafetyRouteImport
       parentRoute: typeof AppEventsEventIdRoute
     }
+    '/_app/events/$eventId/safety_/edit': {
+      id: '/_app/events/$eventId/safety_/edit'
+      path: '/safety/edit'
+      fullPath: '/events/$eventId/safety/edit'
+      preLoaderRoute: typeof AppEventsEventIdSafetyEditRouteImport
+      parentRoute: typeof AppEventsEventIdRoute
+    }
     '/_app/events/$eventId/summary/new': {
       id: '/_app/events/$eventId/summary/new'
       path: '/summary/new'
@@ -417,6 +437,7 @@ interface AppEventsEventIdRouteChildren {
   AppEventsEventIdReassessRoute: typeof AppEventsEventIdReassessRoute
   AppEventsEventIdSafetyRoute: typeof AppEventsEventIdSafetyRoute
   AppEventsEventIdIndexRoute: typeof AppEventsEventIdIndexRoute
+  AppEventsEventIdSafetyEditRoute: typeof AppEventsEventIdSafetyEditRoute
   AppEventsEventIdSummaryNewRoute: typeof AppEventsEventIdSummaryNewRoute
   AppEventsEventIdTrackTodayRoute: typeof AppEventsEventIdTrackTodayRoute
 }
@@ -429,6 +450,7 @@ const AppEventsEventIdRouteChildren: AppEventsEventIdRouteChildren = {
   AppEventsEventIdReassessRoute: AppEventsEventIdReassessRoute,
   AppEventsEventIdSafetyRoute: AppEventsEventIdSafetyRoute,
   AppEventsEventIdIndexRoute: AppEventsEventIdIndexRoute,
+  AppEventsEventIdSafetyEditRoute: AppEventsEventIdSafetyEditRoute,
   AppEventsEventIdSummaryNewRoute: AppEventsEventIdSummaryNewRoute,
   AppEventsEventIdTrackTodayRoute: AppEventsEventIdTrackTodayRoute,
 }
