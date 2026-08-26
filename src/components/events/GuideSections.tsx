@@ -83,7 +83,7 @@ export function GuideSections({ guide, eventId }: { guide: GuideViewModel; event
               <span aria-hidden="true" className="shrink-0 text-xs leading-6 text-heal">
                 ◆
               </span>
-              <span className="min-w-0 leading-relaxed">{item}</span>
+              <span className="min-w-0 font-semibold leading-relaxed">{item}</span>
             </li>
           ))}
         </ul>
