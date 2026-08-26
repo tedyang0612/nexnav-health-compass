@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">其他不適</title>
+  <desc id="desc">三個放大且等距排列的圓點症狀圖示</desc>
+  <defs>
+    <linearGradient id="nexnavGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#318AF3"/>
+      <stop offset="1" stop-color="#08A39C"/>
+    </linearGradient>
+  </defs>
+  <circle cx="128" cy="128" r="116" fill="url(#nexnavGradient)"/>
+  <g fill="#FFFFFF">
+    <circle cx="70" cy="128" r="19"/>
+    <circle cx="128" cy="128" r="19"/>
+    <circle cx="186" cy="128" r="19"/>
+  </g>
+</svg>
