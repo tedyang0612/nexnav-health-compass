@@ -335,7 +335,7 @@ function SymptomRadio({
         checked={checked}
         onChange={onSelect}
       />
-      <SymptomIcon code={option.code} className="size-10" />
+      <SymptomIcon code={option.code} className="size-12" />
       <span className="min-w-0">
         <span className="block break-words font-medium text-foreground">
           {option.display_name}
