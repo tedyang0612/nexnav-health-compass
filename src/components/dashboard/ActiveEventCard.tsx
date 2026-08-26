@@ -141,14 +141,14 @@ export function ActiveEventCard({ event }: { event: ActiveEventItem }) {
 
       {/* 建議下一步 */}
       <div className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-        <div className="flex min-w-0 items-start gap-3">
-          <span
-            className={`mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full ${
-              isUrgent ? "bg-urgent-muted text-urgent-strong" : "bg-primary/10 text-primary"
-            }`}
-          >
-            <Compass className="size-4" aria-hidden="true" />
-          </span>
+        <div className="flex min-w-0 items-center gap-3">
+          <img
+            src={NEXT_STEP_ICON_SRC[nextStep.state]}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            className="size-8 shrink-0 object-contain sm:size-9"
+          />
           <div className="min-w-0">
             <p className="text-xs font-medium text-muted-foreground">建議下一步</p>
             <p className="text-sm font-medium break-words text-foreground">
