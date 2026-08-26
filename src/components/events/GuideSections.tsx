@@ -71,6 +71,7 @@ export function GuideSections({ guide, eventId }: { guide: GuideViewModel; event
           <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
             {content.suggestion_note}
           </p>
+          <SourceLine sources={content.sources} />
         </GuideCard>
       </section>
 
