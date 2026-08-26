@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { SectionCard } from "@/components/shell";
 import { Button } from "@/components/ui/button";
-import type { GuideViewModel } from "@/lib/guide";
+import type { GuideSource, GuideViewModel } from "@/lib/guide";
 
 /** P08 改善方向內容呈現：只顯示已核准 snapshot，不新增任何醫療文案。 */
 export function GuideSections({ guide, eventId }: { guide: GuideViewModel; eventId: string }) {
