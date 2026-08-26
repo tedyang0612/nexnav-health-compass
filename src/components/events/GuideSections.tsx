@@ -145,6 +145,33 @@ export function GuideSections({ guide, eventId }: { guide: GuideViewModel; event
 }
 
 
+/** 區塊底部的既有資料來源列（依 URL 去重，不新增任何內容）。 */
+function SourceLine({ sources }: { sources: GuideSource[] }) {
+  const unique = sources.filter(
+    (source, index) => sources.findIndex((s) => s.url === source.url) === index,
+  );
+  if (unique.length === 0) return null;
+
+  return (
+    <div className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-border pt-3 text-xs text-muted-foreground">
+      <span className="shrink-0">資料來源：</span>
+      {unique.map((source) => (
+        <a
+          key={source.url}
+          href={source.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-w-0 items-start gap-1 break-words rounded-sm text-heal transition-colors hover:underline hover:underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <span className="min-w-0 break-words">{source.title}</span>
+          <ExternalLinkIcon />
+          <span className="sr-only">（在新分頁開啟）</span>
+        </a>
+      ))}
+    </div>
+  );
+}
+
 function GuideCard({ children }: { children: React.ReactNode }) {
   return (
     <SectionCard className="gap-0 border-border/80 p-4 shadow-none sm:p-5">
