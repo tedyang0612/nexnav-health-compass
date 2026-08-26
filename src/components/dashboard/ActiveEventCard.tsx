@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Compass } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SymptomIcon } from "@/lib/symptom-icons";
@@ -30,6 +30,16 @@ const CTA_CLASSES: Record<EventNextStepState, string> = {
 
 const STAGES = ["狀況確認", "改善方向", "每日追蹤", "追蹤變化"] as const;
 
+/** next-step 狀態 → 建議下一步官方 SVG（含淡色圓底，外層不再加底色）。 */
+const NEXT_STEP_ICON_SRC: Record<EventNextStepState, string> = {
+  safety_incomplete: "/icons/next-step/complete_status_check.svg",
+  priority_care: "/icons/next-step/view_professional_support.svg",
+  attention: "/icons/next-step/view_professional_support.svg",
+  guide_pending: "/icons/next-step/view_improvement_guide.svg",
+  track_pending: "/icons/next-step/start_daily_tracking.svg",
+  track_complete: "/icons/next-step/view_tracking_changes.svg",
+};
+
 /** 依下一步狀態推導健康導航進度（不改動既有狀態判斷邏輯）。 */
 function stageIndex(state: EventNextStepState): number {
   switch (state) {
@@ -51,7 +61,6 @@ export function ActiveEventCard({ event }: { event: ActiveEventItem }) {
   const { nextStep } = event;
   const displayStartedOn = formatDisplayDate(event.startedOn);
   const current = stageIndex(nextStep.state);
-  const isUrgent = nextStep.state === "priority_care";
 
   return (
     <Card className="w-full gap-0 overflow-hidden border-border bg-surface-elevated p-5 sm:p-6">
@@ -131,14 +140,14 @@ export function ActiveEventCard({ event }: { event: ActiveEventItem }) {
 
       {/* 建議下一步 */}
       <div className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-        <div className="flex min-w-0 items-start gap-3">
-          <span
-            className={`mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full ${
-              isUrgent ? "bg-urgent-muted text-urgent-strong" : "bg-primary/10 text-primary"
-            }`}
-          >
-            <Compass className="size-4" aria-hidden="true" />
-          </span>
+        <div className="flex min-w-0 items-center gap-3">
+          <img
+            src={NEXT_STEP_ICON_SRC[nextStep.state]}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            className="size-8 shrink-0 object-contain sm:size-9"
+          />
           <div className="min-w-0">
             <p className="text-xs font-medium text-muted-foreground">建議下一步</p>
             <p className="text-sm font-medium break-words text-foreground">
