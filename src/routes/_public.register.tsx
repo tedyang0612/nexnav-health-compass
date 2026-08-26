@@ -158,15 +158,16 @@ function RegisterPage() {
 
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-6 rounded-2xl border border-border bg-card p-8 shadow-card">
+      <div className="nexnav-auth-card w-full max-w-md space-y-6 rounded-2xl p-8">
         <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          <h1 className="text-2xl font-semibold tracking-tight">
             建立 NexNav 帳號
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="nexnav-auth-muted text-sm">
             使用 Email 與密碼建立帳號。
           </p>
         </div>
+
 
         {formError && (
           <div
@@ -233,9 +234,10 @@ function RegisterPage() {
               }
               className={INPUT_CLASS}
             />
-            <p id="password-hint" className="text-xs text-muted-foreground">
+            <p id="password-hint" className="nexnav-auth-muted text-xs">
               密碼至少需要 8 個字元。
             </p>
+
             {errors.password && (
               <p id="password-error" className="text-xs text-destructive">
                 <span aria-hidden="true">⚠ </span>
@@ -294,7 +296,7 @@ function RegisterPage() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="nexnav-auth-muted text-center text-sm">
           已經有帳號？{" "}
           <Link to="/login" className="font-medium text-primary hover:underline">
             登入
