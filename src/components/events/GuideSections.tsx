@@ -41,6 +41,7 @@ export function GuideSections({ guide, eventId }: { guide: GuideViewModel; event
         <p className="mt-4 border-t border-border pt-3 text-xs leading-relaxed text-muted-foreground">
           {content.factors_disclaimer}
         </p>
+        <SourceLine sources={content.sources} />
       </GuideCard>
 
       <section className="space-y-3">
