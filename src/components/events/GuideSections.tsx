@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { SectionCard } from "@/components/shell";
 import { Button } from "@/components/ui/button";
-import type { GuideViewModel } from "@/lib/guide";
+import type { GuideSource, GuideViewModel } from "@/lib/guide";
 
 /** P08 改善方向內容呈現：只顯示已核准 snapshot，不新增任何醫療文案。 */
 export function GuideSections({ guide, eventId }: { guide: GuideViewModel; eventId: string }) {
@@ -41,6 +41,7 @@ export function GuideSections({ guide, eventId }: { guide: GuideViewModel; event
         <p className="mt-4 border-t border-border pt-3 text-xs leading-relaxed text-muted-foreground">
           {content.factors_disclaimer}
         </p>
+        <SourceLine sources={content.sources} />
       </GuideCard>
 
       <section className="space-y-3">
@@ -70,6 +71,7 @@ export function GuideSections({ guide, eventId }: { guide: GuideViewModel; event
           <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
             {content.suggestion_note}
           </p>
+          <SourceLine sources={content.sources} />
         </GuideCard>
       </section>
 
@@ -81,7 +83,7 @@ export function GuideSections({ guide, eventId }: { guide: GuideViewModel; event
               <span aria-hidden="true" className="shrink-0 text-xs leading-6 text-heal">
                 ◆
               </span>
-              <span className="min-w-0 leading-relaxed">{item}</span>
+              <span className="min-w-0 font-semibold leading-relaxed">{item}</span>
             </li>
           ))}
         </ul>
@@ -142,6 +144,33 @@ export function GuideSections({ guide, eventId }: { guide: GuideViewModel; event
   );
 }
 
+
+/** 區塊底部的既有資料來源列（依 URL 去重，不新增任何內容）。 */
+function SourceLine({ sources }: { sources: GuideSource[] }) {
+  const unique = sources.filter(
+    (source, index) => sources.findIndex((s) => s.url === source.url) === index,
+  );
+  if (unique.length === 0) return null;
+
+  return (
+    <div className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-border pt-3 text-xs text-muted-foreground">
+      <span className="shrink-0">資料來源：</span>
+      {unique.map((source) => (
+        <a
+          key={source.url}
+          href={source.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-w-0 items-start gap-1 break-words rounded-sm text-heal transition-colors hover:underline hover:underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <span className="min-w-0 break-words">{source.title}</span>
+          <ExternalLinkIcon />
+          <span className="sr-only">（在新分頁開啟）</span>
+        </a>
+      ))}
+    </div>
+  );
+}
 
 function GuideCard({ children }: { children: React.ReactNode }) {
   return (
