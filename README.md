@@ -1,4 +1,5 @@
 # NexNav Health Navigator
+https://nexnav-health-navigator.lovable.app/
 
 Create a minimal project scaffold for a responsive web application named NexNav.
 
