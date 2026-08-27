@@ -11,6 +11,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useActiveEvents } from "@/hooks/useActiveEvents";
 import { useProfileGate } from "@/hooks/useProfileGate";
 import { ActiveEventCard } from "@/components/dashboard/ActiveEventCard";
+import { ClosedEventsSection } from "@/components/dashboard/ClosedEventsSection";
+import { useClosedEvents } from "@/hooks/useEventLifecycle";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({
@@ -30,6 +32,7 @@ function DashboardPage() {
   const { user } = useAuth();
   const query = useActiveEvents(user?.id);
   const profile = useProfileGate(user?.id);
+  const closedQuery = useClosedEvents(user?.id);
   const displayName =
     profile.data?.display_name?.trim() ||
     user?.email?.split("@")[0]?.trim() ||
@@ -74,6 +77,8 @@ function DashboardPage() {
           ))}
         </div>
       )}
+
+      <ClosedEventsSection events={closedQuery.data ?? []} />
     </PageContainer>
   );
 }

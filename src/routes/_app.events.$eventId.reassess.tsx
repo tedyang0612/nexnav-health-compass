@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { FrequencyDots, ReassessTimeline } from "@/components/events/ReassessTimeline";
 import { SeverityTrendChart } from "@/components/events/SeverityTrendChart";
 import { EventNotFoundError, useReassessData } from "@/hooks/useReassess";
+import { CloseEventSection } from "@/components/events/CloseEventSection";
 import { taipeiToday } from "@/lib/event-wizard";
 import {
   MIN_TRACKS_FOR_TREND,
@@ -365,7 +366,12 @@ function ReassessView({
         <div>
           <BackToEvents />
         </div>
-      ) : null}
+      ) : (
+        <CloseEventSection
+          eventId={eventId}
+          isPriorityCare={currentSafety?.result === "priority_care"}
+        />
+      )}
     </PageContainer>
   );
 }
