@@ -10,6 +10,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { GuideSections } from "@/components/events/GuideSections";
 import { useGuide, useExistingGuide, parseGuideTableRow } from "@/hooks/useGuide";
 import { useGuideSafetyGate } from "@/hooks/useGuideSafetyGate";
+import { useEventStatus } from "@/hooks/useEventLifecycle";
+import { ClosedEventNotice } from "@/components/events/ClosedEventNotice";
 
 
 export const Route = createFileRoute("/_app/events/$eventId/guide")({
@@ -69,6 +71,7 @@ function GuideSkeleton() {
 function Page() {
   const { eventId } = Route.useParams();
   const navigate = useNavigate();
+  const statusQuery = useEventStatus(eventId);
   const gateQuery = useGuideSafetyGate(eventId);
   const existingQuery = useExistingGuide(eventId);
   const safetyResult = gateQuery.data?.currentResult ?? null;
@@ -93,9 +96,14 @@ function Page() {
     }
   })();
 
+  const isClosed =
+    statusQuery.data != null && statusQuery.data.status !== "active";
+
   const guideQuery = useGuide({
     eventId,
     enabled:
+      !isClosed &&
+      statusQuery.isSuccess &&
       gateQuery.isSuccess &&
       safetyResult === "normal" &&
       existingQuery.isSuccess &&
@@ -105,7 +113,16 @@ function Page() {
   const goNavigate = () =>
     void navigate({ to: "/events/$eventId/navigate", params: { eventId } });
 
-  if (gateQuery.isLoading || existingQuery.isLoading) {
+  if (isClosed) {
+    return (
+      <ClosedEventNotice
+        eventId={eventId}
+        description="已結束的狀況無法重新產生改善方向，你仍可查看過去的追蹤紀錄。"
+      />
+    );
+  }
+
+  if (statusQuery.isLoading || gateQuery.isLoading || existingQuery.isLoading) {
     return (
       <PageContainer width="default" className="space-y-5 sm:space-y-6">
         <GuideHeader />

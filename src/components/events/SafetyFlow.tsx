@@ -12,6 +12,7 @@ import {
 } from "@/components/shell";
 import { Button } from "@/components/ui/button";
 import { SafetyQuestionCard } from "@/components/events/SafetyQuestionCard";
+import { ClosedEventNotice } from "@/components/events/ClosedEventNotice";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDisplayDate } from "@/lib/event-wizard";
 import {
@@ -26,6 +27,7 @@ import {
 
 type EventContext = {
   symptomLabel: string;
+  status: string;
   startedOn: string;
   currentRevision: number | null;
   currentResult: SafetyResult | null;
@@ -38,7 +40,7 @@ function useSafetyContext(eventId: string) {
     queryFn: async (): Promise<EventContext | null> => {
       const { data: event, error } = await supabase
         .from("health_events")
-        .select("id, started_on, custom_primary_symptom, symptom_catalog(display_name)")
+        .select("id, started_on, status, custom_primary_symptom, symptom_catalog(display_name)")
         .eq("id", eventId)
         .maybeSingle();
 
@@ -47,6 +49,7 @@ function useSafetyContext(eventId: string) {
 
       const row = event as unknown as {
         started_on: string;
+        status: string;
         custom_primary_symptom: string | null;
         symptom_catalog: { display_name: string } | null;
       };
@@ -78,6 +81,7 @@ function useSafetyContext(eventId: string) {
       }
 
       return {
+        status: row.status,
         symptomLabel:
           row.custom_primary_symptom?.trim() ||
           row.symptom_catalog?.display_name ||
@@ -202,6 +206,16 @@ export function SafetyFlow({
           }
         />
       </PageContainer>
+    );
+  }
+
+  // 已結束的狀況不得執行新的 safety assessment（view / edit 兩種模式皆適用）。
+  if (context.status !== "active") {
+    return (
+      <ClosedEventNotice
+        eventId={eventId}
+        description="已結束的狀況無法重新進行安全確認，你仍可查看過去的追蹤紀錄。"
+      />
     );
   }
 
