@@ -77,6 +77,8 @@ function DashboardPage() {
           ))}
         </div>
       )}
+
+      <ClosedEventsSection events={closedQuery.data ?? []} />
     </PageContainer>
   );
 }
