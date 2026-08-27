@@ -11,6 +11,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useActiveEvents } from "@/hooks/useActiveEvents";
 import { useProfileGate } from "@/hooks/useProfileGate";
 import { ActiveEventCard } from "@/components/dashboard/ActiveEventCard";
+import { ClosedEventsSection } from "@/components/dashboard/ClosedEventsSection";
+import { useClosedEvents } from "@/hooks/useEventLifecycle";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({
