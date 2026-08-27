@@ -32,6 +32,7 @@ function DashboardPage() {
   const { user } = useAuth();
   const query = useActiveEvents(user?.id);
   const profile = useProfileGate(user?.id);
+  const closedQuery = useClosedEvents(user?.id);
   const displayName =
     profile.data?.display_name?.trim() ||
     user?.email?.split("@")[0]?.trim() ||
