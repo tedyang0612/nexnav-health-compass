@@ -366,7 +366,12 @@ function ReassessView({
         <div>
           <BackToEvents />
         </div>
-      ) : null}
+      ) : (
+        <CloseEventSection
+          eventId={eventId}
+          isPriorityCare={currentSafety?.result === "priority_care"}
+        />
+      )}
     </PageContainer>
   );
 }
