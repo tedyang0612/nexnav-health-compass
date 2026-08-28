@@ -349,3 +349,39 @@
 .nexnav-public-header span {
   color: #f5f9ff;
 }
+
+/* ---------- Print / Save as PDF（Ready Summary） ---------- */
+@media print {
+  @page {
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  /* 保留內容用色（例如頻率圓點、警訊色），避免關鍵圖示在 PDF 消失 */
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .shadow-sm,
+  .shadow,
+  .shadow-md,
+  .shadow-lg {
+    box-shadow: none !important;
+  }
+
+  section,
+  li,
+  dl > div {
+    break-inside: avoid;
+  }
+
+  /* 避免桌機表格在 PDF 產生水平 overflow */
+  table {
+    max-width: 100%;
+  }
+}

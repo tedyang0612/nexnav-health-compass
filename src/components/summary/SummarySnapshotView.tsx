@@ -35,11 +35,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const notes = [...(snapshot.selected_track_notes ?? [])].sort((a, b) =>
     b.track_date.localeCompare(a.track_date),
   );
-  const visibleTrackDetails = showAllTrackDetails ? tracks : tracks.slice(0, 5);
   const lifeContextTracks = tracks.filter((track) => hasNumericLifeContext(track.life_context));
-  const visibleLifeContextTracks = showAllLifeContext
-    ? lifeContextTracks
-    : lifeContextTracks.slice(0, 5);
   const questions = snapshot.questions ?? [];
   const background = snapshot.health_background ?? [];
   const associatedSymptoms = (snapshot.initial_record.associated_symptoms ?? [])
@@ -129,7 +125,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const lifeContextCard = hasAnyLifeContext(snapshot.initial_record.life_context, tracks) ? (
     <LifeContextComparison
       initialValues={snapshot.initial_record.life_context}
-      tracks={visibleLifeContextTracks}
+      tracks={lifeContextTracks}
       labels={lifeLabels}
       hiddenCount={Math.max(0, lifeContextTracks.length - 5)}
       expanded={showAllLifeContext}
@@ -166,10 +162,12 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
     >
       {stats.hasTracks ? (
         <ul className="mt-3 space-y-3">
-          {visibleTrackDetails.map((track) => (
+          {tracks.map((track, index) => (
             <li
               key={track.track_id}
-              className="space-y-2 overflow-hidden rounded-lg border border-border bg-surface p-3"
+              className={`space-y-2 overflow-hidden rounded-lg border border-border bg-surface p-3${
+                !showAllTrackDetails && index >= 5 ? " hidden print:list-item" : ""
+              }`}
             >
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.3fr)_minmax(0,1fr)] sm:items-start sm:gap-4">
                 <div className="min-w-0">
@@ -220,7 +218,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
         <Button
           type="button"
           variant="outline"
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto print:hidden"
           onClick={() => setShowAllTrackDetails((current) => !current)}
         >
           {showAllTrackDetails ? "收合至最新 5 筆" : `展開其餘 ${tracks.length - 5} 筆`}
@@ -467,10 +465,14 @@ function LifeContextComparison({
               <th className="sticky left-0 z-10 min-w-24 border-b border-border bg-surface-elevated px-3 py-2 text-xs font-medium text-muted-foreground">
                 生活因素
               </th>
-              {sources.map((source) => (
+              {sources.map((source, sourceIndex) => (
                 <th
                   key={source.key}
-                  className="min-w-28 border-b border-border px-2 py-2 text-xs font-medium text-muted-foreground"
+                  className={`min-w-28 border-b border-border px-2 py-2 text-xs font-medium text-muted-foreground${
+                    !expanded && sourceIndex >= 5 && source.key !== "initial"
+                      ? " hidden print:table-cell"
+                      : ""
+                  }`}
                 >
                   {source.label}
                 </th>
@@ -483,8 +485,15 @@ function LifeContextComparison({
                 <th className="sticky left-0 z-10 border-b border-border bg-surface-elevated px-3 py-3 text-sm font-medium text-foreground">
                   {labels[factor] ?? factor}
                 </th>
-                {sources.map((source) => (
-                  <td key={source.key} className="border-b border-border px-3 py-3">
+                {sources.map((source, sourceIndex) => (
+                  <td
+                    key={source.key}
+                    className={`border-b border-border px-3 py-3${
+                      !expanded && sourceIndex >= 5 && source.key !== "initial"
+                        ? " hidden print:table-cell"
+                        : ""
+                    }`}
+                  >
                     <FiveLevelValue
                       level={source.values?.[factor]}
                       label={`${source.label} ${labels[factor] ?? factor}`}
@@ -499,8 +508,15 @@ function LifeContextComparison({
       </div>
 
       <div className="mt-3 space-y-3 md:hidden">
-        {sources.map((source) => (
-          <section key={source.key} className="rounded-lg border border-border bg-surface p-3">
+        {sources.map((source, sourceIndex) => (
+          <section
+            key={source.key}
+            className={`rounded-lg border border-border bg-surface p-3${
+              !expanded && sourceIndex >= 5 && source.key !== "initial"
+                ? " hidden print:block"
+                : ""
+            }`}
+          >
             <h3 className="text-sm font-semibold text-foreground">{source.label}</h3>
             <div className="mt-3 grid grid-cols-2 gap-3">
               {LIFE_FACTOR_ORDER.map((factor) => (
@@ -519,7 +535,12 @@ function LifeContextComparison({
       </div>
 
       {hiddenCount > 0 ? (
-        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onToggle}>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto print:hidden"
+          onClick={onToggle}
+        >
           {expanded ? "收合至最新 5 筆" : `展開其餘 ${hiddenCount} 筆`}
         </Button>
       ) : null}
