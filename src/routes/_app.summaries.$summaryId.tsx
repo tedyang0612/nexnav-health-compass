@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   EmptyState,
@@ -86,6 +87,9 @@ function Page() {
 
   return (
     <PageContainer className="space-y-6">
+      <p className="hidden text-sm font-semibold tracking-wide text-foreground print:block">
+        NexNav
+      </p>
       <header className="space-y-4 sm:flex sm:items-start sm:justify-between sm:gap-4 sm:space-y-0">
         <div className="min-w-0 space-y-1">
           <h1 className="break-words text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
@@ -98,7 +102,16 @@ function Page() {
             ) : null}
           </p>
         </div>
-        <div className="w-full sm:w-auto sm:shrink-0">
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:shrink-0 sm:flex-row print:hidden">
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11 w-full sm:w-auto"
+            onClick={() => window.print()}
+          >
+            <Printer aria-hidden="true" className="size-4" />
+            匯出 PDF
+          </Button>
           <Button asChild variant="outline" className="min-h-11 w-full sm:w-auto">
             <Link to="/events/$eventId/navigate" params={{ eventId: row.health_event_id }}>
               回到就醫與專業協助
@@ -107,7 +120,7 @@ function Page() {
         </div>
       </header>
       <SummarySnapshotView snapshot={snapshot} />
-      <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-4">
+      <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-4 print:hidden">
         <div>
           <h2 className="font-semibold text-foreground">需要尋找附近的專業協助？</h2>
           <p className="mt-1 text-sm text-muted-foreground">可查看附近醫療院所清單，或前往 Google Maps 搜尋。</p>

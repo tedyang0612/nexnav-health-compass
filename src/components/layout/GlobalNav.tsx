@@ -76,7 +76,7 @@ export function GlobalNav({
   const { signOut, signingOut } = useSignOut();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-surface/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-surface/90 backdrop-blur-md print:hidden">
       <div className="mx-auto grid h-16 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 sm:px-6 lg:px-8">
         <BrandMark to="/dashboard" />
 
