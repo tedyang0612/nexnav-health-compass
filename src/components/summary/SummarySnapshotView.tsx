@@ -508,8 +508,15 @@ function LifeContextComparison({
       </div>
 
       <div className="mt-3 space-y-3 md:hidden">
-        {sources.map((source) => (
-          <section key={source.key} className="rounded-lg border border-border bg-surface p-3">
+        {sources.map((source, sourceIndex) => (
+          <section
+            key={source.key}
+            className={`rounded-lg border border-border bg-surface p-3${
+              !expanded && sourceIndex >= 5 && source.key !== "initial"
+                ? " hidden print:block"
+                : ""
+            }`}
+          >
             <h3 className="text-sm font-semibold text-foreground">{source.label}</h3>
             <div className="mt-3 grid grid-cols-2 gap-3">
               {LIFE_FACTOR_ORDER.map((factor) => (
@@ -528,7 +535,12 @@ function LifeContextComparison({
       </div>
 
       {hiddenCount > 0 ? (
-        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onToggle}>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto print:hidden"
+          onClick={onToggle}
+        >
           {expanded ? "收合至最新 5 筆" : `展開其餘 ${hiddenCount} 筆`}
         </Button>
       ) : null}
