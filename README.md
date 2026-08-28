@@ -573,8 +573,11 @@ NexNav 的定位是：
 ## Project Stage
 
 `P0 MVP`　██████████　Core Completed
+
 `Final Addendum`　████████░░　In Progress
+
 `P1`　░░░░░░░░░░　Planned
+
 `P2`　░░░░░░░░░░　Future
 
 ---
