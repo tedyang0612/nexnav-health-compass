@@ -35,11 +35,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const notes = [...(snapshot.selected_track_notes ?? [])].sort((a, b) =>
     b.track_date.localeCompare(a.track_date),
   );
-  const visibleTrackDetails = showAllTrackDetails ? tracks : tracks.slice(0, 5);
   const lifeContextTracks = tracks.filter((track) => hasNumericLifeContext(track.life_context));
-  const visibleLifeContextTracks = showAllLifeContext
-    ? lifeContextTracks
-    : lifeContextTracks.slice(0, 5);
   const questions = snapshot.questions ?? [];
   const background = snapshot.health_background ?? [];
   const associatedSymptoms = (snapshot.initial_record.associated_symptoms ?? [])
