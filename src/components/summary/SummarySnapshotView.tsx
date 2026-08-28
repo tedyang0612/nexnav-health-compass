@@ -125,7 +125,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   const lifeContextCard = hasAnyLifeContext(snapshot.initial_record.life_context, tracks) ? (
     <LifeContextComparison
       initialValues={snapshot.initial_record.life_context}
-      tracks={visibleLifeContextTracks}
+      tracks={lifeContextTracks}
       labels={lifeLabels}
       hiddenCount={Math.max(0, lifeContextTracks.length - 5)}
       expanded={showAllLifeContext}
@@ -162,10 +162,12 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
     >
       {stats.hasTracks ? (
         <ul className="mt-3 space-y-3">
-          {visibleTrackDetails.map((track) => (
+          {tracks.map((track, index) => (
             <li
               key={track.track_id}
-              className="space-y-2 overflow-hidden rounded-lg border border-border bg-surface p-3"
+              className={`space-y-2 overflow-hidden rounded-lg border border-border bg-surface p-3${
+                !showAllTrackDetails && index >= 5 ? " hidden print:list-item" : ""
+              }`}
             >
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,0.9fr)_minmax(0,0.8fr)_minmax(0,1.3fr)_minmax(0,1fr)] sm:items-start sm:gap-4">
                 <div className="min-w-0">
