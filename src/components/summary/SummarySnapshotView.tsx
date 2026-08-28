@@ -469,7 +469,9 @@ function LifeContextComparison({
                 <th
                   key={source.key}
                   className={`min-w-28 border-b border-border px-2 py-2 text-xs font-medium text-muted-foreground${
-                    !expanded && sourceIndex >= 5 ? " hidden print:table-cell" : ""
+                    !expanded && sourceIndex >= 5 && source.key !== "initial"
+                      ? " hidden print:table-cell"
+                      : ""
                   }`}
                 >
                   {source.label}
@@ -483,8 +485,15 @@ function LifeContextComparison({
                 <th className="sticky left-0 z-10 border-b border-border bg-surface-elevated px-3 py-3 text-sm font-medium text-foreground">
                   {labels[factor] ?? factor}
                 </th>
-                {sources.map((source) => (
-                  <td key={source.key} className="border-b border-border px-3 py-3">
+                {sources.map((source, sourceIndex) => (
+                  <td
+                    key={source.key}
+                    className={`border-b border-border px-3 py-3${
+                      !expanded && sourceIndex >= 5 && source.key !== "initial"
+                        ? " hidden print:table-cell"
+                        : ""
+                    }`}
+                  >
                     <FiveLevelValue
                       level={source.values?.[factor]}
                       label={`${source.label} ${labels[factor] ?? factor}`}
