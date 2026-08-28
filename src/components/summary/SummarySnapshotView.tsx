@@ -218,7 +218,7 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
         <Button
           type="button"
           variant="outline"
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto print:hidden"
           onClick={() => setShowAllTrackDetails((current) => !current)}
         >
           {showAllTrackDetails ? "收合至最新 5 筆" : `展開其餘 ${tracks.length - 5} 筆`}
@@ -465,10 +465,12 @@ function LifeContextComparison({
               <th className="sticky left-0 z-10 min-w-24 border-b border-border bg-surface-elevated px-3 py-2 text-xs font-medium text-muted-foreground">
                 生活因素
               </th>
-              {sources.map((source) => (
+              {sources.map((source, sourceIndex) => (
                 <th
                   key={source.key}
-                  className="min-w-28 border-b border-border px-2 py-2 text-xs font-medium text-muted-foreground"
+                  className={`min-w-28 border-b border-border px-2 py-2 text-xs font-medium text-muted-foreground${
+                    !expanded && sourceIndex >= 5 ? " hidden print:table-cell" : ""
+                  }`}
                 >
                   {source.label}
                 </th>
