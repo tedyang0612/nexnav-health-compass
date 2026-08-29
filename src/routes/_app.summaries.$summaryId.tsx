@@ -85,6 +85,28 @@ function Page() {
   const title = SUMMARY_TYPE_LABEL[snapshot.summary_type as SummaryType] ?? "摘要檢視";
   const confirmedDate = formatTaipeiDate(row.confirmed_at ?? row.created_at);
 
+  // 以 document.title 影響 browser-native「另存為 PDF」的預設檔名。
+  const handleExportPdf = () => {
+    const previousTitle = document.title;
+    const versionSuffix = row.version_number ? ` v${row.version_number}` : "";
+    document.title = `${title}${versionSuffix}`;
+
+    let restored = false;
+    const restore = () => {
+      if (restored) return;
+      restored = true;
+      document.title = previousTitle;
+      window.removeEventListener("afterprint", restore);
+    };
+
+    window.addEventListener("afterprint", restore);
+    window.print();
+    // 部分瀏覽器不會觸發 afterprint（或延後觸發），保留延遲後備還原。
+    window.setTimeout(restore, 3000);
+  };
+
+
+
   return (
     <PageContainer className="space-y-6">
       <p className="hidden text-sm font-semibold tracking-wide text-foreground print:block">
