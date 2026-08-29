@@ -85,6 +85,28 @@ function Page() {
   const title = SUMMARY_TYPE_LABEL[snapshot.summary_type as SummaryType] ?? "摘要檢視";
   const confirmedDate = formatTaipeiDate(row.confirmed_at ?? row.created_at);
 
+  // 以 document.title 影響 browser-native「另存為 PDF」的預設檔名。
+  const handleExportPdf = () => {
+    const previousTitle = document.title;
+    const versionSuffix = row.version_number ? ` v${row.version_number}` : "";
+    document.title = `${title}${versionSuffix}`;
+
+    let restored = false;
+    const restore = () => {
+      if (restored) return;
+      restored = true;
+      document.title = previousTitle;
+      window.removeEventListener("afterprint", restore);
+    };
+
+    window.addEventListener("afterprint", restore);
+    window.print();
+    // 部分瀏覽器不會觸發 afterprint（或延後觸發），保留延遲後備還原。
+    window.setTimeout(restore, 3000);
+  };
+
+
+
   return (
     <PageContainer className="space-y-6">
       <p className="hidden text-sm font-semibold tracking-wide text-foreground print:block">
@@ -107,7 +129,7 @@ function Page() {
             type="button"
             variant="outline"
             className="min-h-11 w-full sm:w-auto"
-            onClick={() => window.print()}
+            onClick={handleExportPdf}
           >
             <Printer aria-hidden="true" className="size-4" />
             匯出 PDF
@@ -122,15 +144,18 @@ function Page() {
       <SummarySnapshotView snapshot={snapshot} />
       <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-4 print:hidden">
         <div>
-          <h2 className="font-semibold text-foreground">需要尋找附近的專業協助？</h2>
-          <p className="mt-1 text-sm text-muted-foreground">可查看附近醫療院所清單，或前往 Google Maps 搜尋。</p>
+          <h2 className="font-semibold text-foreground">下一步｜尋找醫療資源</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            摘要已準備完成，你可以接著查看附近的醫療與專業協助資源。
+          </p>
         </div>
         <Button asChild className="mt-3 min-h-11 w-full sm:mt-0 sm:w-auto">
           <Link to="/events/$eventId/connect" params={{ eventId: row.health_event_id }}>
-            查看附近專業協助
+            查看附近醫療資源
           </Link>
         </Button>
       </section>
+
 
     </PageContainer>
   );
