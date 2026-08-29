@@ -277,17 +277,16 @@ export function SummarySnapshotView({ snapshot }: { snapshot: SummarySnapshot })
   return (
     <div className="space-y-4">
       {isProfessional ? (
-
         <>
           {targetCard}
-          {overview}
-          {backgroundCard}
-          {notesCard}
+          {questionsCard}
           {lifeContextCard}
           {actionsCard}
-          {safetyCard}
+          {overview}
           {tracksCard}
-          {questionsCard}
+          {notesCard}
+          {backgroundCard}
+          {safetyCard}
         </>
       ) : (
         <>
