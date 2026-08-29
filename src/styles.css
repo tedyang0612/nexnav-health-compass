@@ -359,6 +359,25 @@
   html,
   body {
     background: #ffffff !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* 行動版瀏覽器列印時，flex / min-h-screen 容器會裁掉超出第一段的內容。
+     列印時將版型容器攤平為 block、解除高度與 overflow 限制。 */
+  #root,
+  #root > div,
+  main,
+  main > div,
+  main > div > div {
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    flex: none !important;
   }
 
   /* 保留內容用色（例如頻率圓點、警訊色），避免關鍵圖示在 PDF 消失 */
@@ -374,10 +393,18 @@
     box-shadow: none !important;
   }
 
-  section,
+  /* 只避免小單位被切斷；整個 section 若高於一頁，
+     break-inside: avoid 會讓行動版瀏覽器直接丟棄後續內容。 */
   li,
   dl > div {
     break-inside: avoid;
+  }
+
+  section,
+  section > * {
+    break-inside: auto;
+    overflow: visible !important;
+    max-height: none !important;
   }
 
   /* 避免桌機表格在 PDF 產生水平 overflow */
@@ -385,3 +412,4 @@
     max-width: 100%;
   }
 }
+
