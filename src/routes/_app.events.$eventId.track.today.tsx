@@ -490,7 +490,7 @@ function Page() {
         {LIFE_CONTEXT_FIELDS.map((field) => (
           <fieldset
             key={field.key}
-            className="space-y-2 border-t border-border pt-4 first:border-0 first:pt-0"
+            className="space-y-4 border-t border-border pt-7 first:border-0 first:pt-0"
           >
             <legend className="mb-1 flex items-center gap-2 text-sm font-semibold text-foreground">
               <span aria-hidden="true" className="inline-block h-4 w-1 shrink-0 rounded-full bg-primary" />
