@@ -255,14 +255,32 @@ function ReassessView({
 
       {showConclusion && conclusion ? (
         <SectionCard title="困擾程度變化" className={CARD_TIGHT}>
-          <div className="space-y-2">
-            <p className="flex items-center gap-2 text-base font-semibold text-foreground">
-              <DirectionIcon direction={conclusion.direction} />
-              {conclusion.text}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              初始 {conclusion.initial}／10 → 最新 {conclusion.latest}／10
-            </p>
+          <div className="space-y-4">
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 sm:p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground">初始</p>
+                    <p className="text-2xl font-semibold tabular-nums text-foreground">
+                      {conclusion.initial}
+                    </p>
+                  </div>
+                  <span className="text-lg text-primary" aria-hidden="true">
+                    →
+                  </span>
+                  <div>
+                    <p className="text-xs text-muted-foreground">最新</p>
+                    <p className="text-2xl font-semibold tabular-nums text-foreground">
+                      {conclusion.latest}
+                    </p>
+                  </div>
+                </div>
+                <p className="flex items-center gap-2 text-base font-semibold text-foreground">
+                  <DirectionIcon direction={conclusion.direction} />
+                  {conclusion.text}
+                </p>
+              </div>
+            </div>
             {latestTrack ? (
               <p className="text-sm text-foreground">
                 你在最新追蹤中的感受：{subjectiveLabel(latestTrack.subjectiveChange)}

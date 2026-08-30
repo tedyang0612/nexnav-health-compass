@@ -274,7 +274,7 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
         </div>
       </SectionCard>
 
-      <SectionCard title="尋找附近醫療資源" className="gap-3">
+      <SectionCard title="尋找附近醫療資源" className="mt-4 gap-3">
         <Button asChild className="min-h-11 w-full sm:w-auto">
           <Link to="/events/$eventId/connect" params={{ eventId }}>
             查看地圖
