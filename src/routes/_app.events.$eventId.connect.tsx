@@ -177,7 +177,17 @@ function Page() {
                   } ml-1 inline-flex sm:hidden`}>{facility.openToday ? "今日有看診" : "今日休診"}</span></p>
               </div>
               <Button asChild variant="outline" className="mt-3 min-h-11 w-full shrink-0 sm:mt-0 sm:w-auto">
-                <a href={mapsUrl(`${DEFAULT_LOCATION} ${facility.specialty}`)} target="_blank" rel="noreferrer">在 Google Maps 中顯示 <GoogleMapsIcon className="ml-2 h-4 w-auto" /></a>
+                <a
+                  href={mapsUrl(
+                    facility.mapsName && facility.mapsAddress
+                      ? `${facility.mapsName} ${facility.mapsAddress}`
+                      : `${DEFAULT_LOCATION} ${facility.specialty}`
+                  )}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  在 Google Maps 中顯示 <GoogleMapsIcon className="ml-2 h-4 w-auto" />
+                </a>
               </Button>
             </article>
           ))}
