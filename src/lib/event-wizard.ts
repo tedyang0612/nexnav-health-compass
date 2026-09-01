@@ -27,8 +27,6 @@ export const DURATION_UNITS: { value: DurationUnit; label: string }[] = [
   { value: "minutes", label: "分鐘" },
   { value: "hours", label: "小時" },
   { value: "days", label: "天" },
-  { value: "weeks", label: "週" },
-  { value: "months", label: "月" },
 ];
 
 /** 04_Screen_Spec 鎖定的頻率量表。 */
