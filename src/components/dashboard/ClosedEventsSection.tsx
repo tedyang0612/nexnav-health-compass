@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,13 +18,17 @@ function formatClosedAt(value: string | null): string | null {
 
 /** Dashboard 極簡「已結束的狀況」列表；沒有 closed event 時不渲染。 */
 export function ClosedEventsSection({ events }: { events: ClosedEventItem[] }) {
+  const [expanded, setExpanded] = useState(false);
   if (events.length === 0) return null;
+
+  const visibleEvents = expanded ? events : events.slice(0, 3);
+  const remainingCount = events.length - 3;
 
   return (
     <section className="space-y-3">
       <h2 className="text-base font-semibold text-foreground">已結束的狀況</h2>
       <ul className="space-y-2">
-        {events.map((event) => {
+        {visibleEvents.map((event) => {
           const closedAt = formatClosedAt(event.closedAt);
           return (
             <li
@@ -54,6 +59,16 @@ export function ClosedEventsSection({ events }: { events: ClosedEventItem[] }) {
           );
         })}
       </ul>
+      {remainingCount > 0 && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setExpanded((prev) => !prev)}
+          className="w-full text-muted-foreground hover:text-foreground"
+        >
+          {expanded ? "收合紀錄 ↑" : `查看其他 ${remainingCount} 筆 ↓`}
+        </Button>
+      )}
     </section>
   );
 }
