@@ -167,8 +167,8 @@ export function StepContext({
         description="以下四項皆為必填，僅用於整理紀錄，不代表任何健康判斷。"
       >
         {LIFE_CONTEXT_FIELDS.map((field) => (
-          <fieldset key={field.key} className="space-y-2 border-t border-border pt-4 first:border-0 first:pt-0">
-            <legend className="mb-1 flex items-center gap-2 text-sm font-semibold text-foreground">
+          <fieldset key={field.key} className="space-y-4 border-t border-border first:border-0 mt-3 first:mt-0">
+            <legend className="m-0 flex items-center gap-2 text-sm font-semibold text-foreground">
               <span aria-hidden="true" className="inline-block h-4 w-1 shrink-0 rounded-full bg-primary" />
               <span className="min-w-0">{field.label}</span>
             </legend>
