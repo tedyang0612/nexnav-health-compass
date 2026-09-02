@@ -159,20 +159,34 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
 
       {result !== "priority_care" ? (
         <>
-          <SectionCard title="可以從哪裡開始" description="以下為一般性方向，不是個人化醫療建議。">
-            <ul className="grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
-              {START_POINTS.map((item) => (
-                <li
-                  key={item}
-                  className="flex min-w-0 gap-2 text-sm font-medium text-foreground"
-                >
-                  <span aria-hidden="true" className="shrink-0 text-primary">
-                    ◆
-                  </span>
-                  <span className="min-w-0 break-words">{item}</span>
-                </li>
-              ))}
-            </ul>
+          <SectionCard title="可以從哪裡開始">
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                以下為一般性方向，不是個人化醫療建議。
+              </p>
+              <ul className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+                {START_POINTS.map((item) => (
+                  <li
+                    key={item}
+                    className="flex min-w-0 gap-2 text-sm font-medium text-foreground"
+                  >
+                    <span aria-hidden="true" className="shrink-0 text-primary">
+                      ◆
+                    </span>
+                    <span className="min-w-0 break-words">{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="flex items-start gap-3">
+                <span
+                  aria-hidden="true"
+                  className="mt-1.5 inline-block h-4 w-1 shrink-0 rounded-full bg-brand-teal"
+                />
+                <p className="text-sm text-muted-foreground">
+                  後續可依目前紀錄，查看可參考的就醫科別與附近醫療資源。
+                </p>
+              </div>
+            </div>
           </SectionCard>
 
           <SectionCard
