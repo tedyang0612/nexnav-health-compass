@@ -180,9 +180,9 @@ function NavigateView({ eventId, data }: { eventId: string; data: ReassessData }
               <div className="flex items-start gap-3">
                 <span
                   aria-hidden="true"
-                  className="mt-1.5 inline-block h-4 w-1 shrink-0 rounded-full bg-brand-teal"
+                  className="mt-1 inline-block h-4 w-1 shrink-0 rounded-full bg-brand-teal"
                 />
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm font-medium text-foreground/80">
                   後續可依目前紀錄，查看可參考的就醫科別與附近醫療資源。
                 </p>
               </div>
